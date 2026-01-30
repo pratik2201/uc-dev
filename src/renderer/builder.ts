@@ -10,9 +10,9 @@ import { PathBridge } from "ucbuilder/out/global/pathBridge.js";
 import { ProjectRowR } from "ucbuilder/out/common/ipc/enumAndMore.js";
 import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
-import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
 import { ucUtil } from "ucbuilder/out/global/ucUtil.js";
-import { BuildResource } from "ucbuilder/out/common/enumAndMore.js";
+import { BuildResource, UserResource } from "ucbuilder/out/common/enumAndMore.js";
+import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
 //import { Resources } from "./resMng.js";
 
 export interface SourceCodeNode {
@@ -34,7 +34,8 @@ export class builder {
         this.ROOT_DIR = nodeFn.path.resolve('');
         this.project = ProjectManage.getInfoByProjectPath(this.ROOT_DIR);
         this.commonMng = new commonParser(this);
-        this.commonMng.gen.cssBulder = new ResourceBuildEngine(this.project.projectName);
+
+        this.commonMng.gen.cssBulder = new ResourceBuildEngine(this.project.config);
         this.filewatcher = new fileWatcher(this);
         this.filewatcher.init();
         const _this = this;
@@ -195,6 +196,7 @@ export class builder {
     counter = 0;
     async buildALL(onComplete = () => { }, _fillReplacerPath = true) {
         let _this = this;
+        this.commonMng.reset();
         let prj = this.project;
         if (prj.config.env == 'release') return;
         const pref = this.project.config.preference;
@@ -204,16 +206,16 @@ export class builder {
         const outDeclareKey = pref.outDir;
         const outDec = pref.dirDeclaration[outDeclareKey];
         const designerFileDeclaration = fileWisePath.designer;
+        this.commonMng.gen.cssBulder.config
         let designerPath = nodeFn.path.join(prj.projectPath, srcdirDeclaration.dirPath ?? '', designerFileDeclaration?.subDirPath ?? '');
-        //console.log(designerPath);
-
-        const runtimeSrc: BuildResource[] = [];
+        PathBridge.source.forEach(s => this.commonMng.gen.cssBulder.registerProject(s));
+        //const runtimeSrc: BuildResource[] = [];
         await this.buildDynamic();
         await this.recursive(nodeFn.path.join(this.project.projectPath, outDec.dirPath),
             (pth) => false,
             async (fullpath) => {
                 if (fullpath.endsWith('.resx.js')) {
-                    const filwRes: BuildResource[] = [];
+                    const filwRes: UserResource[] = [];
                     const _default = (await import(fullpath)).default;
                     if (typeof _default === 'function')
                         filwRes.push(..._default());
@@ -221,10 +223,11 @@ export class builder {
                         filwRes.push(..._default);
                     filwRes.forEach(r => {
                         if (r.source != undefined) {
-                            this.commonMng.gen.cssBulder.build(nodeFn.path.resolveFilePath(fullpath, r.source), r.name);
+
+                            this.commonMng.gen.cssBulder.build(nodeFn.path.resolveFilePath(fullpath, r.source), r);
                         }
                     });
-                    runtimeSrc.push(...filwRes);
+                    //runtimeSrc.push(...filwRes);
                 }
 
                 /*
@@ -249,8 +252,7 @@ export class builder {
 
 
         let cInfos = ((await _this.getAllDesignerXfiles())).cinfo;
-        console.log(cInfos);
-
+        
         //console.log(Resources.all());
 
         const messages = {

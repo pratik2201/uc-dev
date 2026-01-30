@@ -84,7 +84,7 @@ export default async function () {
     };
     let watcher: FSWatcher;
     let interval = null;
-
+    ///debugger;
     function startWatch() {
         // ---- WATCHER ----
         watcher = chokidar.watch(srcPath, watcherOptions);
@@ -101,7 +101,7 @@ export default async function () {
     }
 
     const { PathBridge } = await import("ucbuilder/out/global/pathBridge.js");
-console.log(PathBridge.source);
+//console.log(PathBridge.source);
 
     const project = GetProject(path.resolve(), PathBridge.source, url);
     const mainProjectUcConfig = project?.config;

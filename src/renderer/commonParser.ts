@@ -68,6 +68,7 @@ export class commonParser {
         return c;
     }
     reset() {
+        this.gen.cssBulder.clear();
         this.rows.length = 0;
         this.pathReplacement.length = 0;
     }

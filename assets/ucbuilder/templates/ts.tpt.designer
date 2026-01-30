@@ -45,7 +45,8 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         <?php if(designer.dynamicName!=undefined){ ?>
         //htmlContents =  <?= designer.dynamicName ?>?.htmlSource() ?? undefined;
         <?php } ?>
-        let oot = Template.GetObjectOfTemplate(fargs.cfInfo,<?=designer.className ?>.MATERIAL.htmlContents,<?=designer.className ?>.MATERIAL.cssContents);
+        
+        let oot = Template.GetObjectOfTemplate(fargs.cfInfo,<?= designer.htmlGuid ?>,<?= designer.cssGuid ?>);
         let tpts = oot.tptObj;
       
        
@@ -68,7 +69,7 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         //htmlContents =  <?= designer.dynamicName ?>?.htmlSource() ?? undefined;
         <?php } ?>
         //fargs.
-        let oot = Template.GetObjectOfTemplate(fargs.cfInfo,<?=designer.className ?>.MATERIAL.htmlContents,<?=designer.className ?>.MATERIAL.cssContents);
+        let oot = Template.GetObjectOfTemplate(fargs.cfInfo,<?= designer.htmlGuid ?>,<?= designer.cssGuid ?>);
         let tpts = oot.tptObj;
        
         <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
@@ -87,8 +88,8 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
 
     //#region MATERIALS
     static MATERIAL  = {
-        htmlGuid: "<?= designer.htmlGuid ?>",
-        cssGuid: "<?= designer.cssGuid ?>",
+       // htmlGuid: "<?= designer.htmlGuid ?>",
+      // cssGuid: "<?= designer.cssGuid ?>",
         htmlContents: <?= designer.material?.htmlContents ?>,
         cssContents: <?= designer.material?.cssContents ?>,
     };

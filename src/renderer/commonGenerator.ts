@@ -1,12 +1,13 @@
 import { SpecialExtType, ucUtil } from "ucbuilder/out/global/ucUtil.js";
-import { IFileDeclarationTypesMap } from "ucbuilder/out/common/ipc/enumAndMore.js";
+import { correctpath, IFileDeclarationTypesMap } from "ucbuilder/out/common/ipc/enumAndMore.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { CommonRow } from "./buildRow.js";
 import { TemplateMaker } from "ucbuilder/out/global/TemplateMaker.js";
 import { buildTimeFn } from "./buildTimeFn.js";
 import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
- 
+
 import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
+import { PathBridge } from "ucbuilder/out/global/pathBridge.js";
 
 interface CodeFilesNode {
     DESIGNER: string,
@@ -155,7 +156,7 @@ export class commonGenerator {
         console.log(rows);
         if (rows == undefined || rows.length == 0) return;
 
-        
+
         this.rows = rows;
         let _data = "";
         const pref = this.rows[0]?.src.callerProject.config.preference;
@@ -213,22 +214,41 @@ export class commonGenerator {
 
     cssBulder: ResourceBuildEngine;
     generateResources() {
-        const resourcesSource = Array.from(this.cssBulder.resources.values());
-        resourcesSource.forEach(s => {
-            s.content = JSON.stringify(s.content);
-            s.source = JSON.stringify(s.source);
-            s.guid = JSON.stringify(s.guid);
-        });
-        let resContent = this.filex('resources')({
-            resources: resourcesSource
-        });
-        // console.log(resourcesSource);
-        // return;
-        // // ProjectManage
+
+
         const proj = ProjectManage.MAIN_PROJECT;
         const pref = proj.config.preference;
+
+
+        const resources = Array.from(this.cssBulder.resources.values());
+        resources.forEach(s => {
+            s.content = JSON.stringify(s.content);
+            s.source = JSON.stringify(nodeFn.path.normalize(nodeFn.path.relativeFilePath(proj.projectPath, s.source)));
+            s.guid = JSON.stringify(s.guid);
+            s.isGlobalCss = s.isGlobalCss == undefined ? false : (s.isGlobalCss ?? false);
+            s.project = s.project ?? proj.projectName
+        });
+        const onlyAlias = resources.filter(s => s.name && s.name != "");
+        const nameRegistry = {};
+        this.cssBulder.projectList.forEach(prj => {
+            const projRes = onlyAlias.filter(s => s.name == prj.projectName);
+            nameRegistry[JSON.stringify(prj.projectName)] = projRes;
+        });
+
+        let resContent = this.filex('resources')({
+            projectList: this.cssBulder.projectList,
+            resources,
+            nameRegistry
+        });
         let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;
         let resFile = nodeFn.path.resolve(proj.projectPath, srcPath, pref.build.ResourceDeclarationFile);
+
+        // const projectList = this.cssBulder.projectList;
+        // for (const res of projectList) {
+        //     if (res.importResource == true) {
+                 
+        //     }    
+        // }
         buildTimeFn.fs.writeFileSync(resFile, resContent, 'utf-8');
         return;
         // const resourcesSource = Resources.all();  

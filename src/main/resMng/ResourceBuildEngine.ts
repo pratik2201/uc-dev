@@ -1,9 +1,11 @@
-import { BuildResource, BuildResourceType, ResourceKeyBridge } from "ucbuilder/out/common/enumAndMore.js";
+import { BuildResourceType, ResourceKeyBridge, UserResource } from "ucbuilder/out/common/enumAndMore.js";
 import { ucUtil } from "ucbuilder/out/global/ucUtil.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { ResourceManage } from "ucbuilder/out/renderer/ResourceManage.js";
 import { minifyCss } from "./minify.js";
 import { buildTimeFn } from "../../renderer/buildTimeFn.js";
+import { BuildTimeGuidMeta, GuidSequenceType, ProjectRowBase, UserUCConfig } from "ucbuilder/out/common/ipc/enumAndMore.js";
+import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
 
 /* ------------------ types ------------------ */
 
@@ -23,71 +25,119 @@ function isDataOrBlob(p: string) {
   return p.startsWith("data:") || p.startsWith("blob:");
 }
 
-function detectUnit(p: string): string | null {
-  if (p.endsWith(".uc.scss") || p.endsWith(".uc.html"))
-    return p.replace(/\.uc\.(scss|html)$/i, ".uc");
+// function detectUnit(p: string): string | null {
+//   if (p.endsWith(".uc.scss") || p.endsWith(".uc.html"))
+//     return p.replace(/\.uc\.(scss|html)$/i, ".uc");
 
-  if (p.endsWith(".tpt.scss") || p.endsWith(".tpt.html"))
-    return p.replace(/\.tpt\.(scss|html)$/i, ".tpt");
+//   if (p.endsWith(".tpt.scss") || p.endsWith(".tpt.html"))
+//     return p.replace(/\.tpt\.(scss|html)$/i, ".tpt");
 
-  return null;
-}
+//   return null;
+// }
 
 /* ------------------ guid resolver ------------------ */
 
 class GuidResolver {
+  config: UserUCConfig;
+  clear() { this.seq = 0; this.fileMap.clear(); }
+  //private unitMap = new Map<string, string>();
+  private fileMap = new Map<string, string>();
+  private seq = 0;
+  constructor(
+    private projectName: string,
+    private projectGuid: string,
+    private mode: GuidSequenceType = "sequenceAndSameGuid",
+    private padSize = 6
+  ) { projectGuid = projectGuid ?? buildTimeFn.crypto.guid(); }
 
-  private unitMap = new Map<string, string>(); // fixedWindow.uc -> guid
-  private fileMap = new Map<string, string>(); // everything else
-
-  constructor(private projectName: string) { }
-
-  private newGuid() {
-    return this.projectName + ":" + buildTimeFn.crypto.guid();
+  private nextId(): string {
+    if (this.mode === "randomGuidAndNoSequence") {
+      return buildTimeFn.crypto.guid(); // uuid
+    }
+    const n = (this.seq++).toString().padStart(this.padSize, "0");
+    return n;
   }
 
-  getGuidForBuild(absPath: string): string {
+  private makeBase(id: string) {
+    return `${this.projectName}:${this.projectGuid}:${id}`;
+  }
 
-    const unit = detectUnit(absPath);
+  getBaseGuid(absPath: string): string {
+
+    /*const unit = detectUnit(absPath);
+
     if (unit) {
       if (!this.unitMap.has(unit)) {
-        this.unitMap.set(unit, this.newGuid());
+        this.unitMap.set(unit, this.makeBase(this.nextId()));
       }
       return this.unitMap.get(unit)!;
-    }
+    }*/
 
     if (!this.fileMap.has(absPath)) {
-      this.fileMap.set(absPath, this.newGuid());
+      this.fileMap.set(absPath, this.makeBase(this.nextId()));
     }
 
     return this.fileMap.get(absPath)!;
   }
 }
 
+
 /* ------------------ engine ------------------ */
 
 export class ResourceBuildEngine {
-
-  private resourceMap = new Map<string, BuildResource>();
+  projectList = new Array<{
+    projectName: string,
+    projectPath: string,
+    styleResourceGuid: string,
+    importResource: boolean,
+    resourceRelativePath: string
+  }>();
+  private resourceMap = new Map<string, UserResource>();
   private guidResolver: GuidResolver;
-
-  constructor(public projectName: string) {
-    this.guidResolver = new GuidResolver(projectName);
+  clear() {
+    this.resourceMap.clear();
+    this.guidResolver.clear();
+    this.projectList.length = 0;
+  }
+  config: UserUCConfig;
+  constructor(public ucCfg: UserUCConfig) {
+    const gOpt = ucCfg.preference.build.guidOptions ?? new BuildTimeGuidMeta();
+    this.guidResolver = new GuidResolver(
+      ucCfg.projectName,
+      ucCfg.guid,
+      gOpt.guidType, gOpt.sequencePadSize);
   }
 
   get resources() {
     return this.resourceMap;
   }
-
+  registerProject = (s: ProjectRowBase) => {
+    let stylePath = nodeFn.path.join(s.projectPath, s.config.projectBaseCssPath);
+    let resourcePath = nodeFn.path.join(s.projectPath, s.config.projectBaseCssPath);
+    const globalStyleguid = this.build(stylePath, {});
+    const pref = s.config.preference;
+    const resFilePath = JSON.stringify(
+      ucUtil.changeExtension(
+        nodeFn.path.normalize(
+          nodeFn.path.join(s.projectPath, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js'));
+    this.projectList.push({
+      projectName: s.projectName,
+      projectPath: s.projectPath,
+      styleResourceGuid: globalStyleguid,
+      importResource: s != ProjectManage.MAIN_PROJECT,
+      resourceRelativePath: resFilePath
+    });
+  }
   /* ========== PUBLIC ENTRY ========== */
 
-  build(path: string, name?: string): string {
+  build(path: string, _blueprint?: Partial<UserResource>): string {
     const absPath = nodeFn.path.resolve(path);
-
+    const blueprint = new UserResource();
+    Object.assign(blueprint, _blueprint);
     if (this.resourceMap.has(absPath)) {
       const res = this.resourceMap.get(absPath);
-      if (name != undefined && name != '') {
-        if (res.name == undefined || res.name == '') res.name = JSON.stringify(name);
+      if (blueprint?.name != undefined && blueprint.name != '') {
+        if (res.name == undefined || res.name == '') res.name = JSON.stringify(blueprint.name);
       }
       return ResourceKeyBridge.makeKey(res!.guid);
     }
@@ -99,25 +149,25 @@ export class ResourceBuildEngine {
 
     const ext = nodeFn.path.extname(absPath).toLowerCase();
 
-    if (ext === ".scss" || ext === ".css") return this.buildCss(absPath, name);
-    if (ext === ".html" || ext === ".htm") return this.buildHtml(absPath, name);
+    if (ext === ".scss" || ext === ".css") return this.buildCss(absPath, _blueprint);
+    if (ext === ".html" || ext === ".htm") return this.buildHtml(absPath, _blueprint);
 
-    return this.buildAsset(absPath, name);
+    return this.buildAsset(absPath, _blueprint);
   }
 
   /* ========== CSS HANDLER ========== */
 
-  private buildCss(absPath: string, name?: string): string {
+  private buildCss(absPath: string, _blueprint?: Partial<UserResource>): string {
 
-    const guid = this.guidResolver.getGuidForBuild(absPath);
-
-    const res: BuildResource = {
+    const guid = this.guidResolver.getBaseGuid(absPath);
+    const res = new UserResource();
+    Object.assign(res, _blueprint, {
       guid,
-      name: JSON.stringify(name),
       type: "css",
       content: "",
       source: absPath
-    };
+    });
+    res.name = JSON.stringify(res.name);
 
     // allocate first (circular safe)
     this.resourceMap.set(absPath, res);
@@ -153,28 +203,29 @@ export class ResourceBuildEngine {
 
   /* ========== HTML PLACEHOLDER (future) ========== */
 
-  private buildHtml(absPath: string, name?: string): string {
+  private buildHtml(absPath: string, _blueprint?: Partial<UserResource>): string {
 
-    const guid = this.guidResolver.getGuidForBuild(absPath);
+    const guid = this.guidResolver.getBaseGuid(absPath);
 
     const html = nodeFn.fs.readFileSync(absPath, "utf8");
 
-    this.resourceMap.set(absPath, {
+    const res = new UserResource();
+    Object.assign(res, _blueprint, {
       guid,
-      name: JSON.stringify(name),
       type: "html",
       content: ResourceManage.x1(html),
       source: absPath
     });
-
+    res.name = JSON.stringify(res.name);
+    this.resourceMap.set(absPath, res);
     return ResourceKeyBridge.makeKey(guid);
   }
 
   /* ========== ASSET HANDLER ========== */
 
-  private buildAsset(absPath: string, name?: string): string {
+  private buildAsset(absPath: string, _blueprint?: Partial<UserResource>): string {
 
-    const guid = this.guidResolver.getGuidForBuild(absPath);
+    const guid = this.guidResolver.getBaseGuid(absPath);
 
     const buf = nodeFn.fs.readFileBufferSync(absPath);
     const ext = nodeFn.path.extname(absPath).slice(1).toLowerCase();
@@ -190,35 +241,43 @@ export class ResourceBuildEngine {
       content = ResourceManage.x1(ucUtil.bufferToString(buf, "utf8"));
     }
 
-    this.resourceMap.set(absPath, {
+    const res = new UserResource();
+    Object.assign(res, _blueprint, {
       guid,
-      name: JSON.stringify(name),
       type,
       content,
       source: absPath
     });
+    res.name = JSON.stringify(res.name);
+
+    this.resourceMap.set(absPath, res);
 
     return ResourceKeyBridge.makeKey(guid);
   }
 
   /* ========== url()/data handler ========== */
 
-  private resolveAsset(rel: string, owner: string, name?: string): string {
+  private resolveAsset(rel: string, owner: string, _blueprint?: Partial<UserResource>): string {
 
     if (isDataOrBlob(rel)) {
 
       if (this.resourceMap.has(rel))
         return ResourceKeyBridge.makeKey(this.resourceMap.get(rel)!.guid);
 
-      const guid = this.guidResolver.getGuidForBuild(rel);
+      const guid = this.guidResolver.getBaseGuid(rel);
 
-      this.resourceMap.set(rel, {
+
+
+
+      const res = new UserResource();
+      Object.assign(res, _blueprint, {
         guid,
-        name: JSON.stringify(name),
         type: "data",
         content: ResourceManage.x1(rel)
       });
+      res.name = JSON.stringify(res.name);
 
+      this.resourceMap.set(rel, res);
       return ResourceKeyBridge.makeKey(guid);
     }
 
@@ -226,7 +285,7 @@ export class ResourceBuildEngine {
 
     if (!nodeFn.fs.existsSync(abs)) return rel;
 
-    return this.build(abs, name);
+    return this.build(abs, _blueprint);
   }
 }
 
