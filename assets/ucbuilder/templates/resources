@@ -2,13 +2,18 @@ import { ResourceStorage } from "ucbuilder/out/main/ResourceStorage.js";
 import { UserResource } from "ucbuilder/out/common/enumAndMore.js";
 declare module "ucbuilder/out/common/enumAndMore" {
    export interface ResourceNamedRegistry{
-        <?php for (const {projectName,projResources} of Object.entries(nameRegistry)) { ?>
-            <?= projectName ?>: { 
-                <?php for (const {resKey,res} of Object.entries(projResources)) { ?>
-                    <?= resKey =?> : <?= res.source ?>,
-                <?php } ?>
-            },
-        <?php } ?>
+      <?php
+      const onlyAlias = resources.filter(s => s.name && s.name != "");
+         for (const res of onlyAlias) { ?>
+            <?= res.name ?> : <?= res.source ?>,
+         <?php 
+         }
+      ?>
+   }
+   export interface ResourceProjectNameRegistry{
+    <?php  for (const res of projectList) { ?>
+            <?= res.projectName ?>: <?= res.projectPath ?>,
+   <?php } ?>
    }
    export interface ResourceKeyRegistry {
         <?php  for (const res of resources) { ?>
@@ -29,25 +34,7 @@ ResourceStorage.bulkRegister(Resources);
 <?php 
 for (const res of projectList) {
     if (res.importResource == true) { ?>
-        await import(<?= res.resourceRelativePath =?>);
+        await import(<?= res.resourceRelativePath ?>);
 <?php    
     }    
 } ?>
-
-/*
-{
-      projectName: s.projectName,
-      projectPath: s.projectPath,
-      styleResourceGuid: globalStyleguid,
-      resourcePath: JSON.stringify(nodeFn.path.normalize(nodeFn.path.join(s.projectPath, pref.dirDeclaration[pref.srcDir].dirPath, pref.build.ResourceDeclarationFile)))
-    }
-*/
-  /*
-  
-   guid: string;
-    name?: string;
-    type: BuildResourceType;
-    content: string;
-    source?: string;
-    
-  */

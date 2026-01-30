@@ -8,6 +8,7 @@ import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
 
 import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
 import { PathBridge } from "ucbuilder/out/global/pathBridge.js";
+import { UserResource } from "ucbuilder/out/enumAndMore.js";
 
 interface CodeFilesNode {
     DESIGNER: string,
@@ -166,58 +167,60 @@ export class commonGenerator {
  
          }*/
 
-        const declareEntries = Object.entries(dirDeclaration);
-        for (let i = 0, len = this.rows.length; i < len; i++) {
-            const row = this.rows[i];
-            let uctype = row.src.extCode;
-            let codeFileSrctype: keyof IFileDeclarationTypesMap = 'code',
-                designerFileSrctype: keyof IFileDeclarationTypesMap = 'designer';
-            for (const [decName, fTypeInfo] of declareEntries) {
-                if (decName == 'out') continue;
-                let srctype = 'ts';
-                commonGenerator.ensureDirectoryExistence(row.src.pathOf[designerFileSrctype]);
-                _data = this.filex(`${srctype}${uctype}.designer`)(row);
-                buildTimeFn.fs.writeFileSync(row.src.pathOf[designerFileSrctype], _data);
+        if (this.generateResources()) {
+            const declareEntries = Object.entries(dirDeclaration);
+            for (let i = 0, len = this.rows.length; i < len; i++) {
+                const row = this.rows[i];
+                let uctype = row.src.extCode;
+                let codeFileSrctype: keyof IFileDeclarationTypesMap = 'code',
+                    designerFileSrctype: keyof IFileDeclarationTypesMap = 'designer';
+                for (const [decName, fTypeInfo] of declareEntries) {
+                    if (decName == 'out') continue;
+                    let srctype = 'ts';
+                    commonGenerator.ensureDirectoryExistence(row.src.pathOf[designerFileSrctype]);
+                    _data = this.filex(`${srctype}${uctype}.designer`)(row);
+                    buildTimeFn.fs.writeFileSync(row.src.pathOf[designerFileSrctype], _data);
 
-                if (row.htmlFileContent != undefined)
-                    buildTimeFn.fs.writeFileSync(`${row.src.pathOf.html}`, row.htmlFileContent);
-                if (!nodeFn.fs.existsSync(row.src.pathOf[codeFileSrctype])) {
-                    _data = this.filex(`${srctype}${uctype}.code`)(row);
-                    buildTimeFn.fs.writeFileSync(row.src.pathOf[codeFileSrctype], _data);
+                    if (row.htmlFileContent != undefined)
+                        buildTimeFn.fs.writeFileSync(`${row.src.pathOf.html}`, row.htmlFileContent);
+                    if (!nodeFn.fs.existsSync(row.src.pathOf[codeFileSrctype])) {
+                        _data = this.filex(`${srctype}${uctype}.code`)(row);
+                        buildTimeFn.fs.writeFileSync(row.src.pathOf[codeFileSrctype], _data);
+                    }
+                    if (!nodeFn.fs.existsSync(row.src.pathOf.scss)) {
+                        _data = this.filex(`${srctype}${uctype}.style`)(row);
+                        buildTimeFn.fs.writeFileSync(row.src.pathOf.scss, _data);
+                    }
                 }
-                if (!nodeFn.fs.existsSync(row.src.pathOf.scss)) {
-                    _data = this.filex(`${srctype}${uctype}.style`)(row);
-                    buildTimeFn.fs.writeFileSync(row.src.pathOf.scss, _data);
-                }
+
+
+
+                /* _data = _this.tMaker.compileTemplate(this.filex(srctype, uctype, '.designer'))(row);
+                 nodeFn.fs.writeFileSync(row.src.pathOf[designerFileSrctype], _data);
+     
+                 if (row.htmlFileContent != undefined)
+                     nodeFn.fs.writeFileSync(`${row.src.pathOf.html}`, row.htmlFileContent);
+     
+                 if (!nodeFn.fs.existsSync(row.src.pathOf[codeFileSrctype])) {
+                     _data = _this.tMaker.compileTemplate(this.filex(srctype, uctype, '.code'))(row);
+                     nodeFn.fs.writeFileSync(row.src.pathOf[codeFileSrctype], _data);
+                 }
+                 if (!nodeFn.fs.existsSync(row.src.pathOf.scss)) {
+                     _data = _this.tMaker.compileTemplate(this.filex(srctype, uctype, '.style'))(row);
+                     nodeFn.fs.writeFileSync(row.src.pathOf.scss, _data);
+                 }*/
             }
-
-
-
-            /* _data = _this.tMaker.compileTemplate(this.filex(srctype, uctype, '.designer'))(row);
-             nodeFn.fs.writeFileSync(row.src.pathOf[designerFileSrctype], _data);
- 
-             if (row.htmlFileContent != undefined)
-                 nodeFn.fs.writeFileSync(`${row.src.pathOf.html}`, row.htmlFileContent);
- 
-             if (!nodeFn.fs.existsSync(row.src.pathOf[codeFileSrctype])) {
-                 _data = _this.tMaker.compileTemplate(this.filex(srctype, uctype, '.code'))(row);
-                 nodeFn.fs.writeFileSync(row.src.pathOf[codeFileSrctype], _data);
-             }
-             if (!nodeFn.fs.existsSync(row.src.pathOf.scss)) {
-                 _data = _this.tMaker.compileTemplate(this.filex(srctype, uctype, '.style'))(row);
-                 nodeFn.fs.writeFileSync(row.src.pathOf.scss, _data);
-             }*/
         }
-
-        this.generateResources();
     }
 
     cssBulder: ResourceBuildEngine;
     generateResources() {
 
-
         const proj = ProjectManage.MAIN_PROJECT;
         const pref = proj.config.preference;
+
+
+
 
 
         const resources = Array.from(this.cssBulder.resources.values());
@@ -231,51 +234,37 @@ export class commonGenerator {
         const onlyAlias = resources.filter(s => s.name && s.name != "");
         const nameRegistry = {};
         this.cssBulder.projectList.forEach(prj => {
-            const projRes = onlyAlias.filter(s => s.name == prj.projectName);
-            nameRegistry[JSON.stringify(prj.projectName)] = projRes;
+            const projRes = onlyAlias.filter(s => s.project == prj.projectName);
+            nameRegistry[JSON.stringify(prj.projectName)] = projRes.reduce<Record<string, UserResource>>(
+                (acc, item) => {
+                    if (!item.name) return acc; // skip if name is undefined
+                    acc[item.name] = item;
+                    return acc;
+                },
+                {}
+            );
         });
-
-        let resContent = this.filex('resources')({
+        const rowForRes = {
             projectList: this.cssBulder.projectList,
             resources,
             nameRegistry
-        });
+        };
         let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;
-        let resFile = nodeFn.path.resolve(proj.projectPath, srcPath, pref.build.ResourceDeclarationFile);
+        let outPath = pref.dirDeclaration[pref.outDir].dirPath;
+        let resSrcFile = nodeFn.path.resolve(proj.projectPath, srcPath, pref.build.ResourceDeclarationFile);
+        let resOutFile = nodeFn.path.resolve(proj.projectPath, outPath, pref.build.ResourceDeclarationFile);
+        rowForRes.projectList.forEach(s => {
+            const resFullpath = s.resourceRelativePath;
+            s.resourceRelativePath = JSON.stringify(correctpath(nodeFn.path.relativeFilePath(resOutFile, resFullpath)));
+            s.importResource = s.projectGuid != ProjectManage.MAIN_PROJECT.config.guid && nodeFn.fs.existsSync(resFullpath);
 
-        // const projectList = this.cssBulder.projectList;
-        // for (const res of projectList) {
-        //     if (res.importResource == true) {
-                 
-        //     }    
-        // }
-        buildTimeFn.fs.writeFileSync(resFile, resContent, 'utf-8');
-        return;
-        // const resourcesSource = Resources.all();  
-        // let resContent = this.filex('resources')({
-        //     resources:resourcesSource
-        // });
-        // console.log(resourcesSource);
-        // return;
-        // // ProjectManage
-        // const proj = ProjectManage.MAIN_PROJECT;
-        // const pref = proj.config.preference;
-        // let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;
-        // let resFile = nodeFn.path.resolve(proj.projectPath, srcPath, 'resources.ts');
-        // buildTimeFn.fs.writeFileSync(resFile, resContent, 'utf-8');
+        });
+        let resContent = this.filex('resources')(rowForRes);
+
+
+        buildTimeFn.fs.writeFileSync(resSrcFile, resContent, 'utf-8');
+        return true;
+
     }
 
-    /*getDesignerCode(rw: CommonRow) {
-         return this.generateNew(rw, this.designerTMPLT[rw.src.extCode]);
-     }
- 
-     getJsFileCode(rw: CommonRow) {
-         return this.generateNew(rw, this.codefileTMPLT[rw.src.extCode]);
-     }
- 
-     private generateNew(node: CommonRow, templateText: string) {
-         let dta = templateText;
-         dta = this.rgxManage.parse(node, dta);
-         return dta;
-     }*/
 }

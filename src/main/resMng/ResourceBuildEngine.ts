@@ -88,6 +88,7 @@ export class ResourceBuildEngine {
   projectList = new Array<{
     projectName: string,
     projectPath: string,
+    projectGuid: string,
     styleResourceGuid: string,
     importResource: boolean,
     resourceRelativePath: string
@@ -116,13 +117,14 @@ export class ResourceBuildEngine {
     let resourcePath = nodeFn.path.join(s.projectPath, s.config.projectBaseCssPath);
     const globalStyleguid = this.build(stylePath, {});
     const pref = s.config.preference;
-    const resFilePath = JSON.stringify(
+    const resFilePath = 
       ucUtil.changeExtension(
         nodeFn.path.normalize(
-          nodeFn.path.join(s.projectPath, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js'));
+          nodeFn.path.join(s.projectPath, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js');
     this.projectList.push({
-      projectName: s.projectName,
-      projectPath: s.projectPath,
+      projectName: JSON.stringify(s.projectName),
+      projectPath: JSON.stringify(s.projectPath),
+      projectGuid: s.config.guid,
       styleResourceGuid: globalStyleguid,
       importResource: s != ProjectManage.MAIN_PROJECT,
       resourceRelativePath: resFilePath

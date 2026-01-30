@@ -244,9 +244,9 @@ export class commonParser {
                 // debugger;
                 let _sspath = ucUtil.devEsc(element.getAttribute("x-from"));
                 let _subpath = nodeFn.path.resolveFilePath(outPathOf.html, _sspath);//["#toFilePath"]();
-               // if (_subpath == 'D:/projects/electronProjects/sharepnl/src/htmlFiles/renderer/util/controls/fixedWindow.uc.html') debugger;
+                // if (_subpath == 'D:/projects/electronProjects/sharepnl/src/htmlFiles/renderer/util/controls/fixedWindow.uc.html') debugger;
                 //console.log([_subpath,outPathOf.html]);
-                    let uFInf = new codeFileInfo();
+                let uFInf = new codeFileInfo();
                 uFInf.parseUrl(_subpath, pref.outDir as any, outPathOf.html);
                 if (uFInf.pathOf == undefined) debugger;
                 if (_exists(uFInf.pathOf.code) || _exists(uFInf.pathOf.tsLayout) ||
@@ -259,9 +259,9 @@ export class commonParser {
                     //let fullcodePath = uFInf.allPathOf[uFpref.outDir].code;
                     //let nws = ucUtil.changeExtension(nodeFn.path.relativeFilePath(outPathOf.designer, fullcodePath), '.ts', '.js');
                     //ctr.codeFilePath = nws; //   oldone;
-                    ctr.codeFilePath = nodeFn.path.relativeFilePath(outPathOf.designer,uFprefOutdir['code']);
+                    ctr.codeFilePath = nodeFn.path.relativeFilePath(outPathOf.designer, uFprefOutdir['code']);
                     //console.log(ctr.codeFilePath);
-                    
+
                     ctr.importedClassName = row.designer.importer.addImport([uFInf.name], ctr.codeFilePath)[0];
                     row.designer.controls.push(ctr);
                 }
@@ -415,8 +415,8 @@ export class commonParser {
         des.rootPath = JSON.stringify(nodeFn.path.normalize(nodeFn.path.relativeFilePath(finfo.projectInfo.projectPath, outPathOf.scss)));
         des.material.cssContents = JSON.stringify(dev$minifyCss(nodeFn.fs.readFileSync(srcPathOf.scss, 'utf-8')));
 
-        des.cssGuid = ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.scss));
-        des.htmlGuid = ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.html));
+        des.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.scss)));
+        des.htmlGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.html)));
 
         // Resources.setResource(des.scssGuid, {
         //     filePath: outPathOf.scss,
