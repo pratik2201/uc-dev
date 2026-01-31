@@ -21,7 +21,7 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         return intenseGenerator.generateUC(this.FILE_PATH,<?=src.name?>,import.meta.url,pera,...args) as <?=src.name?>;
     }
     static async CreateAsync(pera: IUcOptions, ...args: any[]): Promise<<?=src.name ?>> {
-        return (await intenseGenerator.generateUCAsync( this.FILE_PATH, <?=src.name ?>, import.meta.url, pera, ...args)) as <?=src.name ?>;
+       return (await intenseGenerator.generateUCAsync( this.FILE_PATH, <?=src.name ?>, import.meta.url, pera, ...args)) as <?=src.name ?>;
     }
     get(id:<?=designer.getterFunk ?>) {
         return this.ucExtends.find(`[id="${id}"]`)[0];
