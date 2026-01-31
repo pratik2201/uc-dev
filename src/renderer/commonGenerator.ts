@@ -219,10 +219,6 @@ export class commonGenerator {
         const proj = ProjectManage.MAIN_PROJECT;
         const pref = proj.config.preference;
 
-
-
-
-
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -231,40 +227,39 @@ export class commonGenerator {
             s.isGlobalCss = s.isGlobalCss == undefined ? false : (s.isGlobalCss ?? false);
             s.project = s.project ?? proj.projectName
         });
-        const onlyAlias = resources.filter(s => s.name && s.name != "");
-        const nameRegistry = {};
-        this.cssBulder.projectList.forEach(prj => {
-            const projRes = onlyAlias.filter(s => s.project == prj.projectName);
-            nameRegistry[JSON.stringify(prj.projectName)] = projRes.reduce<Record<string, UserResource>>(
-                (acc, item) => {
-                    if (!item.name) return acc; // skip if name is undefined
-                    acc[item.name] = item;
-                    return acc;
-                },
-                {}
-            );
-        });
+        /* const onlyAlias = resources.filter(s => s.name && s.name != "");
+       const nameRegistry = {};
+       this.cssBulder.projectList.forEach(prj => {
+           const projRes = onlyAlias.filter(s => s.project == prj.projectName);
+           nameRegistry[JSON.stringify(prj.projectName)] = projRes.reduce<Record<string, UserResource>>(
+               (acc, item) => {
+                   if (!item.name) return acc; // skip if name is undefined
+                   acc[item.name] = item;
+                   return acc;
+               },
+               {}
+           );
+       });*/
         const rowForRes = {
+            mainProject: {
+                Name: JSON.stringify(ProjectManage.MAIN_PROJECT.projectName),
+                GUID: JSON.stringify(ProjectManage.MAIN_PROJECT.config.guid ?? this.cssBulder.config.guid),
+            },
             projectList: this.cssBulder.projectList,
-            resources,
-            nameRegistry
+            resources 
         };
         let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;
         let outPath = pref.dirDeclaration[pref.outDir].dirPath;
         let resSrcFile = nodeFn.path.resolve(proj.projectPath, srcPath, pref.build.ResourceDeclarationFile);
-        let resOutFile = nodeFn.path.resolve(proj.projectPath, outPath, pref.build.ResourceDeclarationFile);
+        let resOutFile = nodeFn.path.resolve(proj.projectPath, outPath, pref.build.ResourceDeclarationFile);        
         rowForRes.projectList.forEach(s => {
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(correctpath(nodeFn.path.relativeFilePath(resOutFile, resFullpath)));
             s.importResource = s.projectGuid != ProjectManage.MAIN_PROJECT.config.guid && nodeFn.fs.existsSync(resFullpath);
-
         });
-        let resContent = this.filex('resources')(rowForRes);
-
-
+        let resContent = this.filex('resources')(rowForRes); 
         buildTimeFn.fs.writeFileSync(resSrcFile, resContent, 'utf-8');
-        return true;
-
+        return true; 
     }
 
 }

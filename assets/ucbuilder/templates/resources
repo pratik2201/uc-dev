@@ -6,14 +6,10 @@ declare module "ucbuilder/out/common/enumAndMore" {
       const onlyAlias = resources.filter(s => s.name && s.name != "");
          for (const res of onlyAlias) { ?>
             <?= res.name ?> : <?= res.source ?>,
-         <?php 
-         }
-      ?>
+    <?php  } ?>
    }
    export interface ResourceProjectNameRegistry{
-    <?php  for (const res of projectList) { ?>
-            <?= res.projectName ?>: <?= res.projectPath ?>,
-   <?php } ?>
+        <?= mainProject.Name ?> : <?= mainProject.GUID ?>
    }
    export interface ResourceKeyRegistry {
         <?php  for (const res of resources) { ?>
