@@ -218,13 +218,13 @@ export class commonParser {
                 const prePath = (this.project.projectName == 'ucbuilder') ? `.` : `./node_modules/ucbuilder`;
                 _importer.addImport(['Usercontrol'], this.nc(`${prePath}/out/renderer/Usercontrol.js`, outPathOf.designer));
                 _importer.addImport(['intenseGenerator'], this.nc(`${prePath}/out/renderer/intenseGenerator.js`, outPathOf.designer));
-                _importer.addImport(['IUcOptions'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathOf.designer));
+                _importer.addImport(['IUcOptions','ResourceKeyRegistry'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathOf.designer));
                 _importer.addImport(['VariableList'], this.nc(`${prePath}/out/renderer/StylerRegs.js`, outPathOf.designer));
                 break;
             case "types":
                 _importer.addImport(['Usercontrol'], 'ucbuilder/Usercontrol');
                 _importer.addImport(['intenseGenerator'], 'ucbuilder/intenseGenerator');
-                _importer.addImport(['IUcOptions'], 'ucbuilder/enumAndMore');
+                _importer.addImport(['IUcOptions','ResourceKeyRegistry'], 'ucbuilder/enumAndMore');
                 _importer.addImport(['VariableList'], 'ucbuilder/StylerRegs');
                 break;
         }
@@ -326,7 +326,7 @@ export class commonParser {
 
                 row.designer.importer.addImport(['Template', 'TemplateNode'], this.nc(`${prePath}/out/renderer/Template.js`, outPathof.designer));
                 row.designer.importer.addImport(['intenseGenerator'], this.nc(`${prePath}/out/renderer/intenseGenerator.js`, outPathof.designer));
-                row.designer.importer.addImport(['ITptOptions'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathof.designer));
+                row.designer.importer.addImport(['ITptOptions','ResourceKeyRegistry'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathof.designer));
                 row.designer.importer.addImport(['VariableList'], this.nc(`${prePath}/out/renderer/StylerRegs.js`, outPathof.designer));
                 break;
             case "types":

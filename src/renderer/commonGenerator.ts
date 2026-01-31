@@ -1,5 +1,5 @@
 import { SpecialExtType, ucUtil } from "ucbuilder/out/global/ucUtil.js";
-import { correctpath, IFileDeclarationTypesMap } from "ucbuilder/out/common/ipc/enumAndMore.js";
+import { correctpath, GetProject, IFileDeclarationTypesMap } from "ucbuilder/out/common/ipc/enumAndMore.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { CommonRow } from "./buildRow.js";
 import { TemplateMaker } from "ucbuilder/out/global/TemplateMaker.js";
@@ -218,7 +218,7 @@ export class commonGenerator {
 
         const proj = ProjectManage.MAIN_PROJECT;
         const pref = proj.config.preference;
-
+GetProject
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -244,6 +244,7 @@ export class commonGenerator {
             mainProject: {
                 Name: JSON.stringify(ProjectManage.MAIN_PROJECT.projectName),
                 GUID: JSON.stringify(ProjectManage.MAIN_PROJECT.config.guid ?? this.cssBulder.config.guid),
+                path: ProjectManage.MAIN_PROJECT.projectPath
             },
             projectList: this.cssBulder.projectList,
             resources 
