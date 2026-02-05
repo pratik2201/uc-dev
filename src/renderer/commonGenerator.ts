@@ -1,14 +1,13 @@
-import { SpecialExtType, ucUtil } from "ucbuilder/out/global/ucUtil.js";
-import { correctpath, GetProject, IFileDeclarationTypesMap } from "ucbuilder/out/common/ipc/enumAndMore.js";
+
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { CommonRow } from "./buildRow.js";
-import { TemplateMaker } from "ucbuilder/out/global/TemplateMaker.js";
 import { buildTimeFn } from "./buildTimeFn.js";
-import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
+import { ProjectManage } from "./ProjectManage.js";
 
-import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
-import { PathBridge } from "ucbuilder/out/global/pathBridge.js";
-import { UserResource } from "ucbuilder/out/enumAndMore.js";
+import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js"; 
+import { IFileDeclarationTypesMap } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
+import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 
 interface CodeFilesNode {
     DESIGNER: string,
@@ -94,7 +93,7 @@ export class commonGenerator {
     designerTMPLT: { [key: string]: string } = {};
     codefileTMPLT: { [key: string]: string } = {};
     styleTMPLT: { [key: string]: string } = {};
-    tMaker = new TemplateMaker(import.meta.url);
+    tMaker = new TemplateMaker();
 
     //dTpt = '' as string;
     constructor() {
@@ -108,7 +107,7 @@ export class commonGenerator {
     /*Events = {
         onDemandDesignerFile: (type: 'js' | 'ts', extType: SpecialExtType) => {
             return this._CodeFilesNode(type, extType).DESIGNER;
-        },
+        },`
         onDemandCodeFile: (type: 'js' | 'ts', extType: SpecialExtType) => {
             return this._CodeFilesNode(type, extType).CODE;
         },
@@ -218,7 +217,7 @@ export class commonGenerator {
 
         const proj = ProjectManage.MAIN_PROJECT;
         const pref = proj.config.preference;
-GetProject
+
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -241,26 +240,28 @@ GetProject
            );
        });*/
         const rowForRes = {
-            mainProject: {
-                Name: JSON.stringify(ProjectManage.MAIN_PROJECT.projectName),
-                GUID: JSON.stringify(ProjectManage.MAIN_PROJECT.config.guid ?? this.cssBulder.config.guid),
-                path: ProjectManage.MAIN_PROJECT.projectPath
-            },
+            mainProject: ResourceBuildEngine.MAIN_PROJECT,
             projectList: this.cssBulder.projectList,
-            resources 
+            resources
         };
         let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;
         let outPath = pref.dirDeclaration[pref.outDir].dirPath;
         let resSrcFile = nodeFn.path.resolve(proj.projectPath, srcPath, pref.build.ResourceDeclarationFile);
-        let resOutFile = nodeFn.path.resolve(proj.projectPath, outPath, pref.build.ResourceDeclarationFile);        
+        let resOutFile = nodeFn.path.resolve(proj.projectPath, outPath, pref.build.ResourceDeclarationFile);
         rowForRes.projectList.forEach(s => {
             const resFullpath = s.resourceRelativePath;
-            s.resourceRelativePath = JSON.stringify(correctpath(nodeFn.path.relativeFilePath(resOutFile, resFullpath)));
-            s.importResource = s.projectGuid != ProjectManage.MAIN_PROJECT.config.guid && nodeFn.fs.existsSync(resFullpath);
+            s.resourceRelativePath = JSON.stringify(resFullpath);
+            s.importResource = s.projectGuid != ProjectManage.MAIN_PROJECT.config.guid && nodeFn.fs.existsSync(s.resourceFilefullPath);
         });
-        let resContent = this.filex('resources')(rowForRes); 
+        let resContent = this.filex('resources')(rowForRes);
         buildTimeFn.fs.writeFileSync(resSrcFile, resContent, 'utf-8');
-        return true; 
+        return true;
     }
 
+}
+interface resourceMainProject {
+    name: string;
+    guid: string;
+    globalStyleguid: string;
+    configGuid: string;
 }

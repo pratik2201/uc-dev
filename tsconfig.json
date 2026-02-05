@@ -1,6 +1,6 @@
 {
   "include": [
-    "src" ],
+    "src"],
   "exclude": [
     "node_modules",
     "out",
@@ -9,8 +9,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "target": "ESNext",
-    "baseUrl": ".",
+    "target": "ESNext", 
     "outDir": "out",
     "rootDir": "src",
     "strict": true,
@@ -35,10 +34,7 @@
     ],
     "paths": {
       "ucbuilder/*": [
-        "./src/*"
-      ],
-      "@ucbuilder/*": [
-        "./src/*"
+        "./*"
       ]
     }
   }

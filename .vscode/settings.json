@@ -1,6 +1,5 @@
 {    
-    "html.suggest.html5": true,
-    "html.customData": ["./.vscode/html-custom-data.json"],
+    "html.suggest.html5": true, 
     "javascript.suggest.paths": true,
     "javascript.preferences.useAliasesForRenames": false,
     "typescript.preferences.useAliasesForRenames": false,

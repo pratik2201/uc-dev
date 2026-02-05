@@ -1,7 +1,8 @@
-import { FILE_WARCHER_FILE_ROW, ucUtil } from "ucbuilder/out/global/ucUtil.js";
+
 import { IpcRendererHelper } from "ucbuilder/out/renderer/ipc/IpcRendererHelper.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js"; 
 import { builder } from "./builder.js";
+import { FILE_WARCHER_FILE_ROW, ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 export class fileWatcher {
     constructor(main: builder) { this.main = main; }
     main: builder;

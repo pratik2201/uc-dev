@@ -32,6 +32,9 @@ export default function () {
 
      main.On('buildDesignerTS', (event, files: string[], outDir: string) => {  
         event.returnValue = buildDesignerTS(files,outDir);
-    });
+     });
+    
+    console.log('buildtime inited...');
+    
 }
 

@@ -1,19 +1,18 @@
+import { codeFileInfo } from "./codeFileInfo.js";
 import { CommonEvent } from "ucbuilder/out/global/commonEvent.js";
+import { PathBridge } from "./pathBridge.js";
+import { ProjectManage } from "./ProjectManage.js";
+import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
+import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
 import { CommonRow, dynamicDesignerElementTree } from "./buildRow.js";
 import { buildTimeFn } from "./buildTimeFn.js";
-import { codeFileInfo } from "ucbuilder/out/global/codeFileInfo.js";
-import { DynamicToHtml, IHTMLxSource } from "ucbuilder/out/lib/WrapperHelper.js";
 import { commonGenerator } from "./commonGenerator.js";
 import { commonParser } from "./commonParser.js";
-import { fileWatcher } from "./fileWatcher.js";
-import { PathBridge } from "ucbuilder/out/global/pathBridge.js";
-import { ProjectRowR } from "ucbuilder/out/common/ipc/enumAndMore.js";
-import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
-import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
-import { ucUtil } from "ucbuilder/out/global/ucUtil.js";
-import { BuildResource, UserResource } from "ucbuilder/out/common/enumAndMore.js";
-import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
-//import { Resources } from "./resMng.js";
+import { fileWatcher } from "./fileWatcher.js";  
+import { ProjectRowBase } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { getCloneableObject } from "ap-shared-core/out/objectUtil.js";
+import { ResourceKeyBridge, UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+import { IHTMLxSource } from "ucbuilder/out/lib/WrapperHelper.js";
 
 export interface SourceCodeNode {
     designerCode?: string,
@@ -23,7 +22,7 @@ export interface SourceCodeNode {
 
 export class builder {
     private ignoreDirs: string[] = [];
-    project: ProjectRowR;
+    project: ProjectRowBase;
     ROOT_DIR = '';
     private static INSTANCE: builder;
     static GetInstance() {
@@ -35,7 +34,7 @@ export class builder {
         this.project = ProjectManage.getInfoByProjectPath(this.ROOT_DIR);
         this.commonMng = new commonParser(this);
 
-        this.commonMng.gen.cssBulder = new ResourceBuildEngine(this.project.config);
+        this.commonMng.gen.cssBulder = new ResourceBuildEngine(this.project);
         this.filewatcher = new fileWatcher(this);
         this.filewatcher.init();
         const _this = this;
@@ -79,7 +78,7 @@ export class builder {
                     const isHtmlFile = fullpath.endsWith(srcHtmlExt);
                     if (/*isDynamicFile ||*/ isHtmlFile) {
                         if (cInfo.parseUrl(fullpath, pref.srcDir as any) == false) return;
-                        if (cInfo.pathOf == undefined /*|| !nodeFn.fs.existsSync(cInfo.pathOf.html)*/) return;
+                        if (cInfo.pathOf == undefined) return;
                         if (rtrn.cinfo.findIndex(s => (
                             (isHtmlFile && s.pathOf.html == cInfo.pathOf.html) /*||
                             (isDynamicFile && s.pathOf.tsLayout == cInfo.pathOf.tsLayout)*/
@@ -192,7 +191,22 @@ export class builder {
         let c = this.commonMng.gen.filex('ts.uc.dynamicByHtml')(source);
         return c;
     }
-
+    private registerMain = () => {
+        const _mainProj = ProjectManage.MAIN_PROJECT;
+        const _cssbuilder = this.commonMng.gen.cssBulder;
+        const cfg = getCloneableObject(_mainProj.config);
+        const prf = cfg.preference;
+        const srcdir = prf.dirDeclaration[prf.srcDir].dirPath;
+        let stylePath = nodeFn.path.join(_mainProj.projectPath, _mainProj.config.projectBaseCssPath);
+        //let resourcePath = nodeFn.path.join(_mainProj.projectPath, srcdir, _mainProj.config.preference.build.ResourceDeclarationFile);
+        const mp = ResourceBuildEngine.MAIN_PROJECT;
+        mp.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
+        mp.ucConfigGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
+            content: JSON.stringify(_mainProj.config)
+        })));
+        mp.name = JSON.stringify(_mainProj.projectName);
+        mp.guid = _mainProj.config.guid;
+    }
     counter = 0;
     async buildALL(onComplete = () => { }, _fillReplacerPath = true) {
         let _this = this;
@@ -206,8 +220,11 @@ export class builder {
         const outDeclareKey = pref.outDir;
         const outDec = pref.dirDeclaration[outDeclareKey];
         const designerFileDeclaration = fileWisePath.designer;
-        this.commonMng.gen.cssBulder.config
+        // this.commonMng.gen.cssBulder.config
         let designerPath = nodeFn.path.join(prj.projectPath, srcdirDeclaration.dirPath ?? '', designerFileDeclaration?.subDirPath ?? '');
+        this.registerMain();
+
+
         PathBridge.source.forEach(s => this.commonMng.gen.cssBulder.registerProject(s));
         //const runtimeSrc: BuildResource[] = [];
         await this.buildDynamic();
@@ -252,7 +269,7 @@ export class builder {
 
 
         let cInfos = ((await _this.getAllDesignerXfiles())).cinfo;
-        
+
         //console.log(Resources.all());
 
         const messages = {
@@ -301,6 +318,8 @@ export class builder {
                     console.log('GENERATE `output` AND REBUILD DESINGER..');
                 } else */if (nodeFn.fs.existsSync(srcDec.htmlLayout)) {
                 buildTimeFn.fs.writeFileSync(srcDec.html, nodeFn.fs.readFileSync(srcDec.htmlLayout), 'utf-8');
+                console.log(`${srcDec.htmlLayout} HTML generated by htmllayout`);
+
             }
             if (nodeFn.fs.existsSync(srcDec.html))
                 await this.commonMng.init(cinfo);
@@ -397,21 +416,21 @@ export class builder {
     }
 
     /** @param {codeFileInfo} fInfo */
-    async buildFiles(fInfos: codeFileInfo[], onComplete = () => { }) {
+    // async buildFiles(fInfos: codeFileInfo[], onComplete = () => { }) {
 
-        if (this.project.config.env == 'release') return;
-        setTimeout(async () => {
-            this.commonMng.reset();
-            for (let i = 0, ilen = fInfos.length; i < ilen; i++) {
-                const fInfo = fInfos[i];
-                if (nodeFn.fs.existsSync(fInfo.pathOf.html)) {
-                    await this.checkFileState(fInfo.pathOf.html);
-                    this.commonMng.gen.generateFiles(this.commonMng.rows);
-                }
-            }
-            onComplete();
-        }, 1);
-    }
+    //     if (this.project.config.env == 'release') return;
+    //     setTimeout(async () => {
+    //         this.commonMng.reset();
+    //         for (let i = 0, ilen = fInfos.length; i < ilen; i++) {
+    //             const fInfo = fInfos[i];
+    //             if (nodeFn.fs.existsSync(fInfo.pathOf.html)) {
+    //                 await this.checkFileState(fInfo.pathOf.html);
+    //                 this.commonMng.gen.generateFiles(this.commonMng.rows);
+    //             }
+    //         }
+    //         onComplete();
+    //     }, 1);
+    // }
 
     // async getOutputCode(fInfo: codeFileInfo, htmlContents: string): Promise<SourceCodeNode> {
     //     await this.checkFileState(fInfo.pathOf.html, htmlContents);

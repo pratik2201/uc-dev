@@ -1,6 +1,8 @@
 import { ResourceStorage } from "ucbuilder/out/main/ResourceStorage.js";
-import { UserResource } from "ucbuilder/out/common/enumAndMore.js";
-declare module "ucbuilder/out/common/enumAndMore" {
+import { UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+import { Assembly, AssemblyManager } from "ucbuilder/out/main/Assembly.js";
+
+declare module "ap-shared-core/out/ucbuilder/resources/enums" {
    export interface ResourceNamedRegistry{
       <?php
       const onlyAlias = resources.filter(s => s.name && s.name != "");
@@ -8,8 +10,8 @@ declare module "ucbuilder/out/common/enumAndMore" {
             <?= res.name ?> : <?= res.source ?>,
     <?php  } ?>
    }
-   export interface ResourceProjectNameRegistry{
-        <?= mainProject.Name ?> : <?= mainProject.GUID ?>
+   export interface AssemblyRegistry{
+        <?= mainProject.name ?> : Assembly
    }
    export interface ResourceKeyRegistry {
         <?php  for (const res of resources) { ?>
@@ -30,7 +32,15 @@ ResourceStorage.bulkRegister(Resources);
 <?php 
 for (const res of projectList) {
     if (res.importResource == true) { ?>
-        await import(<?= res.resourceRelativePath ?>);
+await import(<?= res.resourceRelativePath ?>);
 <?php    
     }    
 } ?>
+
+AssemblyManager.Register({
+     name: <?= mainProject.name ?>,
+     guid: "<?= mainProject.guid ?>",
+     cssGuid: <?= mainProject.cssGuid ?>,
+     ucConfigGuid: <?= mainProject.ucConfigGuid ?>,
+
+});

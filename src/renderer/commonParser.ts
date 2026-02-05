@@ -1,22 +1,19 @@
-
-import { ITemplatePathOptions, ResourceKeyBridge } from "ucbuilder/out/common/enumAndMore.js";
-import { GetProject, IFileDeclaration, IUCConfigPreference, ProjectRowR, UserUCConfig } from "ucbuilder/out/common/ipc/enumAndMore.js";
-import { codeFileInfo } from "ucbuilder/out/global/codeFileInfo.js";
-import { ATTR_OF } from "ucbuilder/out/global/runtimeOpt.js";
-import { TemplateMaker } from "ucbuilder/out/global/TemplateMaker.js";
-import { ucUtil } from "ucbuilder/out/global/ucUtil.js";
+import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
+import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { ResourceKeyBridge } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+import { ATTR_OF, ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { FilterContent } from "ucbuilder/out/lib/StampGenerator.js";
 import { HTMLx } from "ucbuilder/out/lib/WrapperHelper.js";
-import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { Template } from "ucbuilder/out/renderer/Template.js";
 import { Usercontrol } from "ucbuilder/out/renderer/Usercontrol.js";
 import { builder } from "./builder.js";
 import { CommonRow, Control, DesignerOptionsBase, ImportClassNode, ScopeType, codeOptionsBase, dynamicDesignerElementTree } from "./buildRow.js";
-import { commonGenerator } from "./commonGenerator.js";
-import { dev$minifyCss } from "ucbuilder/out/renderer/StylerRegs.js";
 import { buildTimeFn } from "./buildTimeFn.js";
-import { PathBridge } from "ucbuilder/out/global/pathBridge.js";
+import { codeFileInfo } from "./codeFileInfo.js";
+import { commonGenerator } from "./commonGenerator.js";
+import { ProjectManage } from "./ProjectManage.js";
+import { ITemplatePathOptions } from "ucbuilder/out/common/enumAndMore.js";
 
 export interface PathReplacementNode { findPath: string, replaceWith: string }
 type ContentGuid = { guid: string, content: string };
@@ -120,7 +117,7 @@ export class commonParser {
     //UC_BUILDER_DIRECTORY = "";
     //UC_BUILDER_ALICE = "";
     PREFERENCE: IUCConfigPreference;
-    project: ProjectRowR;
+    project: ProjectRowBase;
     PROJECT_PATH_LENGTH = 0;
     async init(cinfo: codeFileInfo, htmlContents: string | undefined = undefined) {
         let row = await this.fill(cinfo, htmlContents);
@@ -128,7 +125,7 @@ export class commonParser {
             this.rows.push(row);
     }
 
-    tmaker = new TemplateMaker('');
+    tmaker = new TemplateMaker();
     //aliceMng = new AliceManager();
     _filterText = new FilterContent();
     codeHT: HTMLElement;
@@ -179,7 +176,7 @@ export class commonParser {
         if (code == undefined) return undefined;
         code = ucUtil.devEsc(code);
 
-        this.tmaker.mainImportMeta = nodeFn.url.pathToFileURL(srcPathOf.html);
+        //this.tmaker.mainImportMeta = nodeFn.url.pathToFileURL(srcPathOf.html);
         let compileedCode = code;
         try {
 
@@ -188,7 +185,7 @@ export class commonParser {
                 compileedCode = ucUtil.PHP_REMOVE(cccodeCallback({}));
                 this.codeHT = compileedCode["#$"]();
                 _row.htmlFileContent = code;
-                row.designer.material.htmlContents = JSON.stringify(code);
+                //row.designer.material.htmlContents = JSON.stringify(code);
             } else {
                 code = HTMLx.Wrapper({ "x-caption": 'Form' });
                 this.codeHT = code["#$"]() as HTMLElement;
@@ -203,8 +200,8 @@ export class commonParser {
         //let outHT = ucUtil.PHP_REMOVE(ucUtil.devEsc(code) )["#$"]() as HTMLElement;
 
         const elements = Array.from(this.codeHT.querySelectorAll(`[${ATTR_OF.X_NAME}]`));
-        const elementsXfrom = Array.from(this.codeHT.querySelectorAll(`[${ATTR_OF.X_FROM}]`))
-            .filter(s => !elements.includes(s));
+        // const elementsXfrom = Array.from(this.codeHT.querySelectorAll(`[${ATTR_OF.X_FROM}]`))
+        //     .filter(s => !elements.includes(s));
         let accessKeys = `"` + ucUtil.distinct(Array.from(this.codeHT.querySelectorAll(`[${ATTR_OF.ACCESSIBLE_KEY}]`))
             .map(s => s.getAttribute(ATTR_OF.ACCESSIBLE_KEY))).join(`" | "`) + `"`;
 
@@ -218,13 +215,13 @@ export class commonParser {
                 const prePath = (this.project.projectName == 'ucbuilder') ? `.` : `./node_modules/ucbuilder`;
                 _importer.addImport(['Usercontrol'], this.nc(`${prePath}/out/renderer/Usercontrol.js`, outPathOf.designer));
                 _importer.addImport(['intenseGenerator'], this.nc(`${prePath}/out/renderer/intenseGenerator.js`, outPathOf.designer));
-                _importer.addImport(['IUcOptions','ResourceKeyRegistry'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathOf.designer));
+                _importer.addImport(['IUcOptions'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathOf.designer));
                 _importer.addImport(['VariableList'], this.nc(`${prePath}/out/renderer/StylerRegs.js`, outPathOf.designer));
                 break;
             case "types":
                 _importer.addImport(['Usercontrol'], 'ucbuilder/Usercontrol');
                 _importer.addImport(['intenseGenerator'], 'ucbuilder/intenseGenerator');
-                _importer.addImport(['IUcOptions','ResourceKeyRegistry'], 'ucbuilder/enumAndMore');
+                _importer.addImport(['IUcOptions'], 'ucbuilder/enumAndMore');
                 _importer.addImport(['VariableList'], 'ucbuilder/StylerRegs');
                 break;
         }
@@ -241,11 +238,8 @@ export class commonParser {
             ctr.generic = ctr.generic == null ? undefined : `<${ctr.generic}>`;
             ctr.type = 'none';
             if (element.hasAttribute("x-from")) {
-                // debugger;
                 let _sspath = ucUtil.devEsc(element.getAttribute("x-from"));
                 let _subpath = nodeFn.path.resolveFilePath(outPathOf.html, _sspath);//["#toFilePath"]();
-                // if (_subpath == 'D:/projects/electronProjects/sharepnl/src/htmlFiles/renderer/util/controls/fixedWindow.uc.html') debugger;
-                //console.log([_subpath,outPathOf.html]);
                 let uFInf = new codeFileInfo();
                 uFInf.parseUrl(_subpath, pref.outDir as any, outPathOf.html);
                 if (uFInf.pathOf == undefined) debugger;
@@ -256,12 +250,7 @@ export class commonParser {
                     ctr.src = uFInf;
                     const uFpref = uFInf.projectInfo.config.preference;
                     const uFprefOutdir = uFInf.allPathOf[uFpref.outDir];
-                    //let fullcodePath = uFInf.allPathOf[uFpref.outDir].code;
-                    //let nws = ucUtil.changeExtension(nodeFn.path.relativeFilePath(outPathOf.designer, fullcodePath), '.ts', '.js');
-                    //ctr.codeFilePath = nws; //   oldone;
                     ctr.codeFilePath = nodeFn.path.relativeFilePath(outPathOf.designer, uFprefOutdir['code']);
-                    //console.log(ctr.codeFilePath);
-
                     ctr.importedClassName = row.designer.importer.addImport([uFInf.name], ctr.codeFilePath)[0];
                     row.designer.controls.push(ctr);
                 }
@@ -295,7 +284,7 @@ export class commonParser {
 
         if (code == undefined) return undefined;
         code = ucUtil.devEsc(code);
-        this.tmaker.mainImportMeta = nodeFn.url.pathToFileURL(srcPathof.html);
+        //this.tmaker.mainImportMeta = nodeFn.url.pathToFileURL(srcPathof.html);
         let compileedCode = code;
         let rootpath = nodeFn.path.relative(projectPath, srcPathof.html);
         try {
@@ -303,7 +292,7 @@ export class commonParser {
                 compileedCode = ucUtil.PHP_REMOVE(code);
                 this.codeHT = compileedCode["#$"]();
                 _row.htmlFileContent = code;
-                row.designer.material.htmlContents = JSON.stringify(code);
+                //row.designer.material.htmlContents = JSON.stringify(code);
             } else {
                 code = HTMLx.Template({
                     primary: {},
@@ -320,13 +309,14 @@ export class commonParser {
         }
         row.designer.baseClassName = Template.name;
         this.common1(row.designer, row.code, _row.src);
+
         switch (this.UC_CONFIG?.exports ?? this.CONFIG.exports) {
             case "import":
                 const prePath = (this.project.projectName == 'ucbuilder') ? `.` : `./node_modules/ucbuilder`;
 
                 row.designer.importer.addImport(['Template', 'TemplateNode'], this.nc(`${prePath}/out/renderer/Template.js`, outPathof.designer));
                 row.designer.importer.addImport(['intenseGenerator'], this.nc(`${prePath}/out/renderer/intenseGenerator.js`, outPathof.designer));
-                row.designer.importer.addImport(['ITptOptions','ResourceKeyRegistry'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathof.designer));
+                row.designer.importer.addImport(['ITptOptions'], this.nc(`${prePath}/out/common/enumAndMore.js`, outPathof.designer));
                 row.designer.importer.addImport(['VariableList'], this.nc(`${prePath}/out/renderer/StylerRegs.js`, outPathof.designer));
                 break;
             case "types":
@@ -340,8 +330,15 @@ export class commonParser {
         row.designer.baseClassName = Template.name;
 
         let subTemplates: ITemplatePathOptions[];
+
         if (_row.htmlFileContent == undefined)
-            subTemplates = Template.GetArrayOfTemplate(finfo, row.designer.material.htmlContents, row.designer.material.cssContents);
+            subTemplates = Template.GetArrayOfTemplate(
+                row.designer.cssGuid,
+                this.gen.cssBulder.get(row.designer.htmlGuid).content,
+                this.gen.cssBulder.get(row.designer.cssGuid).content
+                /* row.designer.material.htmlContents,
+                 row.designer.material.cssContents*/
+            );
         else {
             let tob = Template.GetOptionsByContent(_row.htmlFileContent,
                 commonGenerator.readTemplate('ts.tpt.style'),/*,
@@ -413,7 +410,7 @@ export class commonParser {
         //des.htmlGuid = `html-${des.guid}`;
         //des.scssGuid = `scss-${des.guid}`;
         des.rootPath = JSON.stringify(nodeFn.path.normalize(nodeFn.path.relativeFilePath(finfo.projectInfo.projectPath, outPathOf.scss)));
-        des.material.cssContents = JSON.stringify(dev$minifyCss(nodeFn.fs.readFileSync(srcPathOf.scss, 'utf-8')));
+        //des.material.cssContents = JSON.stringify(dev$minifyCss(nodeFn.fs.readFileSync(srcPathOf.scss, 'utf-8')));
 
         des.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.scss)));
         des.htmlGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.html)));
@@ -464,20 +461,20 @@ export class commonParser {
         let _import = classList.find(s => s.url.toLowerCase() == _urlLowerCase);
         if (ctrlNode != undefined) ctrlNode.importedClassName = name;
     }
-    treeShake(cssContent: string, projectName: string, cssFilePath: string) {
-        let csinfo = CssResolver.buildProcessCss(cssContent, projectName);
-        let mainKey = CssResolver.makeGuid(projectName);
+    // treeShake(cssContent: string, projectName: string, cssFilePath: string) {
+    //     let csinfo = CssResolver.buildProcessCss(cssContent, projectName);
+    //     let mainKey = CssResolver.makeGuid(projectName);
 
-        for (const [key, res] of Array.from(csinfo.resources.entries())) {
+    //     for (const [key, res] of Array.from(csinfo.resources.entries())) {
 
-            /*nodeFn.resource.setResource(key, {
-                value: res
-            });*/
-        }
+    //         /*nodeFn.resource.setResource(key, {
+    //             value: res
+    //         });*/
+    //     }
 
 
-        return '';
-    }
+    //     return '';
+    // }
 }
 // export function dev$minifyCss(content: string) {
 //     content = (content.replace(/\/\*([\s\S]*?)\*\//gi, "")

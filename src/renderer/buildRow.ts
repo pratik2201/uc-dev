@@ -1,6 +1,6 @@
-import { SpecialExtType } from "ucbuilder/out/global/ucUtil.js";
-import { codeFileInfo } from "ucbuilder/out/global/codeFileInfo.js";
-import { ISourceOptions } from "ucbuilder/out/common/enumAndMore.js";
+
+import { codeFileInfo } from "./codeFileInfo.js";
+export type SpecialExtType = "none" | ".uc" | ".tpt";
 function devEsc(str: string): string {
     // debugger;
     return str?.replace(/(.{0,1}){:(.*?)}/gm, (m, fchar, url) => {
@@ -78,9 +78,9 @@ export class DesignerOptionsBase {
      
     htmlGuid = "";
     cssGuid = "";
-    material: ISourceOptions = {
+    // material: ISourceOptions = {
 
-    };
+    // };
 }
 class ucDesigner extends DesignerOptionsBase {
     getterFunk = "";

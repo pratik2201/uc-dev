@@ -1,11 +1,14 @@
-import { BuildResourceType, ResourceKeyBridge, UserResource } from "ucbuilder/out/common/enumAndMore.js";
-import { ucUtil } from "ucbuilder/out/global/ucUtil.js";
-import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
+
+import { ImportMapResolver } from "ap-shared-core/out/ucbuilder-devtools/ImportMapResolver.js";
 import { ResourceManage } from "ucbuilder/out/renderer/ResourceManage.js";
-import { minifyCss } from "./minify.js";
+import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
+import { ProjectManage } from "../../renderer/ProjectManage.js";
 import { buildTimeFn } from "../../renderer/buildTimeFn.js";
-import { BuildTimeGuidMeta, GuidSequenceType, ProjectRowBase, UserUCConfig } from "ucbuilder/out/common/ipc/enumAndMore.js";
-import { ProjectManage } from "ucbuilder/out/renderer/ipc/ProjectManage.js";
+import { minifyCss } from "./minify.js";
+import { correctpath } from "ap-shared-core/out/pathUtils.js";
+import { UserUCConfig, GuidSequenceType, ProjectRowBase, BuildTimeGuidMeta } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { UserResource, ResourceKeyBridge, BuildResourceType } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 
 /* ------------------ types ------------------ */
 
@@ -25,15 +28,6 @@ function isDataOrBlob(p: string) {
   return p.startsWith("data:") || p.startsWith("blob:");
 }
 
-// function detectUnit(p: string): string | null {
-//   if (p.endsWith(".uc.scss") || p.endsWith(".uc.html"))
-//     return p.replace(/\.uc\.(scss|html)$/i, ".uc");
-
-//   if (p.endsWith(".tpt.scss") || p.endsWith(".tpt.html"))
-//     return p.replace(/\.tpt\.(scss|html)$/i, ".tpt");
-
-//   return null;
-// }
 
 /* ------------------ guid resolver ------------------ */
 
@@ -86,10 +80,9 @@ class GuidResolver {
 
 export class ResourceBuildEngine {
   projectList = new Array<{
-    projectName: string,
-    projectPath: string,
+    project: ProjectRowBase,
+    resourceFilefullPath: string,
     projectGuid: string,
-    styleResourceGuid: string,
     importResource: boolean,
     resourceRelativePath: string
   }>();
@@ -100,40 +93,75 @@ export class ResourceBuildEngine {
     this.guidResolver.clear();
     this.projectList.length = 0;
   }
-  config: UserUCConfig;
-  constructor(public ucCfg: UserUCConfig) {
-    const gOpt = ucCfg.preference.build.guidOptions ?? new BuildTimeGuidMeta();
+  ucCfg: UserUCConfig;
+  constructor(rb: ProjectRowBase) {
+    this.ucCfg = rb.config;
+    const gOpt = this.ucCfg.preference.build.guidOptions ?? new BuildTimeGuidMeta();
     this.guidResolver = new GuidResolver(
-      ucCfg.projectName,
-      ucCfg.guid,
+      rb.projectName,
+      this.ucCfg.guid,
       gOpt.guidType, gOpt.sequencePadSize);
   }
 
   get resources() {
     return this.resourceMap;
   }
+  get = (guid: string) => {
+    return this.resources.get(guid);
+  }
+  static MAIN_PROJECT = {
+    cssGuid: undefined as string,
+    ucConfigGuid: undefined as string,
+    name: undefined as string,
+    guid: undefined as string
+  }
   registerProject = (s: ProjectRowBase) => {
     let stylePath = nodeFn.path.join(s.projectPath, s.config.projectBaseCssPath);
     let resourcePath = nodeFn.path.join(s.projectPath, s.config.projectBaseCssPath);
-    const globalStyleguid = this.build(stylePath, {});
+
+
     const pref = s.config.preference;
-    const resFilePath = 
-      ucUtil.changeExtension(
-        nodeFn.path.normalize(
-          nodeFn.path.join(s.projectPath, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js');
+    const resFilePath = correctpath(ucUtil.changeExtension(nodeFn.path.normalize(nodeFn.path.join(s.projectName, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js'));
     this.projectList.push({
-      projectName: JSON.stringify(s.projectName),
+      /*projectName: JSON.stringify(s.projectName),
       projectPath: JSON.stringify(s.projectPath),
+      ucConfig: configStr,
+      configGuid: configGuid,
       projectGuid: s.config.guid,
-      styleResourceGuid: globalStyleguid,
+      cssGuid: globalStyleguid,*/
+      resourceFilefullPath:
+        ucUtil.changeExtension(
+          nodeFn.path.normalize(
+            nodeFn.path.join(s.projectPath, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js'),
+      project: s,
+      projectGuid: s.config.guid,
       importResource: s != ProjectManage.MAIN_PROJECT,
       resourceRelativePath: resFilePath
     });
+    //console.log(resFilePath);
+
   }
+  isVirtualResource(key: string): boolean {
+    // no file extension + not an absolute/relative path
+    return (
+      !key.includes(nodeFn.path.sep) &&
+      !nodeFn.path.extname(key)
+    );
+  }
+
   /* ========== PUBLIC ENTRY ========== */
 
   build(path: string, _blueprint?: Partial<UserResource>): string {
-    const absPath = nodeFn.path.resolve(path);
+    // ---- STRING / KEY RESOURCE ----
+    // ---- CONTENT-ONLY RESOURCE ----
+    if (
+      (!path || path.trim() === "") &&
+      typeof _blueprint?.content === "string"
+    ) {
+      return this.buildContentOnly(_blueprint);
+    }
+
+    const absPath = /*GetProject(path)*/ nodeFn.path.resolve(nodeFn.url.fileURLToPath(path));
     const blueprint = new UserResource();
     Object.assign(blueprint, _blueprint);
     if (this.resourceMap.has(absPath)) {
@@ -156,6 +184,30 @@ export class ResourceBuildEngine {
 
     return this.buildAsset(absPath, _blueprint);
   }
+  private buildContentOnly(
+    _blueprint: Partial<UserResource>
+  ): string {
+    //const guid = this.guidResolver.getBaseGuid(absPath);
+    const guid = this.guidResolver.getBaseGuid(
+      buildTimeFn.crypto.guid()
+    );
+
+    const res = new UserResource();
+    Object.assign(res, _blueprint, {
+      guid,
+      type: _blueprint.type ?? "string",
+      content: ResourceManage.x1(_blueprint.content),
+      source: ""
+    });
+
+    res.name = JSON.stringify(res.name);
+
+    // use guid as key since no path exists
+    this.resourceMap.set(guid, res);
+
+    return ResourceKeyBridge.makeKey(guid);
+  }
+
 
   /* ========== CSS HANDLER ========== */
 
@@ -169,7 +221,7 @@ export class ResourceBuildEngine {
       content: "",
       source: absPath
     });
-    res.name = JSON.stringify(res.name);
+    res.name = res.name ? JSON.stringify(res.name) : undefined;
 
     // allocate first (circular safe)
     this.resourceMap.set(absPath, res);
@@ -189,7 +241,7 @@ export class ResourceBuildEngine {
     // ---- @use / @import ----
     css = css.replace(SCSS_IMPORT_RE, (_m, _t, rel) => {
       if (isDataOrBlob(rel)) return _m;
-      const childAbs = nodeFn.path.resolve(nodeFn.path.dirname(absPath), rel);
+      const childAbs = ImportMapResolver.resolve(rel, absPath);//nodeFn.path.resolve(nodeFn.path.dirname(absPath), rel);
       const key = this.build(childAbs);
       return key ? `@use "${key}";` : _m;
     });
@@ -218,7 +270,8 @@ export class ResourceBuildEngine {
       content: ResourceManage.x1(html),
       source: absPath
     });
-    res.name = JSON.stringify(res.name);
+
+    res.name = res.name ? JSON.stringify(res.name) : undefined;
     this.resourceMap.set(absPath, res);
     return ResourceKeyBridge.makeKey(guid);
   }
@@ -250,7 +303,8 @@ export class ResourceBuildEngine {
       content,
       source: absPath
     });
-    res.name = JSON.stringify(res.name);
+
+    res.name = res.name ? JSON.stringify(res.name) : undefined;
 
     this.resourceMap.set(absPath, res);
 
@@ -259,10 +313,10 @@ export class ResourceBuildEngine {
 
   /* ========== url()/data handler ========== */
 
-  private resolveAsset(rel: string, owner: string, _blueprint?: Partial<UserResource>): string {
+  private resolveAsset(rel: string, importerPath: string, _blueprint?: Partial<UserResource>): string {
 
     if (isDataOrBlob(rel)) {
-
+      ImportMapResolver
       if (this.resourceMap.has(rel))
         return ResourceKeyBridge.makeKey(this.resourceMap.get(rel)!.guid);
 
@@ -277,13 +331,14 @@ export class ResourceBuildEngine {
         type: "data",
         content: ResourceManage.x1(rel)
       });
-      res.name = JSON.stringify(res.name);
+
+      res.name = res.name ? JSON.stringify(res.name) : undefined;
 
       this.resourceMap.set(rel, res);
       return ResourceKeyBridge.makeKey(guid);
     }
 
-    const abs = nodeFn.path.resolve(nodeFn.path.dirname(owner), rel);
+    const abs = nodeFn.path.resolve(nodeFn.path.dirname(importerPath), rel);
 
     if (!nodeFn.fs.existsSync(abs)) return rel;
 

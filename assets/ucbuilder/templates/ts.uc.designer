@@ -54,11 +54,35 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         ucExt.initializecomponent(args);                
         let CONTROLS = ucExt.controls;
         
-        await Usercontrol.GenerateControls(this,args,args.cfInfo.pathOf.code);
-        
+        //await Usercontrol.GenerateControls(this,args,args.cfInfo.pathOf.code);
+        <?php 
+        for(let i=0;i<designer.controls.length;i++){  let $rw=designer.controls[i];
+            switch($rw.type){ ?>
+                <?php case "none": ?>
+        this<?=$rw.nameThis?> = CONTROLS<?=$rw.nameThis?>  as unknown as <?=$rw.proto?>;<?php   break; ?>
+                <?php case ".tpt": ?>
+        this<?=$rw.nameThis ?> = <?=$rw.importedClassName?>.Create({ 
+            parentUc: this, 
+            accessName:"<?=$rw.name?>" , 
+            elementHT :CONTROLS<?=$rw.nameThis?> as any
+        });<?php   break; ?>
+                <?php case ".uc": ?>
+        this<?=$rw.nameThis?> = <?=$rw.importedClassName?>.Create({ 
+                parentUc : this, 
+                mode:args.mode,
+                accessName:"<?=$rw.name?>" , 
+                targetElement : CONTROLS<?=$rw.nameThis?> as any
+            });
+        this<?=$rw.nameThis ?>.ucExtends.show({decision : 'replace'});<?php   break;  
+            }
+        }
+        ?>
+
+
+
+
         if(args.events?.beforeFinalize!=undefined) args.events?.beforeFinalize(form);
         await ucExt.finalizeInitAsync(args);
-                
         delete this.initializecomponent; 
         delete this.initializecomponentAsync; 
         delete ucExt.initializecomponent;
@@ -112,10 +136,8 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
 
     //#region MATERIALS
     static MATERIAL  = { 
-        htmlGuid: <?= designer.htmlGuid ?> as keyof ResourceKeyRegistry,
-        cssGuid: <?= designer.cssGuid ?> as keyof ResourceKeyRegistry,
-        htmlContents: <?= designer.material?.htmlContents ?>,
-        cssContents: <?= designer.material?.cssContents ?>,
+        htmlGuid: <?= designer.htmlGuid ?> as never,
+        cssGuid: <?= designer.cssGuid ?> as never,        
     };
     //#endregion
 }
