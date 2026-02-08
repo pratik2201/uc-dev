@@ -30,10 +30,10 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         intenseGenerator.setCSS_globalVar(varList,this.FILE_PATH);
     }
     static Create(pera: ITptOptions): <?=src.name?> { 
-        return intenseGenerator.generateTPT(this.FILE_PATH,<?=src.name?>,import.meta.url,pera) as <?=src.name?>;
+        return intenseGenerator.generateTPT(<?=src.name?>,pera) as <?=src.name?>;
     }
     static async CreateAsync(pera: ITptOptions): Promise<<?=src.name?>> {
-        return await intenseGenerator.generateTPTAsync(this.FILE_PATH, <?=src.name?>, import.meta.url, pera);
+        return await intenseGenerator.generateTPTAsync(<?=src.name?>, pera);
     }
      
     <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
@@ -41,15 +41,13 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
    
      async initializecomponentAsync(fargs:ITptOptions){ 
         if(fargs.MakeEmptyTemplate)return;        
-        //let htmlContents = <?= designer.dynamicName ?>.MATERIAL.htmlContents;
-        <?php if(designer.dynamicName!=undefined){ ?>
-        //htmlContents =  <?= designer.dynamicName ?>?.htmlSource() ?? undefined;
-        <?php } ?>
-        fargs.source.cssGuid = <?=designer.className ?>.MATERIAL.cssGuid;
-        fargs.source.htmlGuid = <?=designer.className ?>.MATERIAL.htmlGuid;
-         this.extended.initializebase(fargs);
-        let oot = Template.GetObjectOfTemplate(fargs.source.cssGuid,fargs.source.htmlGuid,fargs.source.cssGuid)
-        let tpts = oot.tptObj;
+        fargs.guid = <?= designer.guid ?>;
+        //let htmlContents = undefined;
+        //fargs.source.cssGuid = <?=designer.className ?>.MATERIAL.cssGuid;
+        //fargs.source.htmlGuid = <?=designer.className ?>.MATERIAL.htmlGuid;
+        this.extended.initializebase(fargs);
+        let oot = Template.GetObjectOfTemplate(fargs.guid)
+        let tpts = oot.templates;
       
        
         <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
@@ -58,8 +56,8 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         delete this.<?=$tpt.name?>.extended.initializecomponent;
         <?php } ?>
 
-        if (oot.outerCSS.trim() != '')
-            this.pushTemplateCss(oot.outerCSS,fargs.source.cssGuid /*fargs.cfInfo.pathOf['.scss']*/);
+        if (oot.outerCssContents.trim() != '')
+            this.pushTemplateCss(oot.outerCssContents,fargs.guid /*fargs.cfInfo.pathOf['.scss']*/);
 
         delete this.initializecomponent;
         delete this.initializecomponentAsync; 
@@ -67,15 +65,13 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
     }
     initializecomponent(fargs:ITptOptions){ 
         if(fargs.MakeEmptyTemplate)return;
+        fargs.guid = <?= designer.guid ?>;
         //let htmlContents = undefined;
-        <?php if(designer.dynamicName!=undefined){ ?>
-        //htmlContents =  <?= designer.dynamicName ?>?.htmlSource() ?? undefined;
-        <?php } ?>
-        fargs.source.cssGuid = <?=designer.className ?>.MATERIAL.cssGuid;
-        fargs.source.htmlGuid = <?=designer.className ?>.MATERIAL.htmlGuid;
-         this.extended.initializebase(fargs);
-        let oot = Template.GetObjectOfTemplate(fargs.source.cssGuid,fargs.source.htmlGuid,fargs.source.cssGuid);
-        let tpts = oot.tptObj;
+        //fargs.source.cssGuid = <?=designer.className ?>.MATERIAL.cssGuid;
+        //fargs.source.htmlGuid = <?=designer.className ?>.MATERIAL.htmlGuid;
+        this.extended.initializebase(fargs);
+        let oot = Template.GetObjectOfTemplate(fargs.guid);
+        let tpts = oot.templates;
        
         <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
         this.<?=$tpt.name ?> = new <?=$tpt.name ?>_TEMPLATE(this); 
@@ -83,19 +79,17 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         delete this.<?=$tpt.name?>.extended.initializecomponent;
         <?php } ?>
 
-        if (oot.outerCSS.trim() != '')
-            this.pushTemplateCss(oot.outerCSS,fargs.source.cssGuid /*fargs.cfInfo.pathOf['.scss']*/);
+        if (oot.outerCssContents.trim() != '')
+            this.pushTemplateCss(oot.outerCssContents,fargs.guid /*fargs.cfInfo.pathOf['.scss']*/);
 
         delete this.initializecomponent;
         delete this.initializecomponentAsync; 
         delete this.extended.initializebase;
     }
-
-
-    //#region MATERIALS
+    /*
     static MATERIAL  = {
         htmlGuid: <?= designer.htmlGuid ?> as never,
         cssGuid: <?= designer.cssGuid ?> as never, 
     };
-    //#endregion
+    */
 }

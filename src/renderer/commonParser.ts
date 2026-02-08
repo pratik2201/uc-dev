@@ -8,15 +8,13 @@ import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { Template } from "ucbuilder/out/renderer/Template.js";
 import { Usercontrol } from "ucbuilder/out/renderer/Usercontrol.js";
 import { builder } from "./builder.js";
-import { CommonRow, Control, DesignerOptionsBase, ImportClassNode, ScopeType, codeOptionsBase, dynamicDesignerElementTree } from "./buildRow.js";
+import { CommonRow, Control, DesignerOptionsBase, ImportClassNode, ScopeType, codeOptionsBase, dynamicDesignerElementTree } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
 import { buildTimeFn } from "./buildTimeFn.js";
-import { codeFileInfo } from "./codeFileInfo.js";
+import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
 import { commonGenerator } from "./commonGenerator.js";
 import { ProjectManage } from "./ProjectManage.js";
-import { ITemplatePathOptions } from "ucbuilder/out/common/enumAndMore.js";
-
+import { ITemplateNodeMeta } from "ap-shared-core/out/ucbuilder/Template.js";
 export interface PathReplacementNode { findPath: string, replaceWith: string }
-type ContentGuid = { guid: string, content: string };
 export class commonParser {
     generateNodes(htContent: string): string {
         let rtrn = '';
@@ -67,17 +65,17 @@ export class commonParser {
     reset() {
         this.gen.cssBulder.clear();
         this.rows.length = 0;
-        this.pathReplacement.length = 0;
+        //this.pathReplacement.length = 0;
     }
     rows: CommonRow[] = [];
-    pathReplacement: PathReplacementNode[] = [];
-    pushReplacement({ findPath = '', replaceWith = "" }: PathReplacementNode) {
-        let index = this.pathReplacement.findIndex(s => ucUtil.equalIgnoreCase(s.findPath, findPath));
-        if (index == -1) this.pathReplacement.push({ findPath: findPath, replaceWith: replaceWith });
-        else this.pathReplacement[index].replaceWith = replaceWith;
-        //console.log(this.pathReplacement);
+    // pathReplacement: PathReplacementNode[] = [];
+    // pushReplacement({ findPath = '', replaceWith = "" }: PathReplacementNode) {
+    //     let index = this.pathReplacement.findIndex(s => ucUtil.equalIgnoreCase(s.findPath, findPath));
+    //     if (index == -1) this.pathReplacement.push({ findPath: findPath, replaceWith: replaceWith });
+    //     else this.pathReplacement[index].replaceWith = replaceWith;
+    //     //console.log(this.pathReplacement);
 
-    }
+    // }
     bldr: builder;
     gen: commonGenerator;
     SRC_DEC: Partial<{
@@ -187,9 +185,9 @@ export class commonParser {
                 _row.htmlFileContent = code;
                 //row.designer.material.htmlContents = JSON.stringify(code);
             } else {
-                code = HTMLx.Wrapper({ "x-caption": 'Form' });
+                code = `<WRAPPER  x-caption="Form" ></WRAPPER>`;
                 this.codeHT = code["#$"]() as HTMLElement;
-                _row.dynamicFileContent = commonGenerator.readTemplate('ts.uc.dynamic');
+                //_row.dynamicFileContent = commonGenerator.readTemplate('ts.uc.dynamic');
             }
         } catch (ex) {
             console.log(ex);
@@ -197,11 +195,8 @@ export class commonParser {
         }
         row.designer.baseClassName = Usercontrol.name;
         this.common1(row.designer, row.code, _row.src);
-        //let outHT = ucUtil.PHP_REMOVE(ucUtil.devEsc(code) )["#$"]() as HTMLElement;
 
         const elements = Array.from(this.codeHT.querySelectorAll(`[${ATTR_OF.X_NAME}]`));
-        // const elementsXfrom = Array.from(this.codeHT.querySelectorAll(`[${ATTR_OF.X_FROM}]`))
-        //     .filter(s => !elements.includes(s));
         let accessKeys = `"` + ucUtil.distinct(Array.from(this.codeHT.querySelectorAll(`[${ATTR_OF.ACCESSIBLE_KEY}]`))
             .map(s => s.getAttribute(ATTR_OF.ACCESSIBLE_KEY))).join(`" | "`) + `"`;
 
@@ -228,7 +223,7 @@ export class commonParser {
         const _exists = nodeFn.fs.existsSync;
         for (let i = 0, iObj = elements, len = iObj.length; i < len; i++) {
             const element = iObj[i];
-            onSelect_xName.fire([element as HTMLElement, _row]);
+            onSelect_xName(element as HTMLElement, _row);
             const ctr = new Control();
             ctr.name = element.getAttribute(ATTR_OF.X_NAME);
             ctr.nodeName = element.nodeName;
@@ -284,7 +279,6 @@ export class commonParser {
 
         if (code == undefined) return undefined;
         code = ucUtil.devEsc(code);
-        //this.tmaker.mainImportMeta = nodeFn.url.pathToFileURL(srcPathof.html);
         let compileedCode = code;
         let rootpath = nodeFn.path.relative(projectPath, srcPathof.html);
         try {
@@ -292,15 +286,15 @@ export class commonParser {
                 compileedCode = ucUtil.PHP_REMOVE(code);
                 this.codeHT = compileedCode["#$"]();
                 _row.htmlFileContent = code;
-                //row.designer.material.htmlContents = JSON.stringify(code);
             } else {
-                code = HTMLx.Template({
-                    primary: {},
-                    header: {},
-                    footer: {},
-                });
+                code = `
+<X:TEMPLATE>
+    <WRAPPER id="header"></WRAPPER>
+    <WRAPPER id="primary"></WRAPPER>
+    <WRAPPER id="footer"></WRAPPER>
+</X:TEMPLATE>`;
                 this.codeHT = code["#$"]() as HTMLElement;
-                _row.dynamicFileContent = commonGenerator.readTemplate('ts.tpt.dynamic');
+                //_row.dynamicFileContent = commonGenerator.readTemplate('ts.tpt.dynamic');
                 _row.htmlFileContent = code;
             }
         } catch (ex) {
@@ -312,7 +306,7 @@ export class commonParser {
 
         switch (this.UC_CONFIG?.exports ?? this.CONFIG.exports) {
             case "import":
-                const prePath = (this.project.projectName == 'ucbuilder') ? `.` : `./node_modules/ucbuilder`;
+                const prePath = /*(this.project.projectName == 'ucbuilder') ? `.` :*/ `./node_modules/ucbuilder`;
 
                 row.designer.importer.addImport(['Template', 'TemplateNode'], this.nc(`${prePath}/out/renderer/Template.js`, outPathof.designer));
                 row.designer.importer.addImport(['intenseGenerator'], this.nc(`${prePath}/out/renderer/intenseGenerator.js`, outPathof.designer));
@@ -326,25 +320,21 @@ export class commonParser {
                 row.designer.importer.addImport(['VariableList'], 'ucbuilder/StylerRegs');
                 break;
         }
-
         row.designer.baseClassName = Template.name;
 
-        let subTemplates: ITemplatePathOptions[];
+        let subTemplates: ITemplateNodeMeta[];
 
-        if (_row.htmlFileContent == undefined)
+        /*if (_row.htmlFileContent == undefined)
             subTemplates = Template.GetArrayOfTemplate(
                 row.designer.cssGuid,
                 this.gen.cssBulder.get(row.designer.htmlGuid).content,
-                this.gen.cssBulder.get(row.designer.cssGuid).content
-                /* row.designer.material.htmlContents,
-                 row.designer.material.cssContents*/
+                this.gen.cssBulder.get(row.designer.cssGuid).content                
             );
         else {
             let tob = Template.GetOptionsByContent(_row.htmlFileContent,
-                commonGenerator.readTemplate('ts.tpt.style'),/*,
-                undefined, nodeFn.url.pathToFileURL(pathOf.scss)*/);
+                commonGenerator.readTemplate('ts.tpt.style'));
             subTemplates = Object.values(tob.tptObj);
-        }
+        }*/
         let tpts = row.designer.templetes;
         subTemplates.forEach(template => {
             let rolelwr = template.accessKey;
@@ -363,7 +353,7 @@ export class commonParser {
             const elements = Array.from(cntHT.querySelectorAll(`[${ATTR_OF.X_NAME}]`));
             for (let i = 0, iObj = elements, len = iObj.length; i < len; i++) {
                 const element = iObj[i];
-                onSelect_xName.fire([element as HTMLElement, _row]);
+                onSelect_xName(element as HTMLElement, _row);
                 let scope = element.getAttribute(ATTR_OF.SCOPE_KEY) as ScopeType;
                 if (scope == undefined)
                     scope = 'public';
@@ -460,160 +450,5 @@ export class commonParser {
         let _urlLowerCase = url.toLowerCase();
         let _import = classList.find(s => s.url.toLowerCase() == _urlLowerCase);
         if (ctrlNode != undefined) ctrlNode.importedClassName = name;
-    }
-    // treeShake(cssContent: string, projectName: string, cssFilePath: string) {
-    //     let csinfo = CssResolver.buildProcessCss(cssContent, projectName);
-    //     let mainKey = CssResolver.makeGuid(projectName);
-
-    //     for (const [key, res] of Array.from(csinfo.resources.entries())) {
-
-    //         /*nodeFn.resource.setResource(key, {
-    //             value: res
-    //         });*/
-    //     }
-
-
-    //     return '';
-    // }
-}
-// export function dev$minifyCss(content: string) {
-//     content = (content.replace(/\/\*([\s\S]*?)\*\//gi, "")
-//         .replace(/\/\/.*/mg, "")).replace(/(;|,|:|{|})[\n\r ]*/gi, "$1");
-//     return content;
-// }
-export interface CssBuildResult {
-    css: string;
-    resources: Map<string, string>; // guid -> original path
-}
-
-
-export class CssResolver {
-    static makeGuid(project: string) {
-        return project + "-" + buildTimeFn.crypto.guid(); /*crypto.randomUUID();*/
-    }
-    static buildProcessCss(
-        input: string,
-        projectName: string
-    ): CssBuildResult {
-
-        let out = "";
-        let inString: string | null = null;
-        let inUrl = false;
-        let inUse = false;
-
-        let buffer = "";
-        const resources = new Map<string, string>();
-
-        function registerResource(path: string): string {
-            const guid = CssResolver.makeGuid(projectName);
-            resources.set(guid, path);
-            return `__RES::${guid}__`;
-        }
-
-
-        for (let i = 0; i < input.length; i++) {
-            const c = input[i];
-
-            // ---------------- strings ----------------
-            if (!inString && (c === '"' || c === "'" || c === "`")) {
-                inString = c;
-                out += c;
-                continue;
-            }
-
-            if (inString) {
-                out += c;
-                if (c === "\\" && input[i + 1]) {
-                    out += input[++i];
-                    continue;
-                }
-                if (c === inString) inString = null;
-                continue;
-            }
-
-            // ---------------- detect url( ----------------
-            if (!inUrl && input.slice(i, i + 4).toLowerCase() === "url(") {
-                inUrl = true;
-                buffer = "";
-                out += "url(";
-                i += 3;
-                continue;
-            }
-
-            // ---------------- detect @use ----------------
-            if (!inUse && input.slice(i, i + 4).toLowerCase() === "@use") {
-                inUse = true;
-                out += "@use";
-                i += 3;
-                continue;
-            }
-
-            // ---------------- inside url(...) ----------------
-            if (inUrl) {
-                if (c === ")") {
-                    inUrl = false;
-
-                    let raw = buffer.trim();
-                    let quote = "";
-
-                    if (
-                        (raw.startsWith('"') && raw.endsWith('"')) ||
-                        (raw.startsWith("'") && raw.endsWith("'"))
-                    ) {
-                        quote = raw[0];
-                        raw = raw.slice(1, -1);
-                    }
-
-                    const key = registerResource(raw);
-                    out += quote + key + quote + ")";
-                    continue;
-                }
-
-                buffer += c;
-                continue;
-            }
-
-
-            // ---------------- inside @use "..." ----------------
-            if (inUse) {
-                if (c === '"' || c === "'") {
-                    const q = c;
-                    let path = "";
-
-                    i++;
-                    while (i < input.length && input[i] !== q) {
-                        path += input[i++];
-                    }
-
-                    const key = registerResource(path);
-                    out += q + key + q;
-                    continue;
-                }
-            }
-
-
-            // ---------------- minify whitespace ----------------
-            if (/\s/.test(c)) {
-                const p = out[out.length - 1];
-                const n = input[i + 1];
-                if (p && !/[{:;,}()]/.test(p) && !/[{:;,}()]/.test(n || "")) {
-                    out += " ";
-                }
-                continue;
-            }
-
-            out += c;
-        }
-        return {
-            css: out.replace(/\s*([:;,{}()])\s*/g, "$1").replace(/;}/g, "}").trim(),
-            resources
-        };
-    }
-    static runtimeApplyCssResources(
-        css: string,
-        resolver: (guid: string) => string
-    ) {
-
-        return css.replace(/__RES::([a-zA-Z0-9-]+)__/g, (_, id) => resolver(id));
     }
 }

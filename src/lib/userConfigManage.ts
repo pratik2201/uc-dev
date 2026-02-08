@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url"; 
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { UserUCConfig, IDirDeclarations, IUCConfigPreference, IFileDeclaration, UcBuildOptions, BuildTimeGuidMeta, GetProjectName } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { deepAssign } from "ap-shared-core/out/objectUtil.js";
 
@@ -13,22 +13,13 @@ export async function GetUcConfig(projectdir: string): Promise<UserUCConfig> {
 }
 export default function UcDefaultConfig<K = IDirDeclarations>(...cfg: Partial<UserUCConfig<K>>[]) {
     let rtrn = new UserUCConfig<K>();
-    //console.log(rtrn);    
     deepAssign(rtrn, ...cfg);
-    // console.log(rtrn);
-
-
     return rtrn;
 }
 
 export async function ImportUserConfig(fpath: string): Promise<UserUCConfig> {
-    //console.log(fpath);
     if (!fpath.startsWith('file:/')) fpath = pathToFileURL(fpath).href;
     try {
-        // let res = (await import(fpath));
-        // let rtrn = res?.default;
-        // checkUc(rtrn, fpath); 
-        // return rtrn;
         return await checkUc(fpath);
     } catch (e) {
         console.log(e);
@@ -71,7 +62,7 @@ async function checkUc(filePath: string) {
     if (filePath.startsWith('file:///')) filePath = fileURLToPath(filePath);
     cfg.browser = cfg.browser ?? { importmap: {} };
     pref.build.guidOptions = pref.build.guidOptions ?? new BuildTimeGuidMeta();
-
+    /*
     const prjName = GetProjectName(path.dirname(filePath), path, fs);
     if (cfg.browser.importmap['ucbuilder'] == undefined) {
         cfg.browser = cfg.browser ?? { importmap: {} };
@@ -80,8 +71,6 @@ async function checkUc(filePath: string) {
             cfg.browser.importmap.ucbuilder =
             (prjName == 'ucbuilder' ? "." : "node_modules/ucbuilder");
         cfg.browser.importmap['ucbuilder-devtools'] = "node_modules/ucbuilder-devtools";
-    }
-
+    }*/
     return cfg;
-    // "ucbuilder": "node_modules/ucbuilder",  
 }

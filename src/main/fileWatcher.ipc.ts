@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path"; 
 import { IpcMainGroup } from "ucbuilder/out/main/ipc/IpcMainHelper.js";
 import url from "url";
-import { ConfigHandler } from "../lib/ConfigHandler.js"; 
+import { ConfigHandler } from "../lib/processes/ConfigHandler.js"; 
 import { GetProject } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { isSamePath } from "ap-shared-core/out/pathUtils.js";
 import { ucUtil, FILE_WARCHER_FILE_ROW } from "ap-shared-core/out/ucbuilder/ucUtil.js";
@@ -11,7 +11,7 @@ export default async function () {
     const main = IpcMainGroup('ucbuilder-devtools/src/renderer/fileWatcher');
     try {
         return;
-        const projectRoot = ConfigHandler.filler.MAIN_PROJECT_PATH ?? path.resolve();
+        const projectRoot = ''; //ConfigHandler.filler.MAIN_PROJECT_PATH ?? path.resolve();
         const srcPath = projectRoot; //path.join(projectRoot, "src");
         const pathMapFile = path.join(projectRoot, "path-map.json");
         const ignoredList = [
@@ -102,7 +102,7 @@ export default async function () {
                 });
         }
 
-        const { PathBridge } = await import("../renderer/pathBridge.js");
+        const { PathBridge } = await import("ap-shared-core/src/ucbuilder-devtools/pathBridge.js");
         //console.log(PathBridge.source);
 
         const project = GetProject(path.resolve(), PathBridge.source, url);

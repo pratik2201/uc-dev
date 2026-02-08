@@ -16,15 +16,17 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
+    "ap-shared-core": "file:../ap-shared-core",
     "electron": "^39.1.1",
     "rimraf": "^6.0.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "ucbuilder": "file:../ucbuilder",
-    "ap-shared-core": "file:../ap-shared-core"
+    "ucbuilder": "file:../ucbuilder"
   },
   "dependencies": {
     "chokidar": "^4.0.3",
-    "jsdom": "^27.0.1"
+    "css-select": "^6.0.0",
+    "dom-serializer": "^2.0.0",
+    "htmlparser2": "^10.1.0"
   }
 }

@@ -1,18 +1,17 @@
-import { codeFileInfo } from "./codeFileInfo.js";
-import { CommonEvent } from "ucbuilder/out/global/commonEvent.js";
-import { PathBridge } from "./pathBridge.js";
-import { ProjectManage } from "./ProjectManage.js";
+import { getCloneableObject } from "ap-shared-core/out/objectUtil.js";
+import { ProjectRowBase } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { ResourceKeyBridge, UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+import { PathBridge } from "ap-shared-core/out/ucbuilder-devtools/pathBridge.js";
+import { IHTMLxSource } from "ucbuilder/out/lib/WrapperHelper.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { ResourceBuildEngine } from "../main/resMng/ResourceBuildEngine.js";
-import { CommonRow, dynamicDesignerElementTree } from "./buildRow.js";
 import { buildTimeFn } from "./buildTimeFn.js";
 import { commonGenerator } from "./commonGenerator.js";
 import { commonParser } from "./commonParser.js";
-import { fileWatcher } from "./fileWatcher.js";  
-import { ProjectRowBase } from "ap-shared-core/out/ucbuilder/configResources.js";
-import { getCloneableObject } from "ap-shared-core/out/objectUtil.js";
-import { ResourceKeyBridge, UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
-import { IHTMLxSource } from "ucbuilder/out/lib/WrapperHelper.js";
+import { fileWatcher } from "./fileWatcher.js";
+import { ProjectManage } from "./ProjectManage.js";
+import { CommonRow, dynamicDesignerElementTree } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
+import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
 
 export interface SourceCodeNode {
     designerCode?: string,
@@ -51,7 +50,7 @@ export class builder {
     commonMng: commonParser;
     filewatcher: fileWatcher;
     Event = {
-        onSelect_xName: new CommonEvent<(ele: HTMLElement, row: CommonRow) => void>()
+        onSelect_xName: (_ele: HTMLElement, _row: CommonRow) => {} // new CommonEvent<(ele: HTMLElement, row: CommonRow) => void>()
     }
     async getAllDesignerXfiles() {
         const rtrn = {
@@ -68,7 +67,7 @@ export class builder {
         if (srcDynamicExt == undefined) { console.log("!!! no dynamic design file (.html.js) "); }
 
         await this.recursive(nodeFn.path.join(this.project.projectPath, srcDec.dirPath),
-            (pth) => false,
+            (_pth) => false,
             async (fullpath) => {
 
                 const extCode = codeFileInfo.getExtType(fullpath);
@@ -116,7 +115,7 @@ export class builder {
         if (srcDynamicExt == undefined) { console.log("!!! no dynamic design file (.html.js) "); }
         const fileToBuild = [] as string[];
         await this.recursive(nodeFn.path.join(this.project.projectPath, srcDec.dirPath),
-            (pth) => false,
+            (_pth) => false,
             async (fullpath) => {
                 if (fullpath.endsWith(srcDynamicExt)) fileToBuild.push(fullpath);
             });
@@ -229,7 +228,7 @@ export class builder {
         //const runtimeSrc: BuildResource[] = [];
         await this.buildDynamic();
         await this.recursive(nodeFn.path.join(this.project.projectPath, outDec.dirPath),
-            (pth) => false,
+            (_pth) => false,
             async (fullpath) => {
                 if (fullpath.endsWith('.resx.js')) {
                     const filwRes: UserResource[] = [];
@@ -272,17 +271,17 @@ export class builder {
 
         //console.log(Resources.all());
 
-        const messages = {
-            generateOutputAndRetry: false
-        }
+        // const messages = {
+        //     generateOutputAndRetry: false
+        // }
 
         //debugger;
         for (let index = 0; index < cInfos.length; index++) {
             const cinfo = cInfos[index];
             //if (cinfo.pathOf.html.includes('ledger$form')) debugger;
             const srcDec = cinfo.allPathOf[pref.srcDir];
-            const outDec = cinfo.allPathOf[pref.outDir];
-            /*let dynamicOutputPath = outDec.tsLayout;
+           /* const outDec = cinfo.allPathOf[pref.outDir];
+            let dynamicOutputPath = outDec.tsLayout;
             let dynamicOutputData = undefined as string;
             let hasDynamicOutput = nodeFn.fs.existsSync(dynamicOutputPath);
             if (hasDynamicOutput) {
@@ -441,7 +440,7 @@ export class builder {
     //     };
     // }
 
-    async checkFileState(filePath: string, htmlContents?: string) {
+    async checkFileState(_filePath: string, _htmlContents?: string) {
         // if (filePath.endsWith('uc.html')) { //  IF USER CONTROL
         //     await this.commonMng.init(filePath, htmlContents);
         // } else if (filePath.endsWith('tpt.html')) { //  IF TEMPLATE

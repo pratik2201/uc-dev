@@ -1,4 +1,4 @@
-import { ResourceStorage } from "ucbuilder/out/main/ResourceStorage.js";
+import { ResourceStorage } from "ap-shared-core/out/ucbuilder/resources/ResourceStorage.js";
 import { UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
 import { Assembly, AssemblyManager } from "ucbuilder/out/main/Assembly.js";
 
@@ -32,8 +32,7 @@ ResourceStorage.bulkRegister(Resources);
 <?php 
 for (const res of projectList) {
     if (res.importResource == true) { ?>
-await import(<?= res.resourceRelativePath ?>);
-<?php    
+await import(<?= res.resourceRelativePath ?>);<?php    
     }    
 } ?>
 
