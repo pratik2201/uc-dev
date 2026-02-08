@@ -9,6 +9,7 @@ import { dirname, join, normalize, resolve } from "path";
 import { ResourceBuildEngine } from "../../main/resMng/ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { relativeFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
+import { safeStringify } from "ap-shared-core/out/objectUtil.js";
 
 interface CodeFilesNode {
     DESIGNER: string,
@@ -78,7 +79,7 @@ export class commonGeneratorX {
 
                     commonGeneratorX.ensureDirectoryExistence(row.src.pathOf[designerFileSrctype]);
                     _data = this.filex(`${srctype}${uctype}.designer`)(row);
-                    console.log(_data);
+                    //console.log(_data);
                     
                     writeFileSync(row.src.pathOf[designerFileSrctype], _data);
 
@@ -116,6 +117,7 @@ export class commonGeneratorX {
             s.isGlobalCss = s.isGlobalCss == undefined ? false : (s.isGlobalCss ?? false);
             s.project = s.project ?? proj.projectName
         });
+        
         /* const onlyAlias = resources.filter(s => s.name && s.name != "");
        const nameRegistry = {};
        this.cssBulder.projectList.forEach(prj => {
@@ -130,6 +132,7 @@ export class commonGeneratorX {
            );
        }); */
         const rowForRes = {
+            importmap : safeStringify(BuildingProcess.configHandler.importmap),
             mainProject: ResourceBuildEngine.MAIN_PROJECT,
             projectList: this.cssBulder.projectList,
             resources

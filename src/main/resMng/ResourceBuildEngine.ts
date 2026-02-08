@@ -95,6 +95,7 @@ export class ResourceBuildEngine {
     resourceRelativePath: string
   }>();
   private resourceMap = new Map<string, UserResource>();
+   
   private guidResolver: GuidResolver;
   clear() {
     this.resourceMap.clear();

@@ -15,9 +15,11 @@ export class BuildingProcess {
         onSelect_xName: (ele: Element, row: CommonRow) => { } // new CommonEvent<(ele: HTMLElement, row: CommonRow) => void>()
     }
     static async start(pth: string) {
-
+        
         PathBridge.init(path, url, this.configHandler.allConfig);
         await this.configHandler.fillConfig(pth);
+        
+        // console.log(this.configHandler.allConfig);
         this.buildDesigner = new BuildDesigner();
         this.resourceCopy.fillFiles();
         this.configHandler.allConfig

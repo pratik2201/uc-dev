@@ -29,6 +29,8 @@ const Resources:UserResource[] = [
 ];
 ResourceStorage.bulkRegister(Resources);
 
+ResourceStorage.RuntimeProps['importmap'] = ResourceStorage.RuntimeProps['importmap'] ?? <?= importmap ?>;
+
 <?php 
 for (const res of projectList) {
     if (res.importResource == true) { ?>

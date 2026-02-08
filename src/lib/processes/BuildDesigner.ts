@@ -182,7 +182,7 @@ export class BuildDesigner {
                 let uFInf = new codeFileInfo();
                 uFInf.parseUrl(_subpath, pref.outDir as any, outPathOf.html);
                 if (uFInf.pathOf == undefined) debugger;
-                if (_exists(uFInf.pathOf.code) || _exists(uFInf.pathOf.tsLayout) ||
+                if (_exists(uFInf.pathOf.code) ||
                     _exists(uFInf.pathOf.scss) || _exists(uFInf.pathOf.html)) {
                     ctr.type = uFInf.extCode;
                     ctr.nodeName = uFInf.name;
@@ -362,10 +362,10 @@ export class BuildDesigner {
         code.className = finfo.name;
         des.className =
             code.designerClassName = `${finfo.name}$Designer`;
-        if (pathOf.tsLayout != undefined) {
+        /*if (pathOf.tsLayout != undefined) {
             let dsTodyn = ucUtil.resolveSubNode(relativeFilePath(pathOf.designer, pathOf.tsLayout));
             des.dynamicFilePath = ucUtil.changeExtension(dsTodyn, this.SRC_CODE_EXT, this.OUT_CODE_EXT);
-        }
+        }*/
         if (pathOf.html != undefined) {
             let dsToht = ucUtil.resolveSubNode(relativeFilePath(pathOf.designer, pathOf.html));
             des.htmlFilePath = dsToht;
