@@ -28,5 +28,8 @@
     "css-select": "^6.0.0",
     "dom-serializer": "^2.0.0",
     "htmlparser2": "^10.1.0"
+  },
+  "bin": {
+    "ucbuilder-devtools": "./out/cli.js"
   }
 }

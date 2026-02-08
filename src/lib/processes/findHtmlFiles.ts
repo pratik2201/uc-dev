@@ -1,9 +1,9 @@
 import { getCloneableObject } from "ap-shared-core/out/objectUtil.js";
 import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
-import { ResourceKeyBridge } from "ap-shared-core/out/ucbuilder/resources/enums.js";
 import { join } from "path";
 import { ResourceBuildEngine } from "../../main/resMng/ResourceBuildEngine.js";
-import { BuildingProcess } from "../BuildingProcess.js";
+import { BuildingProcess } from "../BuildingProcess.js"; 
+import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
 
 export async function collectFiles() {
     const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;

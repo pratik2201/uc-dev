@@ -62,11 +62,29 @@ export class commonGeneratorX {
     generateFiles() {
         let _this = this;
         //console.log(this.rows);
-        if (this.rows == undefined || this.rows.length == 0) return;
+        //if (this.rows == undefined || this.rows.length == 0) return;
         let _data = "";
-        const pref = this.rows[0]?.src.callerProject.config.preference;
-        let dirDeclaration = pref?.dirDeclaration;
+        console.log(`
++---------------------+
+|                    /
+|          BUILD STARTED
+|              /
++-------------+            
+                    `);
         if (this.generateResources()) {
+            if (this.rows.length == 0) {
+                console.log(`
+                  +---------------+
+                 /                |
+          NOTHING TO BUILD        |
+           /                      |
+          +-----------------------+             
+                    `);
+
+                return;
+            }
+            const pref = this.rows[0]?.src.callerProject.config.preference;
+            let dirDeclaration = pref?.dirDeclaration;
             const declareEntries = Object.entries(dirDeclaration);
             for (let i = 0, len = this.rows.length; i < len; i++) {
                 const row = this.rows[i];
@@ -80,7 +98,7 @@ export class commonGeneratorX {
                     commonGeneratorX.ensureDirectoryExistence(row.src.pathOf[designerFileSrctype]);
                     _data = this.filex(`${srctype}${uctype}.designer`)(row);
                     //console.log(_data);
-                    
+
                     writeFileSync(row.src.pathOf[designerFileSrctype], _data);
 
                     // if (row.htmlFileContent != undefined)
@@ -97,27 +115,33 @@ export class commonGeneratorX {
                 }
             }
         }
-        console.log('build.success');
-        
+        console.log(`
+                  +---------------+
+                 /                |
+          SUCCESSFULL             |
+           /                      |
+          +-----------------------+            
+                    `);
+
     }
 
     cssBulder: ResourceBuildEngine;
     generateResources() {
-
-        const proj = BuildingProcess.configHandler.MAIN_CONFIG;
+        const chandler = BuildingProcess.configHandler;
+        const proj = chandler.MAIN_CONFIG;
         const pref = proj.config.preference;
 
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
-            if(s.source!=undefined)
+            if (s.source != undefined)
                 s.source = normalize(relativeFilePath(proj.projectPath, s.source));
             s.source = JSON.stringify(s.source ?? '')
             s.guid = JSON.stringify(s.guid);
             s.isGlobalCss = s.isGlobalCss == undefined ? false : (s.isGlobalCss ?? false);
             s.project = s.project ?? proj.projectName
         });
-        
+
         /* const onlyAlias = resources.filter(s => s.name && s.name != "");
        const nameRegistry = {};
        this.cssBulder.projectList.forEach(prj => {
@@ -132,12 +156,14 @@ export class commonGeneratorX {
            );
        }); */
         const rowForRes = {
-            importmap : safeStringify(BuildingProcess.configHandler.importmap),
+            importmap: JSON.stringify(safeStringify(chandler.importmap)),
             mainProject: ResourceBuildEngine.MAIN_PROJECT,
             projectList: this.cssBulder.projectList,
-            resources
+            resources,
+            PACKAGE_LIST: chandler.PACKAGE_LIST,
+            importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'ucbuilder' ? '../core.js' : undefined
         };
-        
+
         let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;
         let outPath = pref.dirDeclaration[pref.outDir].dirPath;
         let resSrcFile = resolve(proj.projectPath, srcPath, pref.build.ResourceDeclarationFile);
@@ -145,7 +171,7 @@ export class commonGeneratorX {
         rowForRes.projectList.forEach(s => {
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
-            s.importResource = s.projectGuid != BuildingProcess.configHandler.MAIN_CONFIG.config.guid && existsSync(s.resourceFilefullPath);
+            s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(s.resourceFilefullPath);
         });
         let resContent = this.filex('resources')(rowForRes);
         writeFileSync(resSrcFile, resContent, 'utf-8');

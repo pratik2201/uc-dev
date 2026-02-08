@@ -2,10 +2,10 @@
 import { join, relative, dirname, normalize, isAbsolute, resolve } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { copyFileSync, mkdirSync, readdirSync, statSync } from "fs";
-import { normalizeJSON, safeStringify } from "ap-shared-core/out/objectUtil.js";
-import { UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+import { normalizeJSON, safeStringify } from "ap-shared-core/out/objectUtil.js"; 
 import { resolveFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
-import { pathToFileURL } from "url";
+import { pathToFileURL } from "url"; 
+import { UserResource } from "ucbuilder/out/common/resources/enums.js";
 
 export class ResourceCopy {
 

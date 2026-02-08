@@ -1,6 +1,5 @@
 import { getCloneableObject } from "ap-shared-core/out/objectUtil.js";
 import { ProjectRowBase } from "ap-shared-core/out/ucbuilder/configResources.js";
-import { ResourceKeyBridge, UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
 import { PathBridge } from "ap-shared-core/out/ucbuilder-devtools/pathBridge.js";
 import { IHTMLxSource } from "ucbuilder/out/lib/WrapperHelper.js";
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
@@ -11,8 +10,8 @@ import { commonParser } from "./commonParser.js";
 import { fileWatcher } from "./fileWatcher.js";
 import { ProjectManage } from "./ProjectManage.js";
 import { CommonRow, dynamicDesignerElementTree } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
-import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
-
+import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js"; 
+import { ResourceKeyBridge, UserResource } from "ucbuilder/out/common/resources/enums.js";
 export interface SourceCodeNode {
     designerCode?: string,
     jsFileCode?: string,
@@ -50,7 +49,7 @@ export class builder {
     commonMng: commonParser;
     filewatcher: fileWatcher;
     Event = {
-        onSelect_xName: (_ele: HTMLElement, _row: CommonRow) => {} // new CommonEvent<(ele: HTMLElement, row: CommonRow) => void>()
+        onSelect_xName: (_ele: HTMLElement, _row: CommonRow) => { } // new CommonEvent<(ele: HTMLElement, row: CommonRow) => void>()
     }
     async getAllDesignerXfiles() {
         const rtrn = {
@@ -62,9 +61,9 @@ export class builder {
         const pref = this.project.config.preference;
         const srcDec = pref.dirDeclaration[pref.srcDir];
         const srcFileDec = srcDec?.fileDeclaration;
-        const srcDynamicExt = srcFileDec?.tsLayout?.extension;
+        // const srcDynamicExt = srcFileDec?.tsLayout?.extension;
         const srcHtmlExt = srcFileDec?.html?.extension;
-        if (srcDynamicExt == undefined) { console.log("!!! no dynamic design file (.html.js) "); }
+        // if (srcDynamicExt == undefined) { console.log("!!! no dynamic design file (.html.js) "); }
 
         await this.recursive(nodeFn.path.join(this.project.projectPath, srcDec.dirPath),
             (_pth) => false,
@@ -100,7 +99,7 @@ export class builder {
         return results;*/
     }
     async buildDynamic() {
-        const rtrn = {
+        /*const rtrn = {
             cinfo: [] as codeFileInfo[]
         };
         let results = [];
@@ -139,11 +138,8 @@ export class builder {
             //console.log(dynamicHtmlPath);
             //console.log(data.htmlSource());            
         };
-
-
-
-
         return rtrn;
+        */
     }
     nodex = {
         dynamicFiles: [] as string[],
@@ -226,7 +222,7 @@ export class builder {
 
         PathBridge.source.forEach(s => this.commonMng.gen.cssBulder.registerProject(s));
         //const runtimeSrc: BuildResource[] = [];
-        await this.buildDynamic();
+        //await this.buildDynamic();
         await this.recursive(nodeFn.path.join(this.project.projectPath, outDec.dirPath),
             (_pth) => false,
             async (fullpath) => {
@@ -280,50 +276,53 @@ export class builder {
             const cinfo = cInfos[index];
             //if (cinfo.pathOf.html.includes('ledger$form')) debugger;
             const srcDec = cinfo.allPathOf[pref.srcDir];
-           /* const outDec = cinfo.allPathOf[pref.outDir];
-            let dynamicOutputPath = outDec.tsLayout;
-            let dynamicOutputData = undefined as string;
-            let hasDynamicOutput = nodeFn.fs.existsSync(dynamicOutputPath);
-            if (hasDynamicOutput) {
-               // console.log(`====>${dynamicOutputPath}`);
-                const dtodata = (await DynamicToHtml(dynamicOutputPath));
-                dynamicOutputData = dtodata?.htmlSource();
-                //console.log(dynamicOutputData);
-                dynamicOutputData = dynamicOutputData?.trim() ?? '';
-                if (dynamicOutputData.length > 0) {
-                    const htnode = dynamicOutputData["#$"]();
-                    if (htnode?.nodeName != undefined && htnode?.nodeType != undefined) {
-                        commonGenerator.ensureDirectoryExistence(cinfo.pathOf.html);
-                        try {
-                            buildTimeFn.fs.writeFileSync(cinfo.pathOf.html, dynamicOutputData);
-                        } catch (eee) {
-                            console.warn(eee);
-                        }
-                    }
-                } else {
-                    if (nodeFn.fs.existsSync(srcDec.tsLayout)) {
-                        const dynamicContent = nodeFn.fs.readFileSync(srcDec.tsLayout);
-                        if (dynamicContent?.trim().length == 0) {
-                            buildTimeFn.fs.writeFileSync(srcDec.tsLayout,
-                                this.commonMng.gen.filex('ts.uc.dynamic')({}), 'utf-8');
-                            console.log('GENERATE `output` AND REBUILD DESINGER..');
-                        }
-                    }
-                }
-
-                await this.commonMng.init(cinfo);
-            } else {
-                if (nodeFn.fs.existsSync(srcDec.tsLayout)) {
-                    console.log('GENERATE `output` AND REBUILD DESINGER..');
-                } else */if (nodeFn.fs.existsSync(srcDec.htmlLayout)) {
+            /* const outDec = cinfo.allPathOf[pref.outDir];
+             let dynamicOutputPath = outDec.tsLayout;
+             let dynamicOutputData = undefined as string;
+             let hasDynamicOutput = nodeFn.fs.existsSync(dynamicOutputPath);
+             if (hasDynamicOutput) {
+                // console.log(`====>${dynamicOutputPath}`);
+                 const dtodata = (await DynamicToHtml(dynamicOutputPath));
+                 dynamicOutputData = dtodata?.htmlSource();
+                 //console.log(dynamicOutputData);
+                 dynamicOutputData = dynamicOutputData?.trim() ?? '';
+                 if (dynamicOutputData.length > 0) {
+                     const htnode = dynamicOutputData["#$"]();
+                     if (htnode?.nodeName != undefined && htnode?.nodeType != undefined) {
+                         commonGenerator.ensureDirectoryExistence(cinfo.pathOf.html);
+                         try {
+                             buildTimeFn.fs.writeFileSync(cinfo.pathOf.html, dynamicOutputData);
+                         } catch (eee) {
+                             console.warn(eee);
+                         }
+                     }
+                 } else {
+                     if (nodeFn.fs.existsSync(srcDec.tsLayout)) {
+                         const dynamicContent = nodeFn.fs.readFileSync(srcDec.tsLayout);
+                         if (dynamicContent?.trim().length == 0) {
+                             buildTimeFn.fs.writeFileSync(srcDec.tsLayout,
+                                 this.commonMng.gen.filex('ts.uc.dynamic')({}), 'utf-8');
+                             console.log('GENERATE `output` AND REBUILD DESINGER..');
+                         }
+                     }
+                 }
+ 
+                 await this.commonMng.init(cinfo);
+             } else {
+                 if (nodeFn.fs.existsSync(srcDec.tsLayout)) {
+                     console.log('GENERATE `output` AND REBUILD DESINGER..');
+                 } else */
+            /*
+            if (nodeFn.fs.existsSync(srcDec.htmlLayout)) {
                 buildTimeFn.fs.writeFileSync(srcDec.html, nodeFn.fs.readFileSync(srcDec.htmlLayout), 'utf-8');
                 console.log(`${srcDec.htmlLayout} HTML generated by htmllayout`);
-
             }
             if (nodeFn.fs.existsSync(srcDec.html))
                 await this.commonMng.init(cinfo);
+                */
             // }
         }
+        /*
         if (nodeFn.fs.existsSync(designerPath)) {
             let codeExt = fileWisePath.code.extension;
             let designerExt = fileWisePath.designer.extension;
@@ -331,14 +330,14 @@ export class builder {
             await this.recursive(designerPath, undefined, async (pth) => {
                 if (pth.endsWith(designerExt)) {
                     let _pthObj = PathBridge.Convert(pth, pref.srcDir as any, 'designer').paths[pref.srcDir];
-                    let bothExist = /*nodeFn.fs.existsSync(_pthObj.code) &&*/ (nodeFn.fs.existsSync(_pthObj.html) || nodeFn.fs.existsSync(_pthObj.tsLayout));
+                    let bothExist =   (nodeFn.fs.existsSync(_pthObj.html) || nodeFn.fs.existsSync(_pthObj.tsLayout));
                     if (!bothExist) {
                         console.log(`${_pthObj.designer} file deleted...`);
                         buildTimeFn.fs.rmSync(_pthObj.designer)
                     }
                 }
             });
-        }
+        }*/
         this.commonMng.gen.generateFiles(this.commonMng.rows);
         onComplete();
         /*if (nodeFn.fs.existsSync(designerPath)) {

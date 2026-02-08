@@ -3,12 +3,12 @@ import { correctpath } from "ap-shared-core/out/pathUtils.js";
 import { ImportMapResolver } from "ap-shared-core/out/ucbuilder-devtools/ImportMapResolver.js";
 import { BuildTimeGuidMeta, GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { encryptResource } from "ap-shared-core/out/ucbuilder/resources/cryptoResource.js";
-import { BuildResourceType, ResourceKeyBridge, UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
 import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
-import { dirname, extname, join, normalize, resolve, sep } from "path";
+import { dirname, extname, join, normalize, resolve, sep } from "path"; 
 import { fileURLToPath } from "url";
 import { BuildingProcess } from "../../lib/BuildingProcess.js";
+import { UserResource, ResourceKeyBridge, BuildResourceType } from "ucbuilder/out/common/resources/enums.js";
 
 
 /* ------------------ types ------------------ */

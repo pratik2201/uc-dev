@@ -1,13 +1,13 @@
 import { correctpath, trimPath } from "ap-shared-core/out/pathUtils.js";
-import { GetProjectName, IDirDeclarations, IImportMap, IUCConfigPreference, ProjectRowBase, UcBuildOptions, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { GetProjectName, IDirDeclarations, IImportMap, IUCConfigPreference, ProjectRowBase, TPPackage, UcBuildOptions, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { deepAssign } from "ap-shared-core/out/objectUtil.js";
 import { ImportMapResolver } from "ap-shared-core/out/ucbuilder-devtools/ImportMapResolver.js";
 import { PathBridge } from "ap-shared-core/out/ucbuilder-devtools/pathBridge.js";
+import { ImportUserConfig } from "ap-shared-core/out/ucbuilder-devtools/userConfigManage.js";  
 import { createRequire } from "module";
 import fs from "node:fs";
 import path, { join, normalize } from "node:path";
 import url from "node:url";
-import { ImportUserConfig } from "../userConfigManage.js";
 const appRequire = createRequire(
     path.resolve(process.cwd(), "package.json")
 );
@@ -39,17 +39,28 @@ export class ConfigHandler {
 
         }
     };
+
     MAKE_IMPORTMAP = (_config: ProjectRowBase) => {
+        function cpath(p: string) {
+            if (!p.startsWith('.')) p = './' + p;
+            if (!p.endsWith('/')) p = p + '/';
+            if (p == './/') p = './';
+            return p;
+        }
+
         const aliases = {};
         const pathAlias = _config.config?.browser?.importmap ?? {};
+
         for (let [als, relPath] of Object.entries(pathAlias)) {
             als = trimPath(als);
             let fpath = join(_config.projectPath, _config.rootPath);
             let resolvPath = normalize(path.join(fpath, relPath));
-            const np = correctpath(path.relative(fpath, resolvPath));
-            aliases[`${als}/`] = `./${np}/`;
+            let np = correctpath(path.relative(fpath, resolvPath));
+            np = cpath(np);// `./${np}/`;
+            aliases[`${als}/`] = np;
         }
-        const rootPath = `./${correctpath(_config.rootPath)}/`;
+
+        const rootPath = cpath(correctpath(_config.rootPath)); //`./${correctpath(_config.rootPath)}/`;
         if (this.importmap.scopes[rootPath] == undefined)
             this.importmap.scopes[rootPath] = aliases;
         for (let i = 0, iObj = _config.children, ilen = iObj.length; i < ilen; i++) {
@@ -58,6 +69,8 @@ export class ConfigHandler {
         }
     }
 
+    PACKAGE_LIST: TPPackage;
+    ALL_PROJECTS_DIRECTORIES: { [name: string]: string } = {};
     outDirPath: string;
     srcDirPath: string;
     pref: IUCConfigPreference<IDirDeclarations>;
@@ -85,13 +98,14 @@ export class ConfigHandler {
             if (v == undefined || Object.keys(v).length == 0) delete this.importmap.scopes[k];
         }
         //let str = JSON.stringify(this.importmap).replace(/\.\/\.\//g, './');
-        ImportMapResolver.init(this.importmap,this.MAIN_PROJECT_PATH);
+        ImportMapResolver.init(this.importmap, this.MAIN_PROJECT_PATH);
         //console.log(this.importmap);
-        
+
     }
 
     updateAliceToPath(rows: ProjectRowBase[]) {
         let mainProjectPath = this.MAIN_CONFIG.projectPath;
+        const dict = this.ALL_PROJECTS_DIRECTORIES;
         rows.forEach(row => {
             for (const [pathAliasKey, pathAliasValue] of Object.entries(row.config.browser.importmap)) {
                 let fullPath = correctpath(path.join(mainProjectPath, pathAliasValue) + '/');
@@ -100,12 +114,18 @@ export class ConfigHandler {
                     row.aliceToPath[pathAliasKey] = p.projectPath;
             }
             const cfg = row.config;
-            cfg.browser = cfg.browser ?? { importmap: {} };
+            cfg.browser = cfg.browser ?? { importmap: {}, resolveProjects: [] };
             cfg.browser.importmap = cfg.browser.importmap ?? {};
             const imap = cfg.browser.importmap;
-            let ucbuilderProjPath = this.PROJECT_DICTONARY.ucbuilder;
+            cfg.browser.resolveProjects.forEach(resolveProject => {
+                let resolveProjectPath = this.ALL_PROJECTS_DIRECTORIES[resolveProject];
+                if (resolveProjectPath != undefined)
+                    imap[resolveProject] = imap[resolveProject] ?? correctpath(path.relative(row.projectPath, resolveProjectPath));
+            });
+            /*let ucbuilderProjPath = this.PROJECT_DICTONARY.ucbuilder;
             if (ucbuilderProjPath != undefined)
                 imap.ucbuilder = imap.ucbuilder ?? correctpath(path.relative(row.projectPath, ucbuilderProjPath));
+            */
         });
     }
     private async RecurciveFindConfigAndFill(projectDirPath: string, row: ProjectRowBase) {
@@ -127,9 +147,12 @@ export class ConfigHandler {
 
                     row.projectPath = correctpath(projectDirPath);
                     const cfg = row.config;
-                    this.PROJECT_DICTONARY[row.projectName] = row.projectPath;
+                    this.ALL_PROJECTS_DIRECTORIES[row.projectName] = this.ALL_PROJECTS_DIRECTORIES[row.projectName] ?? row.projectPath;
                     row.rootPath = correctpath(path.normalize(path.relative(this.MAIN_PROJECT_PATH, row.projectPath)));
                     row.rootPath = row.rootPath == '.' ? '.' : path.join('./', row.rootPath, '/');
+
+                    cfg.browser = cfg.browser ?? { importmap: {}, resolveProjects: [] };
+                    cfg.browser.importmap = cfg.browser.importmap ?? {};
                     cfg.browser.importmap[row.projectPrimaryAlice] = '';
                     this.allConfig.push(row);
                     row.importMetaURL = url.pathToFileURL(projectDirPath).href;
@@ -146,8 +169,9 @@ export class ConfigHandler {
             }
         }
     }
-    PROJECT_DICTONARY: { [name: string]: string } = {};
+
     listProjectPath(projectDir: string) {
+        const _this = this;
         const pkgJson = JSON.parse(
             fs.readFileSync(path.resolve(projectDir, "package.json"), "utf-8")
         );
@@ -155,24 +179,33 @@ export class ConfigHandler {
             ...pkgJson.dependencies,
             ...pkgJson.optionalDependencies
         };
-
-        const foundConfigs = this.PROJECT_DICTONARY;
         const rtrn: string[] = [];
+
+        //console.log(this.PACKAGE_LIST);
+        const _PACKEGE_LIST = {}
         for (const pkgName of Object.keys(deps)) {
             const ucprojectDir = findUcConfig(pkgName);
             if (ucprojectDir) {
                 rtrn.push(ucprojectDir);
-                foundConfigs[pkgName] = foundConfigs[pkgName] ?? correctpath(ucprojectDir);
+                //foundConfigs[pkgName] = foundConfigs[pkgName] ?? ;
+
             }
         }
-        // console.log(foundConfigs);
+        if (this.PACKAGE_LIST == undefined)
+            this.PACKAGE_LIST = _PACKEGE_LIST;
+        /*for (const [pkgName, _pth] of Object.entries(_PACKEGE_LIST))
+            if (this.PACKAGE_LIST[pkgName])
+                this.PACKAGE_LIST = _PACKEGE_LIST;*/
 
+        // console.log(foundConfigs);
 
         return rtrn;
         function findUcConfig(pkgName) {
             const root = resolvePackageRoot(pkgName);
             if (!root) return null;
-
+            const _rootPath = correctpath(root);
+            _PACKEGE_LIST[pkgName] = _rootPath;
+            _this.ALL_PROJECTS_DIRECTORIES[pkgName] = _this.ALL_PROJECTS_DIRECTORIES[pkgName] ?? _rootPath;
             const configPath = path.join(root, "ucconfig.js");
             return fs.existsSync(configPath) ? root : null;
         }

@@ -6,15 +6,15 @@ import { join, normalize, relative, resolve } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { commonGeneratorX } from "./commonGeneratorX.js";
 
-import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
-import { ResourceKeyBridge } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js"; 
 import { ATTR_OF, ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
 import { ResourceBuildEngine } from "../../main/resMng/ResourceBuildEngine.js";
 
 import { IUsercontrolMeta } from "ap-shared-core/out/ucbuilder/Template.js";
 import { EModify, GetTemplateMetaByContent } from "../files/jsToHtml.js";
-import { correctpath } from "ap-shared-core/out/pathUtils.js";
+import { correctpath } from "ap-shared-core/out/pathUtils.js"; 
+import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
 export class BuildDesigner {
     gen: commonGeneratorX;
     bldr: BuildingProcess;

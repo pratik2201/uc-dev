@@ -1,6 +1,4 @@
-import { ResourceStorage } from "ap-shared-core/out/ucbuilder/resources/ResourceStorage.js";
-import { UserResource } from "ap-shared-core/out/ucbuilder/resources/enums.js";
-import { Assembly, AssemblyManager } from "ucbuilder/out/main/Assembly.js";
+import { UserResource, ResourceStorage, Assembly, AssemblyManager } from "<?= importPath ?? 'ucbuilder/out/core.js' ?>";
 
 declare module "ap-shared-core/out/ucbuilder/resources/enums" {
    export interface ResourceNamedRegistry{
@@ -10,6 +8,14 @@ declare module "ap-shared-core/out/ucbuilder/resources/enums" {
             <?= res.name ?> : <?= res.source ?>,
     <?php  } ?>
    }
+
+   export interface TPPackage {
+        <?php  for (const [pkg,vers] of Object.entries(PACKAGE_LIST)) { ?>
+            "<?= pkg ?>": "", <?php 
+        } ?>
+   }
+
+   
    export interface AssemblyRegistry{
         <?= mainProject.name ?> : Assembly
    }

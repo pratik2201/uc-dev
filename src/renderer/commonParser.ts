@@ -1,19 +1,19 @@
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
 import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
-import { ResourceKeyBridge } from "ap-shared-core/out/ucbuilder/resources/enums.js";
+
+import { CommonRow, Control, DesignerOptionsBase, ImportClassNode, ScopeType, codeOptionsBase, dynamicDesignerElementTree } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
+import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
+import { ITemplateNodeMeta } from "ap-shared-core/out/ucbuilder/Template.js";
 import { ATTR_OF, ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
-import { FilterContent } from "ucbuilder/out/lib/StampGenerator.js";
-import { HTMLx } from "ucbuilder/out/lib/WrapperHelper.js";
+import { FilterContent } from "ucbuilder/out/lib/StampGenerator.js"; 
 import { nodeFn } from "ucbuilder/out/renderer/nodeFn.js";
 import { Template } from "ucbuilder/out/renderer/Template.js";
 import { Usercontrol } from "ucbuilder/out/renderer/Usercontrol.js";
 import { builder } from "./builder.js";
-import { CommonRow, Control, DesignerOptionsBase, ImportClassNode, ScopeType, codeOptionsBase, dynamicDesignerElementTree } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
 import { buildTimeFn } from "./buildTimeFn.js";
-import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
 import { commonGenerator } from "./commonGenerator.js";
 import { ProjectManage } from "./ProjectManage.js";
-import { ITemplateNodeMeta } from "ap-shared-core/out/ucbuilder/Template.js";
+import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
 export interface PathReplacementNode { findPath: string, replaceWith: string }
 export class commonParser {
     generateNodes(htContent: string): string {
@@ -147,9 +147,9 @@ export class commonParser {
         code = htmlContents ??
             nodeFn.fs.readFileSync(finfo.allPathOf[srcDec].html) /*??
             nodeFn.fs.readFileSync(finfo.allPathOf[filePref.outDir].html)*/;
-        if (nodeFn.fs.existsSync(finfo.allPathOf[srcDec].tsLayout)) {
+        /*if (nodeFn.fs.existsSync(finfo.allPathOf[srcDec].tsLayout)) {
             designer.dynamicName = designer.importer.getNameNumber(`${finfo.name}$dynamicHtmlCode`);
-        }
+        }*/
         return code;
     }
     fillUc = async (finfo: codeFileInfo, htmlContents: string, _row: CommonRow) => {
@@ -238,7 +238,7 @@ export class commonParser {
                 let uFInf = new codeFileInfo();
                 uFInf.parseUrl(_subpath, pref.outDir as any, outPathOf.html);
                 if (uFInf.pathOf == undefined) debugger;
-                if (_exists(uFInf.pathOf.code) || _exists(uFInf.pathOf.tsLayout) ||
+                if (_exists(uFInf.pathOf.code) || //_exists(uFInf.pathOf.tsLayout) ||
                     _exists(uFInf.pathOf.scss) || _exists(uFInf.pathOf.html)) {
                     ctr.type = uFInf.extCode;
                     ctr.nodeName = uFInf.name;
@@ -425,11 +425,11 @@ export class commonParser {
 
 
 
-
+        /*
         if (pathOf.tsLayout != undefined) {
             let dsTodyn = ucUtil.resolveSubNode(nodeFn.path.relativeFilePath(pathOf.designer, pathOf.tsLayout));
             des.dynamicFilePath = ucUtil.changeExtension(dsTodyn, this.SRC_CODE_EXT, this.OUT_CODE_EXT);
-        }
+        }*/
         if (pathOf.html != undefined) {
             let dsToht = ucUtil.resolveSubNode(nodeFn.path.relativeFilePath(pathOf.designer, pathOf.html));
             des.htmlFilePath = dsToht;
