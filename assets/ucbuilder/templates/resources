@@ -1,6 +1,6 @@
-import { UserResource, ResourceStorage, Assembly, AssemblyManager } from "<?= importPath ?? 'ucbuilder/out/core.js' ?>";
+import { UserResource, ResourceStorage, Assembly, AssemblyManager } from "<?= importPath ?>";
 
-declare module "ap-shared-core/out/ucbuilder/resources/enums" {
+declare module "<?= declareClassPath ?>" {
    export interface ResourceNamedRegistry{
       <?php
       const onlyAlias = resources.filter(s => s.name && s.name != "");

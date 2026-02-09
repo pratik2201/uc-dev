@@ -46,13 +46,16 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         //fargs.source.cssGuid = <?=designer.className ?>.MATERIAL.cssGuid;
         //fargs.source.htmlGuid = <?=designer.className ?>.MATERIAL.htmlGuid;
         this.extended.initializebase(fargs);
-        let oot = Template.GetObjectOfTemplate(fargs.guid)
+       //let oot = Template.GetObjectOfTemplate(fargs.guid);
+        let oot = this.extended.resource;
         let tpts = oot.templates;
       
        
         <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
         this.<?=$tpt.name ?> = new <?=$tpt.name ?>_TEMPLATE(this); 
-        this.<?=$tpt.name?>.extended.initializecomponent(fargs,tpts['<?=$tpt.name?>']); 
+        tpts.<?=$tpt.name ?>.accessKey = '<?=$tpt.name ?>';
+        tpts.<?=$tpt.name ?>.objectKey  = `${fargs.guid}#<?=$tpt.name ?>`;    
+        this.<?=$tpt.name ?>.extended.initializecomponent(fargs,tpts.<?=$tpt.name ?>); 
         delete this.<?=$tpt.name?>.extended.initializecomponent;
         <?php } ?>
 
@@ -70,7 +73,8 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         //fargs.source.cssGuid = <?=designer.className ?>.MATERIAL.cssGuid;
         //fargs.source.htmlGuid = <?=designer.className ?>.MATERIAL.htmlGuid;
         this.extended.initializebase(fargs);
-        let oot = Template.GetObjectOfTemplate(fargs.guid);
+        //let oot = Template.GetObjectOfTemplate(fargs.guid);
+        let oot = this.extended.resource;
         let tpts = oot.templates;
        
         <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>

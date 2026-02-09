@@ -161,7 +161,8 @@ export class commonGeneratorX {
             projectList: this.cssBulder.projectList,
             resources,
             PACKAGE_LIST: chandler.PACKAGE_LIST,
-            importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'ucbuilder' ? '../core.js' : undefined
+            importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'ucbuilder' ? '../core-main.js' : 'ucbuilder/out/core-main.js',
+            declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'ucbuilder' ? 'ucbuilder/src/core-main' : 'ucbuilder/out/core-main'
         };
 
         let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;

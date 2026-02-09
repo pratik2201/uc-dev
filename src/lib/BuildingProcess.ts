@@ -16,6 +16,7 @@ export class BuildingProcess {
     static async start(pth: string) {
 
         PathBridge.init(path, url, this.configHandler.allConfig);
+
         await this.configHandler.fillConfig(pth);
 
         // console.log(this.configHandler.allConfig);
