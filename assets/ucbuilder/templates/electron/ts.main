@@ -1,0 +1,42 @@
+import { app, BrowserWindow, screen } from "electron";
+import { IpcMainHelper } from "ucbuilder/out/core-main.js";
+import { dirname, join, resolve } from "path";
+import { fileURLToPath, pathToFileURL } from "url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+let win: Electron.BrowserWindow;
+app.on('ready', async () => {
+    const mainScreen: Electron.Display = screen.getPrimaryDisplay();
+    await IpcMainHelper.init(import('<?= resourcePath ?>'));
+    win = new BrowserWindow({
+        width: mainScreen.size.width,
+        height: mainScreen.size.height,
+        titleBarStyle: 'hidden',
+        webPreferences: {
+            nodeIntegration: <?= nodeIntegration ?>,
+            contextIsolation: <?= contextIsolation ?>,
+            sandbox: false,  
+            spellcheck: false,
+            webSecurity: true,
+            preload: join(__dirname, '<?= preloadPath ?>'),
+        },
+    });
+    <?php if(removeMenu===true){ ?>
+    win.setMenu(null);
+    <?php } ?>
+    try {  
+        IpcMainHelper.loadURL(pathToFileURL(join(__dirname, '<?= rendererHtmlPath ?>')).href, win, {
+            // in browser 
+            // this will make resolve path from project root directory instead of loaded html file path            
+            baseURLForDataURL: pathToFileURL(resolve(process.cwd(), 'index.html')).href              
+        }); 
+        win.show();
+        <?php if(devtools===true){ ?> 
+        win.webContents.once('did-finish-load', () => {
+            win!.webContents.openDevTools(/*{ mode: 'detach' }*/);           
+        }); 
+        <?php } ?>
+    } catch (ex) {
+        console.log(ex);
+    }
+});

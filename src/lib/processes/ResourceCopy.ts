@@ -48,7 +48,7 @@ export class ResourceCopy {
         const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;
         const pref = cfg.preference; 
         const projPath = BuildingProcess.configHandler.MAIN_PROJECT_PATH; 
-        const dirDecfullPath = join(projPath, pref.dirDeclaration[pref.outDir].dirPath);
+        const dirDecfullPath = join(projPath, pref.dirDeclaration[pref.outDec].dirPath);
         let filteed = this.sourceFileList.filter(s =>
             s.startsWith(dirDecfullPath) &&
             s.endsWith('.resx.js')
@@ -96,7 +96,7 @@ export class ResourceCopy {
                     else if (res.includeExtensions.includes(fileExt)) {
                         const commonPath = relative(SRC_DIR, full);
                         res.toDeclares.forEach(ot => {
-                            let OUT_DIR = dirDeclaration[pref.outDir].dirPath;
+                            let OUT_DIR = dirDeclaration[pref.outDec].dirPath;
                             const dest = join(OUT_DIR, commonPath);
                             mkdirSync(dirname(dest), { recursive: true });
                             copyFileSync(full, dest);

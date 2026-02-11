@@ -8,6 +8,7 @@ import { createRequire } from "module";
 import fs from "node:fs";
 import path, { join, normalize } from "node:path";
 import url from "node:url";
+import { askForInit_UCCONFIG } from "../../utils/interect_UCCONFIG.js";
 const appRequire = createRequire(
     path.resolve(process.cwd(), "package.json")
 );
@@ -18,16 +19,16 @@ function isSamePath(path1: string, path2: string) {
 }
 export class ConfigHandler {
 
-    async init(importMetaPath: string) {
-        PathBridge.path = path as any;
-        PathBridge.url = url as any;
-        if (importMetaPath.startsWith('file:///')) importMetaPath = url.fileURLToPath(importMetaPath);
-        const cpth = correctpath(importMetaPath);
-        await this.fillConfig(cpth);
-        PathBridge.source = this.allConfig;
-        PathBridge.CheckAndSetDefault();
+    // async init(importMetaPath: string) {
+    //     PathBridge.path = path as any;
+    //     PathBridge.url = url as any;
+    //     if (importMetaPath.startsWith('file:///')) importMetaPath = url.fileURLToPath(importMetaPath);
+    //     const cpth = correctpath(importMetaPath);
+    //     await this.fillConfig(cpth);
+    //     PathBridge.source = this.allConfig;
+    //     PathBridge.CheckAndSetDefault();
 
-    }
+    // }
 
     MAIN_CONFIG: ProjectRowBase;
     MAIN_PROJECT_PATH: string;
@@ -75,19 +76,14 @@ export class ConfigHandler {
     srcDirPath: string;
     pref: IUCConfigPreference<IDirDeclarations>;
     ucConfig = new ProjectRowBase();
-    fillConfig = async (mainDirPath: string) => {
-        let projectDir = this.getProjectDir(mainDirPath);
-        if (projectDir == null) {
-            throw new Error('NO `ucconfig.js` file found..`');
-            return;
-        }
+    fillConfig = async (projectDir: string) => {        
         await this.RecurciveFindConfigAndFill(projectDir, this.ucConfig);
         const cfg = this.MAIN_CONFIG.config;
         this.pref = cfg.preference;
         this.pref.build = Object.assign(new UcBuildOptions(), this.pref.build);
         const bld = this.pref.build;
-        this.srcDirPath = this.pref.dirDeclaration[this.pref.srcDir].dirPath;
-        this.outDirPath = this.pref.dirDeclaration[this.pref.outDir].dirPath;
+        this.srcDirPath = this.pref.dirDeclaration[this.pref.srcDec].dirPath;
+        this.outDirPath = this.pref.dirDeclaration[this.pref.outDec].dirPath;
         //if (bld.keyBind == undefined || bld.keyBind.length == 0)
         //    bld.keyBind = ['ControlRight', 'F12'];
 
@@ -221,30 +217,7 @@ export class ConfigHandler {
         return [];
     }
 
-    getProjectDir(startPath: string): string | null {
-        let dir = fs.statSync(startPath).isFile()
-            ? path.dirname(startPath)
-            : startPath;
-
-        dir = fs.realpathSync(dir);
-
-        while (true) {
-            const candidate = path.join(dir, "ucconfig.js");
-
-            if (fs.existsSync(candidate)) {
-                return dir;
-            }
-
-            const parent = path.dirname(dir);
-
-            // reached filesystem root
-            if (parent === dir) {
-                return null;
-            }
-
-            dir = parent;
-        }
-    }
+    
 }
 
 

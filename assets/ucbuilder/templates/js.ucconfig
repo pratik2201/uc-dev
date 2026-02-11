@@ -1,0 +1,104 @@
+import { UcDefaultConfig } from "ucbuilder/out/core-main.js";
+ <?php 
+       const $prf = preference;
+       const $build = $prf.build;
+       const $dirDec = $prf.dirDeclaration;
+       const $srcDec = $prf.srcDec;
+       const $outDec = $prf.outDec;
+    ?>
+export default UcDefaultConfig({
+    guid: "<?= guid ?>", 
+    browser: {
+        resolveProjects: [ <?php browser.resolveProjects.forEach(v => {
+                         ?> "<?= v ?>", <?php
+                                 }); ?> ],
+        importmap: {
+            <?php for(const [k,v] of Object.entries(browser.importmap)) { ?>
+                <?= JSON.stringify(k) ?>:<?= JSON.stringify(v) ?>
+            <?php } ?>
+        }
+    },
+    projectBaseCssPath: "<?= projectBaseCssPath ?>",   
+    preference: {
+        build: { 
+            ResourceStorageFile: "<?= $build.ResourceStorageFile ?>", 
+            ignorePath: [ <?php $build.ignorePath.forEach(v => {
+                         ?> "<?= v ?>", <?php
+                                 }); ?> ],
+            RuntimeResources: [
+                {
+                    includeExtensions: [ <?php $build.RuntimeResources[0].includeExtensions.forEach(v => {
+                         ?> "<?= v ?>", <?php
+                                 }); ?> ],
+                    fromDeclare: "<?= $srcDec ?>",
+                    toDeclares: ["<?= $outDec ?>"]
+                }
+            ],
+            guidOptions: {
+                guidType: "<?= $build.guidOptions.guidType ?>",
+                sequencePadSize: <?= $build.guidOptions.sequencePadSize ?>,
+            }
+        },
+        
+        dirDeclaration: {
+            <?= $srcDec ?>: {
+                /* 
+                i.e
+                ./[src]/lib/file.uc.ts     =>    ./src/lib/file.uc.ts  
+                ./[]/lib/file.uc.html     =>    ./lib/file.uc.html
+                */
+                dirPath: '<?= $dirDec[$srcDec].dirPath ?>',
+                /**
+                 *  i.e 
+                 * dirDeclaration.<?= $srcDec ?>.dirpath = 'src';
+                 * dirDeclaration.<?= $srcDec ?>.fileDeclaration.subDirPath = 'designerFiles';
+                 *
+                 * ./[src]/[designerFiles]/lib/file.uc.designer.ts     =>    ./src/designerFiles/lib/file.uc.designer.ts
+                 * ./[src]/[]/lib/file.uc.ts     =>    ./src/lib/file.uc.ts
+                 *
+                 * dirDeclaration.<?= $srcDec ?>.fileDeclaration.subDirPath = ''
+                 * ./[src]/[]/lib/file.uc.ts     =>    ./src/lib/file.uc.ts
+                 *
+                 * dirDeclaration.<?= $srcDec ?>.fileDeclaration.subDirPath = 'htmlFiles'
+                 * ./[src]/[htmlFiles]/lib/file.uc.designer.ts     =>    ./src/htmlFiles/lib/file.uc.designer.ts
+                 *   
+                 *  Same for <?= $outDec ?> declaration 
+                 */
+                fileDeclaration: <?php fileDec($dirDec[$srcDec].fileDeclaration) ?>
+            },
+            <?= $outDec ?>: {
+                /* 
+                i.e
+                ./[out]/lib/file.uc.js     =>    ./out/lib/file.uc.js  
+                ./[]/lib/file.uc.html     =>    ./lib/file.uc.html
+                */
+                dirPath: '<?= $dirDec[$outDec].dirPath ?>',
+                fileDeclaration:  <?php fileDec($dirDec[$outDec].fileDeclaration) ?>
+            }
+        }, 
+         /**
+         * A common Declaration  for all declarations specified in `dirDeclaration` 
+         * (i.e <?= $srcDec ?>,<?= $outDec ?>)
+         */
+        fileCommonDeclaration: <?php fileDec($prf.fileCommonDeclaration) ?>,        
+        /**
+         * specify dirDeclaration key for source
+         */
+        srcDec: "<?= $prf.srcDec ?>",
+        /**
+         * specify dirDeclaration key for output
+         */
+        outDec: "<?= $prf.outDec ?>"
+    },
+});
+<?php 
+function fileDec(dec)  { ?> { <?php
+    for(const [k,v] of Object.entries(dec)){ ?>
+        <?= k ?> : <?php fileDecItem(v) ?>,
+    <?php }
+?> } <?php }
+function fileDecItem(dec) { ?> { <?php
+    if(dec.subDirPath!=undefined && dec.subDirPath!=''){ ?> subDirPath : '<?= dec.subDirPath ?>', <?php }
+    if(dec.extension!=undefined && dec.extension!=''){ ?> extension : '<?= dec.extension ?>', <?php }
+?> } <?php }
+?>

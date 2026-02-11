@@ -9,7 +9,7 @@ import { commonGeneratorX } from "./commonGeneratorX.js";
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js"; 
 import { ATTR_OF, ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
-import { ResourceBuildEngine } from "../../main/resMng/ResourceBuildEngine.js";
+import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
 import { IUsercontrolMeta } from "ap-shared-core/out/ucbuilder/Template.js";
 import { EModify, GetTemplateMetaByContent } from "../files/jsToHtml.js";
@@ -47,8 +47,8 @@ export class BuildDesigner {
         this.gen.cssBulder = new ResourceBuildEngine(this.project);
         this.CONFIG = this.project?.config;
         this.PREFERENCE = this.CONFIG?.preference;
-        this.SRC_DEC = this.PREFERENCE?.dirDeclaration[this.PREFERENCE?.srcDir]?.fileDeclaration as any;
-        this.OUT_DEC = this.PREFERENCE?.dirDeclaration[this.PREFERENCE?.outDir]?.fileDeclaration as any;
+        this.SRC_DEC = this.PREFERENCE?.dirDeclaration[this.PREFERENCE?.srcDec]?.fileDeclaration as any;
+        this.OUT_DEC = this.PREFERENCE?.dirDeclaration[this.PREFERENCE?.outDec]?.fileDeclaration as any;
         this.SRC_CODE_EXT = this.SRC_DEC.code.extension;
         this.OUT_CODE_EXT = this.OUT_DEC.code.extension;
         this.PROJECT_PATH_LENGTH = this.project.projectPath.length;
@@ -78,7 +78,7 @@ export class BuildDesigner {
     common0 = (_row: CommonRow) => {
         const finfo = _row.src;
         const filePref = finfo?.projectInfo?.config?.preference;
-        const srcDec = filePref.srcDir;
+        const srcDec = filePref.srcDec;
         const code = readFileSync(finfo.allPathOf[srcDec].html, 'utf-8');
         return code;
     }
@@ -91,8 +91,8 @@ export class BuildDesigner {
 
 
         const pref = _row.src?.projectInfo.config.preference;
-        const srcPathOf = _row.src.allPathOf[pref.srcDir];
-        const outPathOf = _row.src.allPathOf[pref.outDir];
+        const srcPathOf = _row.src.allPathOf[pref.srcDec];
+        const outPathOf = _row.src.allPathOf[pref.outDec];
 
         let htmlCode: string;
         const pathOf = finfo.pathOf;
@@ -158,7 +158,7 @@ export class BuildDesigner {
 
         //let im = row.designer.importClasses;
         const _importer = row.designer.importer;
-        _importer.addImport(['Usercontrol', 'VariableList', 'intenseGenerator', 'IUcOptions'], 'ucbuilder/out/core.js');
+        _importer.addImport(['Usercontrol', 'intenseGenerator', 'IUcOptions'], 'ucbuilder/out/core.js');
 
 
         this.common2(row.designer, finfo);
@@ -180,7 +180,7 @@ export class BuildDesigner {
                 let _sspath = ucUtil.devEsc(EModify.getAttribute(element, "x-from"));
                 let _subpath = resolveFilePath(outPathOf.html, _sspath);
                 let uFInf = new codeFileInfo();
-                uFInf.parseUrl(_subpath, pref.outDir as any, outPathOf.html);
+                uFInf.parseUrl(_subpath, pref.outDec as any, outPathOf.html);
                 if (uFInf.pathOf == undefined) debugger;
                 if (_exists(uFInf.pathOf.code) ||
                     _exists(uFInf.pathOf.scss) || _exists(uFInf.pathOf.html)) {
@@ -188,7 +188,7 @@ export class BuildDesigner {
                     ctr.nodeName = uFInf.name;
                     ctr.src = uFInf;
                     const uFpref = uFInf.projectInfo.config.preference;
-                    const uFprefOutdir = uFInf.allPathOf[uFpref.outDir];
+                    const uFprefOutdir = uFInf.allPathOf[uFpref.outDec];
                     ctr.codeFilePath = relativeFilePath(outPathOf.designer, uFprefOutdir['code']);
                     ctr.importedClassName = row.designer.importer.addImport([uFInf.name], ctr.codeFilePath)[0];
                     row.designer.controls.push(ctr);
@@ -204,8 +204,8 @@ export class BuildDesigner {
         let _this = this;
         _row.src = finfo;
         const pref = _row.src?.projectInfo.config.preference;
-        const srcPathof = _row.src.allPathOf[pref.srcDir];
-        const outPathof = _row.src.allPathOf[pref.outDir];
+        const srcPathof = _row.src.allPathOf[pref.srcDec];
+        const outPathof = _row.src.allPathOf[pref.outDec];
         let onSelect_xName = BuildingProcess.Event.onSelect_xName;
         let projectPath = resolve();
 
@@ -248,7 +248,7 @@ export class BuildDesigner {
             return undefined;
         }
         this.common1(row.designer, row.code, _row.src);
-        row.designer.importer.addImport(['TemplateNode', 'Template', 'intenseGenerator', 'ITptOptions', 'VariableList'],
+        row.designer.importer.addImport(['TemplateNode', 'Template', 'intenseGenerator', 'ITptOptions'],
             'ucbuilder/out/core.js');
 
 
@@ -349,8 +349,8 @@ export class BuildDesigner {
         des.importer.addImport([finfo.name], des.codeFilePath);
 
         const pref = finfo?.projectInfo.config.preference;
-        const srcPathOf = finfo.allPathOf[pref.srcDir];
-        const outPathOf = finfo.allPathOf[pref.outDir];
+        const srcPathOf = finfo.allPathOf[pref.srcDec];
+        const outPathOf = finfo.allPathOf[pref.outDec];
         const guid = crypto.randomUUID();
         des.rootPath = JSON.stringify(normalize(relativeFilePath(finfo.projectInfo.projectPath, outPathOf.scss)));
 

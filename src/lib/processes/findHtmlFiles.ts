@@ -1,7 +1,7 @@
 import { getCloneableObject } from "ap-shared-core/out/objectUtil.js";
 import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
 import { join } from "path";
-import { ResourceBuildEngine } from "../../main/resMng/ResourceBuildEngine.js";
+import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js"; 
 import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
 
@@ -9,7 +9,7 @@ export async function collectFiles() {
     const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;
     const pref = cfg.preference;
     const projPath = BuildingProcess.configHandler.MAIN_PROJECT_PATH;
-    const srcDirDec = pref.dirDeclaration[pref.srcDir];
+    const srcDirDec = pref.dirDeclaration[pref.srcDec];
     const htmlFileDec = srcDirDec.fileDeclaration.html;
     const htmlDirPath = join(projPath, srcDirDec.dirPath, htmlFileDec.subDirPath);
     const allFileList = BuildingProcess.resourceCopy.sourceFileList;
@@ -44,7 +44,7 @@ function registerMain() {
     const _cssbuilder = BuildingProcess.buildDesigner.gen.cssBulder;
     const cfg = getCloneableObject(_mainProj.config);
     const prf = cfg.preference;
-    const srcdir = prf.dirDeclaration[prf.srcDir].dirPath;
+    const srcdir = prf.dirDeclaration[prf.srcDec].dirPath;
     let stylePath = join(_mainProj.projectPath, _mainProj.config.projectBaseCssPath);
     const mp = ResourceBuildEngine.MAIN_PROJECT;
     mp.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));

@@ -7,12 +7,9 @@ import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
 import { dirname, extname, join, normalize, resolve, sep } from "path"; 
 import { fileURLToPath } from "url";
-import { BuildingProcess } from "../../lib/BuildingProcess.js";
+import { BuildingProcess } from "../BuildingProcess.js";
 import { UserResource, ResourceKeyBridge, BuildResourceType } from "ucbuilder/out/common/resources/enums.js";
-
-
-/* ------------------ types ------------------ */
-
+ 
 
 /* ------------------ helpers ------------------ */
 
@@ -130,9 +127,9 @@ export class ResourceBuildEngine {
 
 
     const pref = s.config.preference;
-    const resRelFilePath = correctpath(ucUtil.changeExtension(normalize(join(s.projectName, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js'));
+    const resRelFilePath = correctpath(ucUtil.changeExtension(normalize(join(s.projectName, pref.dirDeclaration[pref.outDec].dirPath, pref.build.ResourceStorageFile)), '.ts', '.js'));
     const resAbsoluteFilePath = ucUtil.changeExtension(
-      normalize(join(s.projectPath, pref.dirDeclaration[pref.outDir].dirPath, pref.build.ResourceDeclarationFile)), '.ts', '.js');
+      normalize(join(s.projectPath, pref.dirDeclaration[pref.outDec].dirPath, pref.build.ResourceStorageFile)), '.ts', '.js');
     this.projectList.push({
       resourceFilefullPath: resAbsoluteFilePath,
       project: s,

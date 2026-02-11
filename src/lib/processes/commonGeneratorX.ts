@@ -6,7 +6,7 @@ import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join, normalize, resolve } from "path";
-import { ResourceBuildEngine } from "../../main/resMng/ResourceBuildEngine.js";
+import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { relativeFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
 import { safeStringify } from "ap-shared-core/out/objectUtil.js";
@@ -60,17 +60,9 @@ export class commonGeneratorX {
         }
     }
     generateFiles() {
-        let _this = this;
-        //console.log(this.rows);
-        //if (this.rows == undefined || this.rows.length == 0) return;
+        let _this = this;       
         let _data = "";
-        console.log(`
-+---------------------+
-|                    /
-|          BUILD STARTED
-|              /
-+-------------+            
-                    `);
+       
         if (this.generateResources()) {
             if (this.rows.length == 0) {
                 console.log(`
@@ -116,11 +108,11 @@ export class commonGeneratorX {
             }
         }
         console.log(`
-                  +---------------+
-                 /                |
-          SUCCESSFULL             |
-           /                      |
-          +-----------------------+            
++----------------------------------+
+|                                  |
+|          SUCCESSFULL             |
+|                                  |
++----------------------------------+            
                     `);
 
     }
@@ -165,10 +157,10 @@ export class commonGeneratorX {
             declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'ucbuilder' ? 'ucbuilder/src/core-main' : 'ucbuilder/out/core-main'
         };
 
-        let srcPath = pref.dirDeclaration[pref.srcDir].dirPath;
-        let outPath = pref.dirDeclaration[pref.outDir].dirPath;
-        let resSrcFile = resolve(proj.projectPath, srcPath, pref.build.ResourceDeclarationFile);
-        let resOutFile = resolve(proj.projectPath, outPath, pref.build.ResourceDeclarationFile);
+        let srcPath = pref.dirDeclaration[pref.srcDec].dirPath;
+        let outPath = pref.dirDeclaration[pref.outDec].dirPath;
+        let resSrcFile = resolve(proj.projectPath, srcPath, pref.build.ResourceStorageFile);
+        let resOutFile = resolve(proj.projectPath, outPath, pref.build.ResourceStorageFile);
         rowForRes.projectList.forEach(s => {
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
