@@ -1,6 +1,6 @@
 
 import { CommonRow } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
-import { IFileDeclarationTypesMap } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { type IFileDeclarationTypesMap } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
 import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
@@ -10,6 +10,7 @@ import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { relativeFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
 import { safeStringify } from "ap-shared-core/out/objectUtil.js";
+import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
 
 interface CodeFilesNode {
     DESIGNER: string,
@@ -60,18 +61,12 @@ export class commonGeneratorX {
         }
     }
     generateFiles() {
-        let _this = this;       
+        let _this = this;
         let _data = "";
-       
+
         if (this.generateResources()) {
             if (this.rows.length == 0) {
-                console.log(`
-                  +---------------+
-                 /                |
-          NOTHING TO BUILD        |
-           /                      |
-          +-----------------------+             
-                    `);
+                console.log(`NO FILE TO GENERATE`);
 
                 return;
             }
@@ -89,10 +84,17 @@ export class commonGeneratorX {
 
                     commonGeneratorX.ensureDirectoryExistence(row.src.pathOf[designerFileSrctype]);
                     _data = this.filex(`${srctype}${uctype}.designer`)(row);
-                    //console.log(_data);
-
                     writeFileSync(row.src.pathOf[designerFileSrctype], _data);
 
+                    if (uctype == '.uc') {
+                        _data = this.filex(`js${uctype}.designer`)(row);
+                        writeFileSync(ucUtil.changeExtension(row.src.pathOf[designerFileSrctype], '.ts', '.js'), _data);
+                    }
+
+                    if (uctype == '.tpt') {
+                        _data = this.filex(`js${uctype}.designer`)(row);
+                        writeFileSync(ucUtil.changeExtension(row.src.pathOf[designerFileSrctype], '.ts', '.js'), _data);
+                    }
                     // if (row.htmlFileContent != undefined)
                     //     writeFileSync(`${row.src.pathOf.html}`, row.htmlFileContent);
 
@@ -107,13 +109,7 @@ export class commonGeneratorX {
                 }
             }
         }
-        console.log(`
-+----------------------------------+
-|                                  |
-|          SUCCESSFULL             |
-|                                  |
-+----------------------------------+            
-                    `);
+        console.log(`${this.rows.length} FILES GENERATED..`);
 
     }
 
@@ -122,7 +118,6 @@ export class commonGeneratorX {
         const chandler = BuildingProcess.configHandler;
         const proj = chandler.MAIN_CONFIG;
         const pref = proj.config.preference;
-
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -133,22 +128,7 @@ export class commonGeneratorX {
             s.isGlobalCss = s.isGlobalCss == undefined ? false : (s.isGlobalCss ?? false);
             s.project = s.project ?? proj.projectName
         });
-
-        /* const onlyAlias = resources.filter(s => s.name && s.name != "");
-       const nameRegistry = {};
-       this.cssBulder.projectList.forEach(prj => {
-           const projRes = onlyAlias.filter(s => s.project == prj.projectName);
-           nameRegistry[JSON.stringify(prj.projectName)] = projRes.reduce<Record<string, UserResource>>(
-               (acc, item) => {
-                   if (!item.name) return acc; // skip if name is undefined
-                   acc[item.name] = item;
-                   return acc;
-               },
-               {}
-           );
-       }); */
         const rowForRes = {
-            importmap: JSON.stringify(safeStringify(chandler.importmap)),
             mainProject: ResourceBuildEngine.MAIN_PROJECT,
             projectList: this.cssBulder.projectList,
             resources,
@@ -157,17 +137,23 @@ export class commonGeneratorX {
             declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'ucbuilder' ? 'ucbuilder/src/core-main' : 'ucbuilder/out/core-main'
         };
 
-        let srcPath = pref.dirDeclaration[pref.srcDec].dirPath;
+        const srcDec = pref.dirDeclaration[pref.srcDec];
+        let srcPath = srcDec.dirPath;
         let outPath = pref.dirDeclaration[pref.outDec].dirPath;
         let resSrcFile = resolve(proj.projectPath, srcPath, pref.build.ResourceStorageFile);
-        let resOutFile = resolve(proj.projectPath, outPath, pref.build.ResourceStorageFile);
         rowForRes.projectList.forEach(s => {
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
             s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(s.resourceFilefullPath);
         });
-        let resContent = this.filex('resources')(rowForRes);
+        commonGeneratorX.ensureDirectoryExistence(resSrcFile);
+        let resContent = this.filex('ts.resources')(rowForRes);
         writeFileSync(resSrcFile, resContent, 'utf-8');
+        if (!proj.config.useTypeScript) {
+            let resSrcTypeFile = ucUtil.changeExtension(resSrcFile, '.js', '.d.ts');
+            let resContentTypes = this.filex('t.resources')(rowForRes);
+            writeFileSync(resSrcTypeFile, resContentTypes, 'utf-8');
+        }
         return true;
     }
 

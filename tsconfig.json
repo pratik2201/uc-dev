@@ -15,6 +15,7 @@
     "rootDir": "src",
     "strict": true,
     "allowJs": true,
+    "verbatimModuleSyntax": true,
     "strictNullChecks": false,
     "esModuleInterop": true,
     "checkJs": false,

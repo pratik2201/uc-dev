@@ -27,44 +27,29 @@ export const cMap_<?=src.name?>: {
 
 export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
      
-    static Create(pera: ITptOptions): <?=src.name?> { 
-        return intenseGenerator.generateTPT(<?=src.name?>,pera) as <?=src.name?>;
-    }
-    static async CreateAsync(pera: ITptOptions): Promise<<?=src.name?>> {
-        return await intenseGenerator.generateTPTAsync(<?=src.name?>, pera);
-    }
-     
     <?php $templates.forEach($tpt=>{ 
     ?> public&nbsp;<?=$tpt.name?>:<?=$tpt.name?>$TemplateNode;
     <?php }); ?>
    
-    initializecomponentAsync? = async (fargs:ITptOptions) => { 
+    <?php _DESIGNER(false); ?>
+    
+    <?php _DESIGNER(true); ?>
+}
+
+<?php 
+function _DESIGNER(isAsync = false){
+    $initializecomponent = isAsync ? 'initializecomponentAsync':'initializecomponent';
+    $generateTPT = isAsync ? 'generateTPTAsync':'generateTPT';
+    $Create = isAsync ? 'CreateAsync':'Create';
+    $async = isAsync ? ' async ':'';
+    $await = isAsync ? ' await ':'';
+     ?>
+    static <?= $async ?> <?= $Create ?>(pera: ITptOptions) {
+        return <?= $await ?> intenseGenerator.<?= $generateTPT ?>(<?=src.name?>, pera) as <?=src.name?>;
+    }
+    <?=$initializecomponent ?>? = <?= $async ?> (fargs:ITptOptions) => { 
         if(fargs.MakeEmptyTemplate)return;        
         fargs.guid = <?= designer.guid ?>;
-        this.extended.initializebase(fargs);
-        let oot = this.extended.resource;
-        let tpts = oot.templates;
-      
-       
-        <?php $templates.forEach($tpt=>{ ?>
-        this.<?=$tpt.name ?> = new <?=$tpt.name ?>$TemplateNode(this); 
-        tpts.<?=$tpt.name ?>.accessKey = '<?=$tpt.name ?>';
-        tpts.<?=$tpt.name ?>.objectKey  = `${fargs.guid}#<?=$tpt.name ?>`;    
-        this.<?=$tpt.name ?>.extended.initializecomponent(fargs,tpts.<?=$tpt.name ?>); 
-        this.<?=$tpt.name?>.extended.takeoff();
-      
-        <?php }); ?>
-
-        if (oot.outerCssContents.trim() != '')
-            this.pushTemplateCss(oot.outerCssContents,fargs.guid);
-
-        delete this.initializecomponent;
-        delete this.initializecomponentAsync; 
-        this.extended.takeoff();
-    }
-    initializecomponent? = (fargs:ITptOptions) => { 
-        if(fargs.MakeEmptyTemplate)return;
-        fargs.guid = <?= designer.guid ?>;        
         this.extended.initializebase(fargs);
         let oot = this.extended.resource;
         let tpts = oot.templates;
@@ -84,4 +69,6 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
         delete this.initializecomponentAsync; 
         delete this.extended.initializebase;
     }
+<?php 
 }
+?>

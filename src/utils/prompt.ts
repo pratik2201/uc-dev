@@ -1,8 +1,10 @@
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import readline from "node:readline";
 import { fileURLToPath } from "node:url";
+import { commonGeneratorX } from "../lib/processes/commonGeneratorX.js";
+import { cliOptions } from "./cliMain.js";
 
 export function ask(question: string, def?: string): Promise<string> {
   const rl = readline.createInterface({
@@ -40,6 +42,22 @@ export function runTemplate(tptPath: string, importmeta: string, row: any) {
   const callback = tmaker.compileTemplate(tptContent);
   return callback(row);
 }
+export async function writeFileSafely(fpath: string, data: string, options: cliOptions) {
+  if (existsSync(fpath)) {
+    const overwrite = options.force ?? await askYesNo(
+      `${fpath} already exists. Overwrite?`,
+      false
+    );
+
+    if (!overwrite) {
+      console.log(`✖ ${fpath} is not overwrited`);
+      return;
+    }
+  }
+  commonGeneratorX.ensureDirectoryExistence(fpath);
+  writeFileSync(fpath, data, { encoding: 'utf8' });
+}
+
 // import readline from "node:readline";
 // export function ask(question: string, def: string): Promise<string> {
 //     const rl = readline.createInterface({

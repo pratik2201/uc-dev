@@ -3,7 +3,7 @@ import { ImportUserConfig } from "ap-shared-core/out/ucbuilder-devtools/userConf
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { commonGeneratorX } from "../lib/processes/commonGeneratorX.js";
-import { findProject } from "../lib/processes/findProject.js";
+import { findProject } from "./cliFindProjects.js";
 import { ask, askYesNo, runTemplate } from "./prompt.js";
 import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 
@@ -100,19 +100,8 @@ Use Typescript
         rendererIndexFilePath,
         runTemplate('../../assets/ucbuilder/templates/electron/ts.renderer', import.meta.url, options),
         { overrideOld: opts.force });
-    try {
 
-
-        /*const _projectBaseCssPath = resolve(cfg.projectBaseCssPath);
-        if (!existsSync(_projectBaseCssPath))
-            writeFileSync(_projectBaseCssPath, '', { encoding: 'utf-8' });*/
-
-        //const _ResourceStorageFile = resolve(dirdec[pref.srcDec].dirPath, cfg.preference.build.ResourceStorageFile);
-        //commonGeneratorX.ensureDirectoryExistence(_ResourceStorageFile);
-        console.log('.... ELECTRON GENERATED ...');
-    } catch (e) {
-        console.log(e);
-    }
+    console.log('.... ELECTRON GENERATED ...');
 }
 async function writeFileSafely(fpath: string, data: string, options = { overrideOld: false }) {
     if (existsSync(fpath)) {

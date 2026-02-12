@@ -1,13 +1,11 @@
+import { CommonRow } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
+import { PathBridge } from "ap-shared-core/out/ucbuilder-devtools/pathBridge.js";
 import path from "path";
 import url from "url";
 import { BuildDesigner } from "./processes/BuildDesigner.js";
 import { ConfigHandler } from "./processes/ConfigHandler.js";
 import { ResourceCopy } from "./processes/ResourceCopy.js";
 import { collectFiles } from "./processes/findHtmlFiles.js";
-import { CommonRow } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
-import { PathBridge } from "ap-shared-core/out/ucbuilder-devtools/pathBridge.js";
-import { findProject } from "./processes/findProject.js";
-import { askForInit_UCCONFIG } from "../utils/interect_UCCONFIG.js";
 export class BuildingProcess {
     static configHandler = new ConfigHandler();
     static resourceCopy = new ResourceCopy();

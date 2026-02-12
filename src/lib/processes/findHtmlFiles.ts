@@ -1,9 +1,10 @@
-import { getCloneableObject } from "ap-shared-core/out/objectUtil.js";
+import { getCloneableObject, safeStringify } from "ap-shared-core/out/objectUtil.js";
 import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
 import { join } from "path";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
-import { BuildingProcess } from "../BuildingProcess.js"; 
+import { BuildingProcess } from "../BuildingProcess.js";
 import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
+import type { UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
 
 export async function collectFiles() {
     const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;
@@ -33,20 +34,25 @@ export async function collectFiles() {
         const cInfo = cInfos[index];
         await BuildingProcess.buildDesigner.init(cInfo);
     }
-    
+
     BuildingProcess.buildDesigner.gen.rows.push(...BuildingProcess.buildDesigner.rows);
     BuildingProcess.buildDesigner.gen.generateFiles();
     //console.log(BuildingProcess.buildDesigner.gen.cssBulder.resources);
 
 }
 function registerMain() {
-    const _mainProj = BuildingProcess.configHandler.MAIN_CONFIG;
+    const chandler = BuildingProcess.configHandler;
+    const _mainProj = chandler.MAIN_CONFIG;
     const _cssbuilder = BuildingProcess.buildDesigner.gen.cssBulder;
-    const cfg = getCloneableObject(_mainProj.config);
+    const cfg = getCloneableObject(_mainProj.config) as UserUCConfig;
     const prf = cfg.preference;
     const srcdir = prf.dirDeclaration[prf.srcDec].dirPath;
     let stylePath = join(_mainProj.projectPath, _mainProj.config.projectBaseCssPath);
     const mp = ResourceBuildEngine.MAIN_PROJECT;
+    mp.importMapGuid = ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
+        content: safeStringify(chandler.importmap),
+        encrypt: cfg.encryptResource,
+    }));
     mp.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
     mp.ucConfigGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
         content: JSON.stringify(_mainProj.config)

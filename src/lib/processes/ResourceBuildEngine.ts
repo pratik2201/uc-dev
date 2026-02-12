@@ -1,15 +1,15 @@
 
 import { correctpath } from "ap-shared-core/out/pathUtils.js";
 import { ImportMapResolver } from "ap-shared-core/out/ucbuilder-devtools/ImportMapResolver.js";
-import { BuildTimeGuidMeta, GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { BuildTimeGuidMeta, type GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { encryptResource } from "ap-shared-core/out/ucbuilder/resources/cryptoResource.js";
 import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
-import { dirname, extname, join, normalize, resolve, sep } from "path"; 
+import { dirname, extname, join, normalize, resolve, sep } from "path";
 import { fileURLToPath } from "url";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { UserResource, ResourceKeyBridge, BuildResourceType } from "ucbuilder/out/common/resources/enums.js";
- 
+import { UserResource, ResourceKeyBridge, type BuildResourceType } from "ucbuilder/out/common/resources/enums.js";
+
 
 /* ------------------ helpers ------------------ */
 
@@ -92,7 +92,8 @@ export class ResourceBuildEngine {
     resourceRelativePath: string
   }>();
   private resourceMap = new Map<string, UserResource>();
-   
+
+  doEncrypt = false;
   private guidResolver: GuidResolver;
   clear() {
     this.resourceMap.clear();
@@ -119,7 +120,9 @@ export class ResourceBuildEngine {
     cssGuid: undefined as string,
     ucConfigGuid: undefined as string,
     name: undefined as string,
-    guid: undefined as string
+    guid: undefined as string,
+    importMapGuid: undefined as string,
+    encryptResource: false,
   }
   registerProject = (s: ProjectRowBase) => {
     let stylePath = join(s.projectPath, s.config.projectBaseCssPath);
@@ -192,12 +195,14 @@ export class ResourceBuildEngine {
     );
 
     const res = new UserResource();
+    _blueprint.content = this.doEncrypt ? encryptResource(_blueprint.content) : _blueprint.content;
     Object.assign(res, _blueprint, {
       guid,
       type: _blueprint.type ?? "string",
-      content: encryptResource(_blueprint.content),
+      content: _blueprint.content,
+      encrypt: this.doEncrypt
       //source: ""
-    });
+    } as UserResource);
 
     res.name = JSON.stringify(res.name);
 
@@ -249,8 +254,9 @@ export class ResourceBuildEngine {
     // css = css.replace(CSS_URL_RE, (_m, rel) => {
     //   return `url("${this.resolveAsset(rel, absPath)}")`;
     // });
-
-    res.content = encryptResource(this.treeShakeCss(absPath));
+    res.content = this.treeShakeCss(absPath);
+    res.content = this.doEncrypt ? encryptResource(res.content) : res.content;
+    res.encrypt = this.doEncrypt;
     return ResourceKeyBridge.makeKey(guid);
   }
   treeShakeCss(absPath: string) {
@@ -290,14 +296,16 @@ export class ResourceBuildEngine {
     const guid = this.guidResolver.getBaseGuid(absPath);
 
     const html = readFileSync(absPath, "utf8");
+    let content = this.doEncrypt ? encryptResource(html) : html;
 
     const res = new UserResource();
     Object.assign(res, _blueprint, {
       guid,
       type: "html",
-      content: encryptResource(html),
+      content: content,
+      encrypt: this.doEncrypt,
       source: absPath
-    });
+    } as UserResource);
 
     res.name = res.name ? JSON.stringify(res.name) : undefined;
     this.resourceMap.set(absPath, res);
@@ -321,7 +329,8 @@ export class ResourceBuildEngine {
       content = `data:image/${ext};base64,${ucUtil.bufferToString(buf, "base64")}`;
     } else {
       type = "text";
-      content = encryptResource(ucUtil.bufferToString(buf, "utf8"));
+      content = ucUtil.bufferToString(buf, "utf8");
+      content = this.doEncrypt ? encryptResource(content) : content;
     }
 
     const res = new UserResource();
@@ -329,8 +338,9 @@ export class ResourceBuildEngine {
       guid,
       type,
       content,
+      encrypt: this.doEncrypt,
       source: absPath
-    });
+    } as UserResource);
 
     res.name = res.name ? JSON.stringify(res.name) : undefined;
 
@@ -357,8 +367,9 @@ export class ResourceBuildEngine {
       Object.assign(res, _blueprint, {
         guid,
         type: "data",
-        content: encryptResource(rel)
-      });
+        encrypt: this.doEncrypt,
+        content: this.doEncrypt ? encryptResource(rel) : rel
+      } as UserResource);
 
       res.name = res.name ? JSON.stringify(res.name) : undefined;
 

@@ -1,0 +1,26 @@
+import { Assembly } from "<?= importPath ?>";
+declare module "<?= declareClassPath ?>" {
+   export interface ResourceNamedRegistry{
+      <?php
+      const onlyAlias = resources.filter(s => s.name && s.name != "");
+         for (const res of onlyAlias) { ?>
+            <?= res.name ?> : <?= res.source ?>,
+    <?php  } ?>
+   }
+
+   export interface TPPackage {
+        <?php  for (const [pkg,vers] of Object.entries(PACKAGE_LIST)) { ?>
+            "<?= pkg ?>": "", <?php 
+        } ?>
+   }
+
+   
+   export interface AssemblyRegistry{
+        <?= mainProject.name ?> : Assembly
+   }
+   export interface ResourceKeyRegistry {
+        <?php  for (const res of resources) { ?>
+            <?= res.guid ?>: <?= res.source ?>,
+        <?php } ?>
+   }
+}

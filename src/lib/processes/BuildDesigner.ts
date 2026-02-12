@@ -1,4 +1,4 @@
-import { codeOptionsBase, CommonRow, Control, DesignerOptionsBase, ScopeType } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
+import { codeOptionsBase, CommonRow, Control, DesignerOptionsBase,type ScopeType } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
 import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
 import { relativeFilePath, resolveFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
 import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from "fs";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
 import { IUsercontrolMeta } from "ap-shared-core/out/ucbuilder/Template.js";
-import { EModify, GetTemplateMetaByContent } from "../files/jsToHtml.js";
+import { EModify, GetTemplateMetaByContent } from "./jsToHtml.js";
 import { correctpath } from "ap-shared-core/out/pathUtils.js"; 
 import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
 export class BuildDesigner {
@@ -44,8 +44,10 @@ export class BuildDesigner {
         this.bldr = BuildingProcess;
         this.gen = new commonGeneratorX();
         this.project = BuildingProcess.configHandler.MAIN_CONFIG;
+         
         this.gen.cssBulder = new ResourceBuildEngine(this.project);
         this.CONFIG = this.project?.config;
+        this.gen.cssBulder.doEncrypt = this.CONFIG.encryptResource;
         this.PREFERENCE = this.CONFIG?.preference;
         this.SRC_DEC = this.PREFERENCE?.dirDeclaration[this.PREFERENCE?.srcDec]?.fileDeclaration as any;
         this.OUT_DEC = this.PREFERENCE?.dirDeclaration[this.PREFERENCE?.outDec]?.fileDeclaration as any;
@@ -259,7 +261,10 @@ export class BuildDesigner {
         let subTemplates = GetTemplateMetaByContent(compileedCode, cssContent);
         row.designer.guid = JSON.stringify(
             ResourceKeyBridge.extractKey(
-                this.gen.cssBulder.build(undefined, { source: srcPathof.html, content: JSON.stringify(subTemplates) })
+                this.gen.cssBulder.build(undefined, {
+                    source: srcPathof.html,
+                    content: JSON.stringify(subTemplates)
+                })
             )
         );
 

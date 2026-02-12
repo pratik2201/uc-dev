@@ -1,14 +1,12 @@
-import { correctpath, trimPath } from "ap-shared-core/out/pathUtils.js";
-import { GetProjectName, IDirDeclarations, IImportMap, IUCConfigPreference, ProjectRowBase, TPPackage, UcBuildOptions, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { deepAssign } from "ap-shared-core/out/objectUtil.js";
+import { correctpath, trimPath } from "ap-shared-core/out/pathUtils.js";
 import { ImportMapResolver } from "ap-shared-core/out/ucbuilder-devtools/ImportMapResolver.js";
-import { PathBridge } from "ap-shared-core/out/ucbuilder-devtools/pathBridge.js";
-import { ImportUserConfig } from "ap-shared-core/out/ucbuilder-devtools/userConfigManage.js";  
+import { ImportUserConfig } from "ap-shared-core/out/ucbuilder-devtools/userConfigManage.js";
+import { GetProjectName, type IDirDeclarations, type IImportMap, IUCConfigPreference, ProjectRowBase, type TPPackage, UcBuildOptions, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
 import { createRequire } from "module";
 import fs from "node:fs";
 import path, { join, normalize } from "node:path";
 import url from "node:url";
-import { askForInit_UCCONFIG } from "../../utils/interect_UCCONFIG.js";
 const appRequire = createRequire(
     path.resolve(process.cwd(), "package.json")
 );
@@ -76,12 +74,13 @@ export class ConfigHandler {
     srcDirPath: string;
     pref: IUCConfigPreference<IDirDeclarations>;
     ucConfig = new ProjectRowBase();
-    fillConfig = async (projectDir: string) => {        
+    fillConfig = async (projectDir: string) => {
         await this.RecurciveFindConfigAndFill(projectDir, this.ucConfig);
         const cfg = this.MAIN_CONFIG.config;
         this.pref = cfg.preference;
         this.pref.build = Object.assign(new UcBuildOptions(), this.pref.build);
         const bld = this.pref.build;
+        
         this.srcDirPath = this.pref.dirDeclaration[this.pref.srcDec].dirPath;
         this.outDirPath = this.pref.dirDeclaration[this.pref.outDec].dirPath;
         //if (bld.keyBind == undefined || bld.keyBind.length == 0)
@@ -96,7 +95,7 @@ export class ConfigHandler {
         //let str = JSON.stringify(this.importmap).replace(/\.\/\.\//g, './');
         ImportMapResolver.init(this.importmap, this.MAIN_PROJECT_PATH);
         //console.log(this.importmap);
-
+        
     }
 
     updateAliceToPath(rows: ProjectRowBase[]) {
@@ -217,7 +216,7 @@ export class ConfigHandler {
         return [];
     }
 
-    
+
 }
 
 

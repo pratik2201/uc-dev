@@ -1,6 +1,5 @@
-import { statSync, realpathSync, existsSync } from "fs";
+import { existsSync, realpathSync, statSync } from "fs";
 import path from "path";
-import { askForInit_UCCONFIG } from "../../utils/interect_UCCONFIG.js";
 
 export async function findProject(mainDirPath: string) {
     let projectDir = getProjectDir(mainDirPath);
@@ -9,13 +8,13 @@ export async function findProject(mainDirPath: string) {
     } else {
         const cfgFile = path.join(projectDir, 'ucconfig.js');
         if (existsSync(cfgFile)) return projectDir;
-        else {            
+        else {
             /*if (existsSync(cfgFile)) return projectDir;
             else */ return undefined;
         }
     }
 }
-function getProjectDir(startPath: string): string | null {
+export function getProjectDir(startPath: string): string | null {
     let dir = statSync(startPath).isFile()
         ? path.dirname(startPath)
         : startPath;

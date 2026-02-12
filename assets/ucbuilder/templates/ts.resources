@@ -31,11 +31,11 @@ const Resources:UserResource[] = [
         if(res.isGlobalCss === true){ ?> isGlobalCss : true, <?php } 
         if(res.name && res.name!=''){ ?> name : <?= res.name ?>, <?php } 
         
-        ?>  project: "<?= res.project ?>",  source: <?= res.source ?>,   type: "<?= res.type ?>",     content: <?= res.content ?>  }, <?php } ?>
+        ?>  project: "<?= res.project ?>",  source: <?= res.source ?>,   type: "<?= res.type ?>",  encrypt:<?= res.encrypt ?>,   content: <?= res.content ?>  }, <?php } ?>
 ];
 ResourceStorage.bulkRegister(Resources);
 
-ResourceStorage.RuntimeProps['importmap'] = ResourceStorage.RuntimeProps['importmap'] ?? <?= importmap ?>;
+ResourceStorage.RuntimeProps['importmap'] = ResourceStorage.RuntimeProps['importmap'] ?? ResourceStorage.getContent("<?= mainProject.importMapGuid ?>");
 
 <?php 
 for (const res of projectList) {
@@ -48,6 +48,5 @@ AssemblyManager.Register({
      name: <?= mainProject.name ?>,
      guid: "<?= mainProject.guid ?>",
      cssGuid: <?= mainProject.cssGuid ?>,
-     ucConfigGuid: <?= mainProject.ucConfigGuid ?>,
-
+     ucConfigGuid: <?= mainProject.ucConfigGuid ?>
 });

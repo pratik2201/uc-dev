@@ -1,90 +1,96 @@
-<?php for(let i=0;i<designer.importClasses.length;i++){ let $rw=designer.importClasses[i]; ?>
-import { <?=$rw.importText?> } from "<?=$rw.url?>";<?php } ?>
- /**
- *  code filename must same and case sensitive with classname   ---------------
- */
-import { <?=src.name?> } from "<?=codeFilePath?>";
+<?php let designer = sources.ts_tpt.designer; ?>
+<?php for(let i=0;i<designer.importer.classes.length;i++){ let $rw=designer.importer.classes[i]; 
+?>import { <?= $rw.names.map(s=>s.asText).join(',') ?> } from "<?=$rw.url?>";
+<?php } ?>
+<?php 
+const $templates = designer.templetes; 
+?>
 
-    
-<?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
+
+<?php $templates.forEach($tpt=>{ ?>
 /**
- * @typedef <?=$tpt.name?>_ELEMENT_MAP
+ *  @typedef <?=$tpt.name?>$ElementMAP
  <?php for(let i=0;i<$tpt.controls.length;i++){ let $rw=$tpt.controls[i]; ?>
- * @prop {<?=$rw.proto?><?=$rw.generic?>} <?=$rw.nameQT?> The street
+ * @prop {<?=$rw.proto?><?=$rw.generic?>} <?=$rw.nameQT?> 
  <?php } ?>
  */
-class <?=$tpt.name?>_TEMPLATE extends TemplateNode{
-    constructor(tpt:Template) { super(tpt);   }
+
+class <?=$tpt.name?>$TemplateNode extends TemplateNode{
+    /**
+     * @param {Template} tpt 
+     */
+    constructor(tpt) { super(tpt);   }
     /**
      * @param {HTMLElement} elementHT 
-     * @returns {<?=$tpt.name?>_ELEMENT_MAP}
+     * @returns {<?=$tpt.name?>$ElementMAP}
      */
     getAllControls(elementHT) {
         return this.extended.getAllControls(undefined,elementHT);
     }
 }
-<?php } ?>
+<?php }); ?>
 
 
 /**
  * @typedef dMap_<?=src.name?>
- <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
- * @prop {<?=$tpt.name?>_ELEMENT_MAP} <?=$tpt.name?> The street
- <?php } ?>
+ <?php $templates.forEach($tpt=>{ ?>
+ * @prop {<?=$tpt.name?>$ElementMAP} <?=$tpt.name?> 
+ <?php }); ?>
  */
 /** @type {dMap_<?=src.name?>}  */ 
 export const cMap_<?=src.name?>= {};
 
-export class <?=designer.className ?> extends Template {
-    /** <?=src.mainBase.rootWithExt?>
-     *  AUTO RENAMING IS DEPEND ON `_FILE_PATH` SO KEEP YOUR SELF FAR FROM THIS :-)
-     */
-    private static _FILE_PATH =  '<?=src.html.rootPath?>'; //window.atob('<?=src.mainFileRootPath_btoa?>');
-    public static get FILE_PATH() {
-        return Designer._FILE_PATH;
-    }
-    /**
-     * @param {VariableList} varList 
-     * @returns {void}
-     */
-    static setCSS_globalVar (varList)  {
-        intenseGenerator.setCSS_globalVar(varList,this.FILE_PATH);
-    }
+export class <?=designer.className ?> extends <?= designer.baseClassName ?> {   
+    <?php $templates.forEach($tpt=>{ ?>
+    /** @<?=$rw.scope?> @type {<?=$tpt.name?>$TemplateNode}  */     
+    <?=$tpt.name?>;
+    <?php }); ?>
+
+    <?php _DESIGNER(false); ?>
+    
+    <?php _DESIGNER(true); ?>
+}
+
+<?php 
+function _DESIGNER(isAsync = false){
+    $initializecomponent = isAsync ? 'initializecomponentAsync':'initializecomponent';
+    $generateTPT = isAsync ? 'generateTPTAsync':'generateTPT';
+    $Create = isAsync ? 'CreateAsync':'Create';
+    $async = isAsync ? ' async ':'';
+    $await = isAsync ? ' await ':'';
+     ?>
     /**
      * @param {ITptOptions} pera 
-     * @returns {gstSupplyBluePrintRow}
-     */
-    static Create(pera)  { 
-        return intenseGenerator.generateTPT(this.FILE_PATH,<?=src.name?>,import.meta.url,pera) as <?=src.name?>;
+     * @returns {<?=src.name?>}
+    */
+    static <?= $async ?> <?= $Create ?>(pera) {
+        return <?= $await ?> intenseGenerator.<?= $generateTPT ?>(<?=src.name?>, pera);
     }
-
-     
-    <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
-    public&nbsp;<?=$tpt.name?>:<?=$tpt.name?>_TEMPLATE;<?php } ?>
     /**
-     * @param {IArguments} args 
-     * @returns 
+     * @param {ITptOptions} fargs 
      */
-    constructor(args:IArguments){    
-        let aargs = Template.extractArgs(arguments);
-        let fargs = aargs[aargs.length - 1] as ITptOptions;
-        super(fargs);    
-        //this.extended.parentUc = fargs.parentUc;
-        //let fargs = Template.extractArgs(arguments) as TptOptions;
-        if(fargs.MakeEmptyTemplate)return;
-        //fargs = fargs[fargs.length-1] as TptOptions;
-        //let ext = this.extended;
-        let oot = Template.GetObjectOfTemplate(fargs.cfInfo);
-        let tpts = oot.tptObj;
+    <?=$initializecomponent ?> = <?= $async ?> (fargs) => { 
+        if(fargs.MakeEmptyTemplate)return;        
+        fargs.guid = <?= designer.guid ?>;
+        this.extended.initializebase(fargs);
+        let oot = this.extended.resource;
+        let tpts = oot.templates;
        
-        <?php for(let j=0;j<designer.templetes.length;j++){ let $tpt=designer.templetes[j]; ?>
-        this.<?=$tpt.name ?> = new <?=$tpt.name ?>_TEMPLATE(this); // ext._templeteNode as <?=$tpt.name?>_TEMPLATE;
-        this.<?=$tpt.name?>.extended.initializecomponent(fargs,tpts['<?=$tpt.name?>']); 
-        <?php } ?>
+        <?php $templates.forEach($tpt=>{ ?>
+        this.<?=$tpt.name ?> = new <?=$tpt.name ?>$TemplateNode(this); 
+        tpts.<?=$tpt.name ?>.accessKey = '<?=$tpt.name ?>';
+        tpts.<?=$tpt.name ?>.objectKey  = `${fargs.guid}#<?=$tpt.name ?>`;    
+        this.<?=$tpt.name ?>.extended.initializecomponent(fargs,tpts.<?=$tpt.name ?>); 
+        this.<?=$tpt.name?>.extended.takeoff();
+        <?php }); ?>
 
-        if (oot.outerCSS.trim() != '')
-            this.pushTemplateCss(oot.outerCSS);
-        //console.log(oot.outerCSS);
-        //fargs.elementHT.remove();
+        if (oot.outerCssContents.trim() != '')
+            this.pushTemplateCss(oot.outerCssContents,fargs.guid);
+
+        delete this.initializecomponent;
+        delete this.initializecomponentAsync; 
+        delete this.extended.initializebase;
     }
+<?php 
 }
+?>

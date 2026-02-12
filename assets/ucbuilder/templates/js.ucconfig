@@ -7,6 +7,7 @@ import { UcDefaultConfig } from "ucbuilder/out/core-main.js";
        const $outDec = $prf.outDec;
     ?>
 export default UcDefaultConfig({
+    useTypeScript:<?= useTypeScript ?>,
     guid: "<?= guid ?>", 
     browser: {
         resolveProjects: [ <?php browser.resolveProjects.forEach(v => {

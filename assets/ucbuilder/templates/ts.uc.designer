@@ -1,16 +1,14 @@
-<?php let designer = sources.ts_uc.designer; ?>
-<?php for(let i=0;i<designer.importer.classes.length;i++){ let $rw=designer.importer.classes[i]; 
-?>import { <?= $rw.names.map(s=>s.asText).join(',') ?> } from "<?=$rw.url?>";
-<?php } ?>
+<?php const $designer = sources.ts_uc.designer; ?>
+<?php $designer.importer.classes.forEach($rw=>{ 
+?> import { <?= $rw.names.map(s=>s.asText).join(',') ?> } from "<?=$rw.url?>";
+<?php }); ?>
 
-export class <?=designer.className ?> extends <?= designer.baseClassName ?> {    
+export class <?=$designer.className ?> extends <?= $designer.baseClassName ?> {    
     
-    get(id:<?=designer.getterFunk ?>) {
+    get(id:<?=$designer.getterFunk ?>) {
         return this.ucExtends.find(`[id="${id}"]`)[0];
     }
-    
-    <?php 
-    for(let i=0;i<designer.controls.length;i++){  let $rw=designer.controls[i];
+    <?php $designer.controls.forEach($rw => { 
         switch($rw.type){ 
             case "none": ?>
             <?=$rw.scope?>&nbsp;<?=$rw.nameQT?>!: <?=$rw.proto?><?=$rw.generic?>;
@@ -22,7 +20,7 @@ export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
             <?=$rw.scope?>&nbsp;<?=$rw.nameQT?>!: import('<?=$rw.codeFilePath?>').<?=$rw.src.name?>;
     <?php   break; 
         }
-    } ?>
+    }); ?>
     
     constructor(){ super(); }
 
@@ -46,12 +44,12 @@ function _DESIGNER(isAsync = false){
 
     <?=  $async ?> <?= $initializecomponent ?>?(args: IUcOptions, form: <?=src.name?>){
         const ucExt = this.ucExtends;
-        args.guid = <?= designer.guid ?>;
+        args.guid = <?= $designer.guid ?>;
         
         ucExt.initializecomponent(args);                
         const CONTROLS = ucExt.controls; 
-        <?php 
-        for(let i=0;i<designer.controls.length;i++){  let $rw=designer.controls[i];
+
+        <?php $designer.controls.forEach($rw => { 
             switch($rw.type){ ?>
                 <?php case "none": ?>
         this<?=$rw.nameThis?> = CONTROLS<?=$rw.nameThis?>  as unknown as <?=$rw.proto?>;<?php   break; ?>
@@ -74,7 +72,7 @@ function _DESIGNER(isAsync = false){
         this<?=$rw.nameThis ?>.ucExtends.show({decision : 'replace'});
         <?php   break;  
             }
-        }
+        });
         ?>
 
         if(args.events?.beforeFinalize!=undefined) args.events?.beforeFinalize(form);
@@ -84,5 +82,6 @@ function _DESIGNER(isAsync = false){
         ucExt.takeoff();
     }
 
-<?php }
+<?php 
+}
 ?>
