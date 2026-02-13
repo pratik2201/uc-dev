@@ -1,20 +1,22 @@
-import { UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { commonGeneratorX } from "../lib/processes/commonGeneratorX.js";
-import { ask, askYesNo, runTemplate, writeFileSafely } from "./prompt.js";
-import type { cliMain } from "./cliMain.js";
-import { ImportUserConfig } from "ap-shared-core/out/ucbuilder-devtools/userConfigManage.js";
+import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
+import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
+import { cliMain } from "../cliMain.js";
+import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
+import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { fileURLToPath } from "node:url";
 
 export class cliUcconfigInquiry {
     constructor(public main: cliMain) { }
     get exist() {
-         return existsSync(this.configFilepath);
+        return existsSync(this.configFilepath);
     }
     async read() {
-       
+
         this.main.ucConfig = await ImportUserConfig(this.configFilepath);
-        
+
     }
     get configFilepath() {
         return join(this.main.projectDir, 'ucconfig.js');
@@ -40,19 +42,19 @@ export class cliUcconfigInquiry {
         const defaults = this.inferConfigFromKnownFiles();
         const cfg = new UserUCConfig();
         cfg.useTypeScript = this.main.useTypescript;
-       const SRC_DIR_NAME = await ask(
+        const SRC_DIR_NAME = await ask(
             `
 +----------------------------------------+
-|   QUICK SETUP UCBUILDER CONFIG FILE    |
+|              UCCONFIG FILE             |
 +----------------------------------------+
         
 SOURCE DIRECTORY (SPECIFY DIRPATH)
 >`, defaults?.srcDir ?? "src");
         const fileExt = cfg.useTypeScript ? '.ts' : '.js';
-        
-     
 
-        
+
+
+
         const OUT_DIR_NAME = cfg.useTypeScript ? await ask(`OUTPUT DIRECTORY (SPECIFY DIRPATH)
 >`, defaults?.outDir ?? "out") : SRC_DIR_NAME;
 
@@ -95,7 +97,7 @@ SOURCE DIRECTORY (SPECIFY DIRPATH)
                 ];
             }
         }
-        cfg.browser.resolveProjects = ['ucbuilder', 'ucbuilder-devtools'] as any;
+        cfg.browser.resolveProjects = ['uc-control', 'uc-dev'] as any;
         pref.build.ResourceStorageFile = resourceStorageFile;
 
         pref.srcDec = 'src';
@@ -121,27 +123,26 @@ SOURCE DIRECTORY (SPECIFY DIRPATH)
             designer: { subDirPath: DESIGNER_DIR_NAME },
             scss: { extension: '.scss' },
             html: { extension: '.html' }
-        }
-
-        try {
+        } 
+        try { 
             writeFileSafely(
                 resolve('ucconfig.js'),
-                runTemplate('../../assets/ucbuilder/templates/js.ucconfig', import.meta.url, JSON.parse(JSON.stringify(cfg))),
+                runTemplate(resolveFilePath(import.meta.url, 'templates/js.ucconfig'), import.meta.url, JSON.parse(JSON.stringify(cfg))),
                 this.main.cliOptions);
 
             const _projectBaseCssPath = resolve(cfg.projectBaseCssPath);
-            commonGeneratorX.ensureDirectoryExistence(_projectBaseCssPath);
+            ensureDirectoryExistence(_projectBaseCssPath);
             if (!existsSync(_projectBaseCssPath))
                 writeFileSync(_projectBaseCssPath, '', { encoding: 'utf-8' });
 
             const _ResourceStorageFile = resolve(dirdec[pref.srcDec].dirPath, cfg.preference.build.ResourceStorageFile);
-            commonGeneratorX.ensureDirectoryExistence(_ResourceStorageFile);
+            ensureDirectoryExistence(_ResourceStorageFile);
 
             writeFileSync(_ResourceStorageFile, 'export {};', { encoding: 'utf-8' });
-            console.log('.... CONFIG FILE GENERATED ...');
+            console.log('.... UC CONFIG FILE GENERATED ...');
         } catch (e) {
             console.log(e);
         }
     }
 }
- 
+

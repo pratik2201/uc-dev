@@ -2,39 +2,24 @@
 import { join, relative, dirname, normalize, isAbsolute, resolve } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { copyFileSync, mkdirSync, readdirSync, statSync } from "fs";
-import { normalizeJSON, safeStringify } from "ap-shared-core/out/objectUtil.js"; 
-import { resolveFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
-import { pathToFileURL } from "url"; 
-import { UserResource } from "ucbuilder/out/common/resources/enums.js";
+import { normalizeJSON, safeStringify } from "ap-shared-core/out/objectUtil.js";
+import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { pathToFileURL } from "url";
+import { UserResource } from "uc-control/out/common/resources/enums.js";
+import { recursive } from "ap-shared-core/out/uc-dev/ConfigHandler.js";
 
 export class ResourceCopy {
 
     sourceFileList: string[] = [];
-    fillFiles(ignoreDirs = new Set(["node_modules", ".git"/*, "dist", "out"*/])) {
-        const result: string[] = [];
-        function walk(dir: string) {
-            const entries = readdirSync(dir, { withFileTypes: true });
-            for (const entry of entries) {
-                const fullPath = join(dir, entry.name);
-                if (entry.isDirectory()) {
-                    if (!ignoreDirs.has(entry.name)) {
-                        walk(fullPath);
-                    }
-                } else if (entry.isFile()) {
-                    result.push(fullPath);
-                }
-            }
-        }
-
-        walk(BuildingProcess.configHandler.MAIN_PROJECT_PATH);
-        this.sourceFileList = result;
+    fillFiles() {
+        this.sourceFileList = recursive(BuildingProcess.configHandler.MAIN_PROJECT_PATH);
     }
     registerResource = async () => {
         const _builder = BuildingProcess.buildDesigner.gen.cssBulder;
-        async function walk(fullpath: string) { 
+        async function walk(fullpath: string) {
             const filwRes: UserResource[] = [];
             fullpath = !fullpath.startsWith('file:///') ? pathToFileURL(fullpath).href : fullpath;
-            const _default = (await import(fullpath)).default; 
+            const _default = (await import(fullpath)).default;
             if (typeof _default === 'function')
                 filwRes.push(..._default());
             else if (typeof _default === 'object')
@@ -46,8 +31,8 @@ export class ResourceCopy {
             });
         }
         const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;
-        const pref = cfg.preference; 
-        const projPath = BuildingProcess.configHandler.MAIN_PROJECT_PATH; 
+        const pref = cfg.preference;
+        const projPath = BuildingProcess.configHandler.MAIN_PROJECT_PATH;
         const dirDecfullPath = join(projPath, pref.dirDeclaration[pref.outDec].dirPath);
         let filteed = this.sourceFileList.filter(s =>
             s.startsWith(dirDecfullPath) &&
@@ -78,7 +63,8 @@ export class ResourceCopy {
                 res.toDeclares.forEach((todeclare) => {
                     let targetDir = dirDeclaration[todeclare].dirPath;
                     const dest = join(targetDir, commonPath);
-                    mkdirSync(dirname(dest), { recursive: true });
+                    //mkdirSync(dirname(dest), { recursive: true });
+                    ensureDirectoryExistence(dest);
                     copyFileSync(full, dest);
                 });
             });

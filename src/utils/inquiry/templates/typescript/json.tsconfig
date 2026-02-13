@@ -1,0 +1,39 @@
+<?php 
+const $pref = preference;
+const $outdec = $pref.dirDeclaration[$pref.outDec];
+const $srcdec = $pref.dirDeclaration[$pref.srcDec];
+?>
+{
+    "exclude": [
+        "node_modules",
+        "<?= $outdec.dirPath ?>",
+    ],
+    "include": [
+        "<?= $srcdec.dirPath ?>"
+    ],
+    "compileOnSave": true,
+    "compilerOptions": { 
+        "module": "ESNext",
+        "moduleResolution": "Bundler",
+        "target": "ESNext",
+        "strict": true,
+        "baseUrl": "./<?= $srcdec.dirPath ?>",
+        "outDir": "./<?= $outdec.dirPath ?>",
+        "rootDir": "./<?= $srcdec.dirPath ?>",
+        "declaration": true,
+        "sourceMap": true,
+        "allowJs": true,
+        "strictNullChecks": false,
+        "esModuleInterop": true,
+        "checkJs": false,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "noEmit": false,
+        "skipLibCheck": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "removeComments": false,
+        "noImplicitAny": false,
+        "inlineSources": true
+    },
+}

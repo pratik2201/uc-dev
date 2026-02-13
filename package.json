@@ -1,5 +1,5 @@
 {
-  "name": "ucbuilder-devtools",
+  "name": "uc-dev",
   "version": "1.0.0-bata-0",
   "description": "project builder for ucbuilder",
   "license": "ISC",
@@ -10,7 +10,7 @@
     "clean": "rimraf out",
     "start": "electron .",
     "build:dts": "tsc --emitDeclarationOnly",
-    "build": "tsc",
+    "build": "tsc && node copyRes.mjs",
     "rebuild": "npm run clean && npm run build && npm run build:dts",
     "rebuild:start": "npm run rebuild && npm run start"
   },
@@ -21,7 +21,7 @@
     "rimraf": "^6.0.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "ucbuilder": "file:../ucbuilder"
+    "uc-control": "file:../uc-control"
   },
   "dependencies": {
     "chokidar": "^4.0.3",
@@ -30,6 +30,6 @@
     "htmlparser2": "^10.1.0"
   },
   "bin": {
-    "ucbuilder-devtools": "./out/cli.js"
+    "uc-dev": "./out/cli.js"
   }
 }

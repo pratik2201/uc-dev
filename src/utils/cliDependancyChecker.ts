@@ -62,8 +62,8 @@ export class cliDependancyChecker {
       missing.push("electron");
     }
 
-    if (opts.ucbuilder && !this.isInstalled("ucbuilder")) {
-      missing.push("ucbuilder");
+    if (opts.ucbuilder && !this.isInstalled("uc-control")) {
+      missing.push("uc-control");
     }
 
     if (opts.typescript && !this.isInstalled("typescript")) {
@@ -89,6 +89,9 @@ export class cliDependancyChecker {
     }
 
     await this.installPackages(missing);
+    this.main.QUERY.JUST_ELECTRON_INSTALLED = rtrn.includes('electron');
+    this.main.QUERY.JUST_TYPESCRIPT_INSTALLED = rtrn.includes('typescript');
+    this.main.QUERY.JUST_UCBUILDER_INSTALLED = rtrn.includes('uc-control');
     await this.main.updateDependancies();
     // recheck
     const stillMissing = missing.filter(p => !this.isInstalled(p));

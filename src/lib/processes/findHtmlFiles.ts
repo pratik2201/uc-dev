@@ -1,10 +1,11 @@
 import { getCloneableObject, safeStringify } from "ap-shared-core/out/objectUtil.js";
-import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
+import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
 import { join } from "path";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
-import type { UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { ResourceKeyBridge } from "uc-control/out/common/resources/enums.js";
+import type { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import { rmSync } from "fs";
 
 export async function collectFiles() {
     const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;
@@ -14,18 +15,36 @@ export async function collectFiles() {
     const htmlFileDec = srcDirDec.fileDeclaration.html;
     const htmlDirPath = join(projPath, srcDirDec.dirPath, htmlFileDec.subDirPath);
     const allFileList = BuildingProcess.resourceCopy.sourceFileList;
-    const ext = htmlFileDec.extension;
+    let ext = htmlFileDec.extension;
     let filteed = allFileList.filter(s =>
         s.startsWith(htmlDirPath) &&
         (s.endsWith(`.uc${ext}`) ||
             s.endsWith(`tpt${ext}`))
     );
+    const designerFileDec = srcDirDec.fileDeclaration.designer;
+    const designerDirPath = join(projPath, srcDirDec.dirPath, designerFileDec.subDirPath);
+    let designerList = allFileList.filter(s =>
+        s.startsWith(designerDirPath) &&
+        (s.endsWith(`.uc${designerFileDec.extension}`) ||
+            s.endsWith(`tpt${designerFileDec.extension}`))
+    )
     const cInfos: codeFileInfo[] = [];
+    const oldUsedDesigners: string[] = [];
     filteed.forEach(s => {
         const cInfo = new codeFileInfo();
-        if (cInfo.parseUrl(s, 'src') == true)
+        if (cInfo.parseUrl(s, 'src') == true) {
             cInfos.push(cInfo);
+            oldUsedDesigners.push(cInfo.allPathOf.src.designer);
+        }
     });
+
+    const toRemoveOldUnUsedDesigners = designerList.filter(s => !oldUsedDesigners.includes(s));
+    toRemoveOldUnUsedDesigners.forEach(s => {
+        rmSync(s, { force: true });
+        console.log(`!! '${s}' file deleted`);        
+    });
+
+
     BuildingProcess.buildDesigner.cInfoToBuild.length = 0;
     BuildingProcess.buildDesigner.cInfoToBuild.push(...cInfos);
     registerMain();

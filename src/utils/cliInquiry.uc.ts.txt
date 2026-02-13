@@ -1,11 +1,12 @@
-import { relativeFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
-import { ImportUserConfig } from "ap-shared-core/out/ucbuilder-devtools/userConfigManage.js";
+import { ensureDirectoryExistence, relativeFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { commonGeneratorX } from "../lib/processes/commonGeneratorX.js";
 import { findProject } from "./cliFindProjects.js";
 import { ask, askYesNo, runTemplate } from "./prompt.js";
-import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
+import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
+import { cliMain } from "./cliMain.js";
 
 function inferConfigFromKnownFiles() {
     if (existsSync("tsconfig.json")) {
@@ -81,24 +82,25 @@ Use Typescript
     options.rendererIndexPath = ucUtil.changeExtension(relativeFilePath(rendererHtmlFilePath, rendererIndexFilePath), '.ts', '.js');
 
     opts.force = true;
+    resolveFilePath(import.meta.url, `templates/${tptFileName}`);
     writeFileSafely(
         mainFilePath,
-        runTemplate('../../assets/ucbuilder/templates/electron/ts.main', import.meta.url, options),
+        runTemplate(join(cliMain.TEMPLATE_DIR,'electron/ts.main'), import.meta.url, options),
         { overrideOld: opts.force });
 
     writeFileSafely(
         preloadFilePath,
-        runTemplate('../../assets/ucbuilder/templates/electron/ts.preload', import.meta.url, options),
+        runTemplate(join(cliMain.TEMPLATE_DIR,'electron/ts.preload'), import.meta.url, options),
         { overrideOld: opts.force });
 
     writeFileSafely(
         rendererHtmlFilePath,
-        runTemplate('../../assets/ucbuilder/templates/electron/html.renderer', import.meta.url, options),
+        runTemplate(join(cliMain.TEMPLATE_DIR,'electron/html.renderer'), import.meta.url, options),
         { overrideOld: opts.force });
 
     writeFileSafely(
         rendererIndexFilePath,
-        runTemplate('../../assets/ucbuilder/templates/electron/ts.renderer', import.meta.url, options),
+        runTemplate(join(cliMain.TEMPLATE_DIR,'electron/ts.renderer'), import.meta.url, options),
         { overrideOld: opts.force });
 
     console.log('.... ELECTRON GENERATED ...');
@@ -115,7 +117,7 @@ async function writeFileSafely(fpath: string, data: string, options = { override
             return;
         }
     }
-    commonGeneratorX.ensureDirectoryExistence(fpath);
+    ensureDirectoryExistence(fpath);
     writeFileSync(fpath, data, { encoding: 'utf8' });
 }
 

@@ -19,7 +19,7 @@ switch (cmd) {
     case "--help":
     default:
         console.log(`
-ucbuilder-devtools
+uc-dev
 Commands:
   build   build the designer files 
   setup   setup project install required depandancy

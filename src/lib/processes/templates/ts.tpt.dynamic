@@ -1,4 +1,4 @@
-import { HTMLx } from "ucbuilder/out/lib/WrapperHelper.js";
+import { HTMLx } from "uc-control/out/lib/WrapperHelper.js";
 export default function () {
     let fcontent =
         HTMLx.Wrapper([{

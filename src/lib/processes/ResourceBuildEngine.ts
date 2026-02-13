@@ -1,14 +1,14 @@
 
 import { correctpath } from "ap-shared-core/out/pathUtils.js";
-import { ImportMapResolver } from "ap-shared-core/out/ucbuilder-devtools/ImportMapResolver.js";
-import { BuildTimeGuidMeta, type GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
-import { encryptResource } from "ap-shared-core/out/ucbuilder/resources/cryptoResource.js";
-import { ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
+import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
+import { BuildTimeGuidMeta, type GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import { encryptResource } from "ap-shared-core/out/uc-control/resources/cryptoResource.js";
+import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
 import { dirname, extname, join, normalize, resolve, sep } from "path";
 import { fileURLToPath } from "url";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { UserResource, ResourceKeyBridge, type BuildResourceType } from "ucbuilder/out/common/resources/enums.js";
+import { UserResource, ResourceKeyBridge, type BuildResourceType } from "uc-control/out/common/resources/enums.js";
 
 
 /* ------------------ helpers ------------------ */

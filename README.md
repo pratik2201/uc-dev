@@ -52,13 +52,13 @@ app.on('ready', async () => {
 `preload.ts` 
 ```ts
 import { contextBridge, ipcRenderer } from "electron";
-import { IpcPreload } from "ucbuilder/out/main/ipc/IpcPreload.js";
+import { IpcPreload } from "uc-control/out/main/ipc/IpcPreload.js";
 IpcPreload.init(contextBridge, ipcRenderer);   // mandetory
 ```
 ---
 Third one is `ucconfig.js`  (configuration)
 ```js
-import UcDefaultConfig from "ucbuilder/out/ipc/userConfigManage.js";
+import UcDefaultConfig from "uc-control/out/ipc/userConfigManage.js";
 export default UcDefaultConfig({    
     preference: {                
         dirDeclaration: {  //  add declaration of directory

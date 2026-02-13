@@ -5,6 +5,7 @@ import readline from "node:readline";
 import { fileURLToPath } from "node:url";
 import { commonGeneratorX } from "../lib/processes/commonGeneratorX.js";
 import { cliOptions } from "./cliMain.js";
+import { ensureDirectoryExistence } from "ap-shared-core/out/uc-dev/pathUtil.js";
 
 export function ask(question: string, def?: string): Promise<string> {
   const rl = readline.createInterface({
@@ -54,7 +55,7 @@ export async function writeFileSafely(fpath: string, data: string, options: cliO
       return;
     }
   }
-  commonGeneratorX.ensureDirectoryExistence(fpath);
+  ensureDirectoryExistence(fpath);
   writeFileSync(fpath, data, { encoding: 'utf8' });
 }
 

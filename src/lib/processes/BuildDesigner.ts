@@ -1,20 +1,22 @@
-import { codeOptionsBase, CommonRow, Control, DesignerOptionsBase,type ScopeType } from "ap-shared-core/out/ucbuilder-devtools/buildRow.js";
-import { codeFileInfo } from "ap-shared-core/out/ucbuilder-devtools/codeFileInfo.js";
-import { relativeFilePath, resolveFilePath } from "ap-shared-core/out/ucbuilder-devtools/pathUtil.js";
-import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/ucbuilder/configResources.js";
+import { codeOptionsBase, CommonRow, Control, DesignerOptionsBase, type ScopeType } from "ap-shared-core/out/uc-dev/buildRow.js";
+import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
+import { relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { join, normalize, relative, resolve } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { commonGeneratorX } from "./commonGeneratorX.js";
 
-import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js"; 
-import { ATTR_OF, ucUtil } from "ap-shared-core/out/ucbuilder/ucUtil.js";
+import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
+import { ATTR_OF, ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
-import { IUsercontrolMeta } from "ap-shared-core/out/ucbuilder/Template.js";
+import { IUsercontrolMeta } from "ap-shared-core/out/uc-control/Template.js";
 import { EModify, GetTemplateMetaByContent } from "./jsToHtml.js";
-import { correctpath } from "ap-shared-core/out/pathUtils.js"; 
-import { ResourceKeyBridge } from "ucbuilder/out/common/resources/enums.js";
+import { correctpath } from "ap-shared-core/out/pathUtils.js";
+import { ResourceKeyBridge } from "uc-control/out/common/resources/enums.js";
+import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
+import { fileURLToPath } from "url";
 export class BuildDesigner {
     gen: commonGeneratorX;
     bldr: BuildingProcess;
@@ -44,7 +46,7 @@ export class BuildDesigner {
         this.bldr = BuildingProcess;
         this.gen = new commonGeneratorX();
         this.project = BuildingProcess.configHandler.MAIN_CONFIG;
-         
+
         this.gen.cssBulder = new ResourceBuildEngine(this.project);
         this.CONFIG = this.project?.config;
         this.gen.cssBulder.doEncrypt = this.CONFIG.encryptResource;
@@ -160,7 +162,10 @@ export class BuildDesigner {
 
         //let im = row.designer.importClasses;
         const _importer = row.designer.importer;
-        _importer.addImport(['Usercontrol', 'intenseGenerator', 'IUcOptions'], 'ucbuilder/out/core.js');
+        const imppath = _row.src?.projectInfo.projectName == 'uc-control' ?
+            relativeFilePath(_row.src.allPathOf.out.designer, join(_row.src.projectInfo.projectPath, 'out/core.js'))
+            : 'uc-control/out/core.js';
+        _importer.addImport(['Usercontrol', 'intenseGenerator', 'IUcOptions'], imppath);
 
 
         this.common2(row.designer, finfo);
@@ -180,7 +185,8 @@ export class BuildDesigner {
             ctr.type = 'none';
             if (EModify.hasAttribute(element, "x-from")) {
                 let _sspath = ucUtil.devEsc(EModify.getAttribute(element, "x-from"));
-                let _subpath = resolveFilePath(outPathOf.html, _sspath);
+                let _subpath = ImportMapResolver.resolve(_sspath, outPathOf.html);// resolveFilePath(outPathOf.html, _sspath);
+                _subpath = fileURLToPath(_subpath);              
                 let uFInf = new codeFileInfo();
                 uFInf.parseUrl(_subpath, pref.outDec as any, outPathOf.html);
                 if (uFInf.pathOf == undefined) debugger;
@@ -251,7 +257,7 @@ export class BuildDesigner {
         }
         this.common1(row.designer, row.code, _row.src);
         row.designer.importer.addImport(['TemplateNode', 'Template', 'intenseGenerator', 'ITptOptions'],
-            'ucbuilder/out/core.js');
+            'uc-control/out/core.js');
 
 
         this.common2(row.designer, finfo);

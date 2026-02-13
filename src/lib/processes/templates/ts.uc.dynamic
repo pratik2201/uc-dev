@@ -1,5 +1,5 @@
-import { HTMLx } from "ucbuilder/out/lib/WrapperHelper.js";
-import ucWinFrame$dynamic from "ucbuilder/out/renderer/controls/ucWinFrame.uc.html.js";
+import { HTMLx } from "uc-control/out/lib/WrapperHelper.js";
+import ucWinFrame$dynamic from "uc-control/out/renderer/controls/ucWinFrame.uc.html.js";
 export default HTMLx.Design({
     dynamicFilePath: import.meta.url,
     htmlSource() {
