@@ -1,5 +1,6 @@
 {    
     "html.suggest.html5": true, 
+    "editor.tabSize": 2,
     "javascript.suggest.paths": true,
     "javascript.preferences.useAliasesForRenames": false,
     "typescript.preferences.useAliasesForRenames": false,

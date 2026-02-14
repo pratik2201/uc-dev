@@ -64,17 +64,28 @@ SOURCE DIRECTORY (SPECIFY DIRPATH)
         const resourceStorageFile = await ask(`RESOURCE FILE PATH (SPECIFY FILEPATH (INSIDE '${SRC_DIR_NAME}'))
 >`, `${DESIGNER_DIR_NAME}/Resources${fileExt}`);
 
+
+
         let filesToMove: string = '';
         if (cfg.useTypeScript) {
             filesToMove = await ask(`RUNTIME EXTRA FILES (SPECIFY EXTENSIONS)
 >`, '.jpg,.png,.html,.scss,.ico,.svg') ?? '';
         }
-        let ignoreInBuild = await ask(`IGNORE THESE PATH IN BUILD (SPECIFY PATHS)
+        let ignoreInBuild = await ask(`IGNORE THESE PATH IN BUILD (SPECIFY PATH FROM ROOT)
 >`, `node_modules;.git;.vscode${cfg.useTypeScript ? ';' + OUT_DIR_NAME : ''}`) ?? '';
 
-        cfg.projectBaseCssPath = await ask(`BASE CSS FILE PATH (SPECIFY PATHS)
+        const browser = cfg.browser;
+
+        browser.baseHtmlPath = await ask(`BASE HTML FILE PATH (FROM ROOT)
+>`, `index.html`) ?? undefined;
+        if (browser.baseHtmlPath != undefined && browser.baseHtmlPath.trim().length == 0)
+            browser.baseHtmlPath = undefined;
+
+        browser.baseCssPath = await ask(`BASE CSS FILE PATH (FROM ROOT)
 >`, `styles.scss`) ?? '';
 
+        browser.baseCodePath = await ask(`BASE CODE FILE PATH (SPECIFY FILEPATH (INSIDE '${SRC_DIR_NAME}')')
+>`, `${SRC_DIR_NAME}/index.${fileExt}`) ?? '';
 
 
 
@@ -123,18 +134,26 @@ SOURCE DIRECTORY (SPECIFY DIRPATH)
             designer: { subDirPath: DESIGNER_DIR_NAME },
             scss: { extension: '.scss' },
             html: { extension: '.html' }
-        } 
-        try { 
+        }
+        try {
             writeFileSafely(
                 resolve('ucconfig.js'),
                 runTemplate(resolveFilePath(import.meta.url, 'templates/js.ucconfig'), import.meta.url, JSON.parse(JSON.stringify(cfg))),
                 this.main.cliOptions);
 
-            const _projectBaseCssPath = resolve(cfg.projectBaseCssPath);
-            ensureDirectoryExistence(_projectBaseCssPath);
-            if (!existsSync(_projectBaseCssPath))
-                writeFileSync(_projectBaseCssPath, '', { encoding: 'utf-8' });
-
+            if (cfg.browser.baseCssPath?.trim().length > 0) {
+                const _projectBaseCssPath = resolve(cfg.browser.baseCssPath);
+                ensureDirectoryExistence(_projectBaseCssPath);
+                if (!existsSync(_projectBaseCssPath))
+                    writeFileSync(_projectBaseCssPath, '', { encoding: 'utf-8' });
+            }
+            
+            if (cfg.browser.baseHtmlPath?.trim().length > 0) {
+                const _projectBaseHtmlPath = resolve(cfg.browser.baseHtmlPath);
+                ensureDirectoryExistence(_projectBaseHtmlPath);
+                if (!existsSync(_projectBaseHtmlPath))
+                    writeFileSync(_projectBaseHtmlPath, '', { encoding: 'utf-8' });
+            }
             const _ResourceStorageFile = resolve(dirdec[pref.srcDec].dirPath, cfg.preference.build.ResourceStorageFile);
             ensureDirectoryExistence(_ResourceStorageFile);
 

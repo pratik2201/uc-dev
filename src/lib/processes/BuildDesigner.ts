@@ -14,7 +14,7 @@ import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { IUsercontrolMeta } from "ap-shared-core/out/uc-control/Template.js";
 import { EModify, GetTemplateMetaByContent } from "./jsToHtml.js";
 import { correctpath } from "ap-shared-core/out/pathUtils.js";
-import { ResourceKeyBridge } from "uc-control/out/common/resources/enums.js";
+import { ResourceKeyBridge } from "uc-control/common/resources/enums.js";
 import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
 import { fileURLToPath } from "url";
 export class BuildDesigner {
@@ -164,7 +164,7 @@ export class BuildDesigner {
         const _importer = row.designer.importer;
         const imppath = _row.src?.projectInfo.projectName == 'uc-control' ?
             relativeFilePath(_row.src.allPathOf.out.designer, join(_row.src.projectInfo.projectPath, 'out/core.js'))
-            : 'uc-control/out/core.js';
+            : 'uc-control/core.js';
         _importer.addImport(['Usercontrol', 'intenseGenerator', 'IUcOptions'], imppath);
 
 
@@ -257,7 +257,7 @@ export class BuildDesigner {
         }
         this.common1(row.designer, row.code, _row.src);
         row.designer.importer.addImport(['TemplateNode', 'Template', 'intenseGenerator', 'ITptOptions'],
-            'uc-control/out/core.js');
+            'uc-control/core.js');
 
 
         this.common2(row.designer, finfo);

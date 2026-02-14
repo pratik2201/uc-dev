@@ -45,6 +45,7 @@ export function runTemplate(tptPath: string, importmeta: string, row: any) {
 }
 export async function writeFileSafely(fpath: string, data: string, options: cliOptions) {
   if (existsSync(fpath)) {
+    options = JSON.parse(JSON.stringify(options));
     const overwrite = options.force ?? await askYesNo(
       `${fpath} already exists. Overwrite?`,
       false

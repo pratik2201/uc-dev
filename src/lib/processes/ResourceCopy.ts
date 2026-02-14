@@ -5,7 +5,7 @@ import { copyFileSync, mkdirSync, readdirSync, statSync } from "fs";
 import { normalizeJSON, safeStringify } from "ap-shared-core/out/objectUtil.js";
 import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { pathToFileURL } from "url";
-import { UserResource } from "uc-control/out/common/resources/enums.js";
+import { UserResource } from "uc-control/common/resources/enums.js";
 import { recursive } from "ap-shared-core/out/uc-dev/ConfigHandler.js";
 
 export class ResourceCopy {

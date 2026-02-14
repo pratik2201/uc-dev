@@ -3,7 +3,7 @@ import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
 import { join } from "path";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { ResourceKeyBridge } from "uc-control/out/common/resources/enums.js";
+import { ResourceKeyBridge } from "uc-control/common/resources/enums.js";
 import type { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { rmSync } from "fs";
 
@@ -41,7 +41,7 @@ export async function collectFiles() {
     const toRemoveOldUnUsedDesigners = designerList.filter(s => !oldUsedDesigners.includes(s));
     toRemoveOldUnUsedDesigners.forEach(s => {
         rmSync(s, { force: true });
-        console.log(`!! '${s}' file deleted`);        
+        console.log(`!! '${s}' file deleted`);
     });
 
 
@@ -64,15 +64,21 @@ function registerMain() {
     const _mainProj = chandler.MAIN_CONFIG;
     const _cssbuilder = BuildingProcess.buildDesigner.gen.cssBulder;
     const cfg = getCloneableObject(_mainProj.config) as UserUCConfig;
+    const browser = cfg.browser;
     const prf = cfg.preference;
     const srcdir = prf.dirDeclaration[prf.srcDec].dirPath;
-    let stylePath = join(_mainProj.projectPath, _mainProj.config.projectBaseCssPath);
+    let stylePath = join(_mainProj.projectPath, browser.baseCssPath);
     const mp = ResourceBuildEngine.MAIN_PROJECT;
     mp.importMapGuid = ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
         content: safeStringify(chandler.importmap),
         encrypt: cfg.encryptResource,
     }));
     mp.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
+
+    if (browser.baseHtmlPath != undefined) {
+        let htmlPath = join(_mainProj.projectPath, browser.baseHtmlPath);
+        mp.mainHtmlGuid = ResourceKeyBridge.extractKey(_cssbuilder.build(htmlPath, {}));
+    }
     mp.ucConfigGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
         content: JSON.stringify(_mainProj.config)
     })));

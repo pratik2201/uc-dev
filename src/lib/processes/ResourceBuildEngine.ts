@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "fs";
 import { dirname, extname, join, normalize, resolve, sep } from "path";
 import { fileURLToPath } from "url";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { UserResource, ResourceKeyBridge, type BuildResourceType } from "uc-control/out/common/resources/enums.js";
+import { UserResource, ResourceKeyBridge, type BuildResourceType } from "uc-control/common/resources/enums.js";
 
 
 /* ------------------ helpers ------------------ */
@@ -86,7 +86,6 @@ class GuidResolver {
 export class ResourceBuildEngine {
   projectList = new Array<{
     project: ProjectRowBase,
-    resourceFilefullPath: string,
     projectGuid: string,
     importResource: boolean,
     resourceRelativePath: string
@@ -122,19 +121,18 @@ export class ResourceBuildEngine {
     name: undefined as string,
     guid: undefined as string,
     importMapGuid: undefined as string,
+    mainHtmlGuid:undefined as string,
     encryptResource: false,
   }
   registerProject = (s: ProjectRowBase) => {
-    let stylePath = join(s.projectPath, s.config.projectBaseCssPath);
-    let resourcePath = join(s.projectPath, s.config.projectBaseCssPath);
+    // let stylePath = join(s.projectPath, s.config.projectBaseCsdsPath);
+    // let resourcePath = join(s.projectPath, s.config.projectBadseCssPath);
 
 
     const pref = s.config.preference;
-    const resRelFilePath = correctpath(ucUtil.changeExtension(normalize(join(s.projectName, pref.dirDeclaration[pref.outDec].dirPath, pref.build.ResourceStorageFile)), '.ts', '.js'));
-    const resAbsoluteFilePath = ucUtil.changeExtension(
-      normalize(join(s.projectPath, pref.dirDeclaration[pref.outDec].dirPath, pref.build.ResourceStorageFile)), '.ts', '.js');
+    const resRelFilePath = correctpath(ucUtil.changeExtension(
+      normalize(join(s.projectName, pref.build.ResourceStorageFile)), '.ts', '.js'));
     this.projectList.push({
-      resourceFilefullPath: resAbsoluteFilePath,
       project: s,
       projectGuid: s.config.guid,
       importResource: s != BuildingProcess.configHandler.MAIN_CONFIG,

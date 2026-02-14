@@ -1,5 +1,5 @@
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
-import { type IFileDeclarationTypesMap } from "ap-shared-core/out/uc-control/configResources.js";
+import { extractPathConfig, type IFileDeclarationTypesMap } from "ap-shared-core/out/uc-control/configResources.js";
 import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
 import { CommonRow } from "ap-shared-core/out/uc-dev/buildRow.js";
 import { ensureDirectoryExistence, relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
@@ -59,13 +59,13 @@ export class commonGeneratorX {
         if (this.generateResources()) {
             if (this.rows.length == 0) {
                 console.log(`NO FILE TO GENERATE`);
-
                 return;
             }
-            const pref = this.rows[0]?.src.callerProject.config.preference;
-            let dirDeclaration = pref?.dirDeclaration;
-            const declareEntries = Object.entries(dirDeclaration);
-            
+            //const pref = this.rows[0]?.src.callerProject.config.preference;
+            const x = extractPathConfig(this.rows[0]?.src.callerProject.config);
+            //let dirDeclaration = pref?.dirDeclaration;
+            const declareEntries = Object.entries(x.dirDec);
+
             for (let i = 0, len = this.rows.length; i < len; i++) {
                 const row = this.rows[i];
                 let uctype = row.src.extCode;
@@ -102,8 +102,8 @@ export class commonGeneratorX {
                 }
             }
         }
-       //console.log(this.rows);
-        
+        //console.log(this.rows);
+
         console.log(`${this.rows.length} FILES GENERATED..`);
 
     }
@@ -112,7 +112,8 @@ export class commonGeneratorX {
     generateResources() {
         const chandler = BuildingProcess.configHandler;
         const proj = chandler.MAIN_CONFIG;
-        const pref = proj.config.preference;
+        const x = extractPathConfig(proj.config);
+        //const pref = proj.config.preference;
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -128,18 +129,19 @@ export class commonGeneratorX {
             projectList: this.cssBulder.projectList,
             resources,
             PACKAGE_LIST: chandler.PACKAGE_LIST,
-            importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-control' ? '../core-main.js' : 'uc-control/out/core-main.js',
-            declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-control' ? 'uc-control/src/core-main' : 'uc-control/out/core-main'
+            importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-control' ? '../core-main.js' : 'uc-control/core-main.js',
+            declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-control' ? 'uc-control/src/core-main' : 'uc-control/core-main'
         };
 
-        const srcDec = pref.dirDeclaration[pref.srcDec];
-        let srcPath = srcDec.dirPath;
-        let outPath = pref.dirDeclaration[pref.outDec].dirPath;
-        let resSrcFile = resolve(proj.projectPath, srcPath, pref.build.ResourceStorageFile);
+        const srcDec = x.srcDec;
+        let resSrcFile = resolve(proj.projectPath, x.srcDec.dirPath, x.pref.build.ResourceStorageFile);
         rowForRes.projectList.forEach(s => {
+
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
-            s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(s.resourceFilefullPath);
+            const y = extractPathConfig(s.project.config);
+            const resFpath = join(s.project.projectPath, y.srcDec.dirPath, y.pref.build.ResourceStorageFile)
+            s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(resFpath);
         });
         ensureDirectoryExistence(resSrcFile);
         let resContent = this.filex('ts.resources')(rowForRes);

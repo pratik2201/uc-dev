@@ -10,7 +10,7 @@
   "compilerOptions": {
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "target": "ESNext", 
+    "target": "ESNext",
     "outDir": "out",
     "rootDir": "src",
     "strict": true,
@@ -35,9 +35,10 @@
       "./node_modules/@types"
     ],
     "paths": {
-      "ucbuilder/*": [
-        "./*"
+      "uc-control/*": [
+        "../uc-control/*"
       ]
-    }
-  }
+    },
+    //"composite": true
+  } 
 }
