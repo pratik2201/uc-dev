@@ -37,7 +37,7 @@ ResourceStorage.bulkRegister(Resources);
 
 ResourceStorage.RuntimeProps['importmap'] = ResourceStorage.RuntimeProps['importmap'] ?? ResourceStorage.getContent("<?= mainProject.importMapGuid ?>");
 <?php  if(mainProject.mainHtmlGuid!=undefined){ ?>
-ResourceStorage.RuntimeProps['htmlfile'] = ResourceStorage.RuntimeProps['htmlfile'] ?? ResourceStorage.getContent("<?= mainProject.mainHtmlGuid ?>");
+ResourceStorage.RuntimeProps['htmlcontent'] = ResourceStorage.RuntimeProps['htmlcontent'] ?? ResourceStorage.getContent("<?= mainProject.mainHtmlGuid ?>");
 <?php  } ?>
 
 <?php 

@@ -10,21 +10,37 @@ import { cliElectronInquiry } from "./inquiry/cliElectronInquiry.js";
 import { BuildingProcess } from "../lib/BuildingProcess.js";
 import { cliTypeScriptInquiry } from "./inquiry/cliTypeScriptInquiry.js";
 import { cliNewStartInquiry } from "./inquiry/cliNewStartInquiry.js";
+import { cliQuickSetup } from "./inquiry/cliQuickSetup.js";
 export class cliOptions {
     yes? = false;
     force? = false;
+}
+class metaInfo {
+    projectDir: string;
+    
+    srcDir: string;
+    designerDir: string;
+    outDir: string;
 
+    useTypescript: boolean;
+    mainProcessFilePath: string;
+    preloadScriptFilePath: string;
+    resourceFilePath: string
+    htmlFilePath: string;
+    codeFilePath: string;
+    cssFilePath: string; 
 }
 export class cliMain {
     cliOptions = new cliOptions();
-    projectDir: string;
+
     QUERY = {
         JUST_ELECTRON_INSTALLED: false,
         rendererIndexFilePath: undefined,
         JUST_TYPESCRIPT_INSTALLED: false,
         JUST_UCBUILDER_INSTALLED: false,
     }
-    useTypescript = true;
+    meta = new metaInfo();
+   // useTypescript = true;
     hasConfigFound = false;
     ucConfig: UserUCConfig;
     // static TEMPLATE_DIR = resolve(`assets/ucbuilder/templates`);
@@ -34,13 +50,14 @@ export class cliMain {
     _cliNewStart: cliNewStartInquiry;
     _cliElectronInq: cliElectronInquiry;
     _cliTypeScriptInq: cliTypeScriptInquiry;
+    _cliQuickSetup: cliQuickSetup;
     constructor() { }
     private async doNewSurveys() {
-        this.useTypescript = await askYesNo(`IS TYPESCRIPT PROJECT ? 
-==>`, this.useTypescript);
+        this.meta.useTypescript = await askYesNo(`IS TYPESCRIPT PROJECT ? 
+==>`, this.meta.useTypescript);
         await this.dependancyChecker.ensureDependencies({
             electron: true,
-            typescript: this.useTypescript,
+            typescript: this.meta.useTypescript,
             ucbuilder: true,
         });
         this.QUERY.JUST_UCBUILDER_INSTALLED = true;
@@ -49,6 +66,7 @@ export class cliMain {
     }
 
     private async doInquiryForNewJoinee() {
+        
         if (this.QUERY.JUST_UCBUILDER_INSTALLED) {
             await this._cliUcconfigInq.inquiry();
             if (this._cliUcconfigInq.exist)
@@ -63,9 +81,9 @@ export class cliMain {
 
     }
     async init() {
-        this.projectDir = await getProjectDir(process.cwd());
+        this.meta.projectDir = await getProjectDir(process.cwd());
 
-        if (this.projectDir == null) {
+        if (this.meta.projectDir == null) {
             throw Error('NO PROJECT FOUND');
         }
         this.dependancyChecker = new cliDependancyChecker(this);
@@ -74,45 +92,37 @@ export class cliMain {
         this._cliElectronInq = new cliElectronInquiry(this);
         this._cliTypeScriptInq = new cliTypeScriptInquiry(this);
         this._cliNewStart = new cliNewStartInquiry(this);
+        this._cliQuickSetup = new cliQuickSetup(this);
+
         if (!this._cliUcconfigInq.exist) {
             await this.doNewSurveys();
         } else {
-
-            const oldValue = this.cliOptions.yes;
-            //this.cliOptions.yes = true;
             await this.dependancyChecker.ensureDependencies({
                 electron: true,
                 ucbuilder: false,
             });
             await this._cliUcconfigInq.read();
-            this.useTypescript = this.ucConfig.useTypeScript;
+            this.meta.useTypescript = this.ucConfig.useTypeScript;
             if (this.QUERY.JUST_ELECTRON_INSTALLED) {
                 await this._cliElectronInq.inquiry();
             }
-
             await this.dependancyChecker.ensureDependencies({
                 typescript: this.ucConfig.useTypeScript,
             });
-            // console.log(this.QUERY.JUST_TYPESCRIPT_INSTALLED);
 
             if (this.QUERY.JUST_TYPESCRIPT_INSTALLED) {
                 await this._cliTypeScriptInq.inquiry();
             }
-            //this.cliOptions.yes = oldValue;
-
-
         }
-
-
     }
     async updateDependancies() {
-        if (this.projectDir != undefined) {
+        if ( this.meta.projectDir != undefined) {
             this.dependentProjects = this.listProjectDependencies();
         }
     }
 
     listProjectDependencies(): string[] {
-        const pkgPath = path.resolve(this.projectDir, "package.json");
+        const pkgPath = path.resolve(this.meta.projectDir, "package.json");
         if (!existsSync(pkgPath)) {
             throw new Error("package.json not found in project directory");
         }
@@ -131,7 +141,7 @@ export class cliMain {
     async startBuild() {
         await this.init();
         if (this._cliUcconfigInq.exist) {
-            await BuildingProcess.startBuild(this.projectDir);
+            await BuildingProcess.startBuild(this.meta.projectDir);
             if (BuildingProcess.FILE_COUNT_OF_PREV_BUILD == 0) {
                 await this._cliNewStart.inquiry();
             }

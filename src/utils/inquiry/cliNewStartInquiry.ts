@@ -13,35 +13,40 @@ export class cliNewStartInquiry {
     async inquiry() {
         const cfg = await ImportUserConfig(resolve('ucconfig.js'));
 
-        if (await askYesNo(
-            `
-+-------------------------------+
-|              NEW              |
-+-------------------------------+            
-add Blank Form?
->`, true)) {
-            const pref = cfg.preference;
-            const srcdec = pref.dirDeclaration[pref.srcDec];
-            let __dpath = "";
-            if (this.main.QUERY.rendererIndexFilePath != undefined) {
-                const renderDirPath = dirname(this.main.QUERY.rendererIndexFilePath);
-                let ddirdpath = await ask(`WHERE TO GENERATE?
+
+
+        if (await askYesNo(`
++-----------------------------+
+|        EMPTY PROJECT        |
++-----------------------------+
+
+ADD BLANK FORM?
+>`, false) == false) return;
+
+
+
+        const pref = cfg.preference;
+        const srcdec = pref.dirDeclaration[pref.srcDec];
+        let __dpath = "";
+        if (this.main.QUERY.rendererIndexFilePath != undefined) {
+            const renderDirPath = dirname(this.main.QUERY.rendererIndexFilePath);
+            let ddirdpath = await ask(`WHERE TO GENERATE?
 INSIDE ('${renderDirPath}' DIRECTORY)
 >`, '');
-                __dpath = join(resolve(renderDirPath), ddirdpath); 
-            } else {
-                let dirPath = await ask(`WHERE TO GENERATE?
+            __dpath = join(resolve(renderDirPath), ddirdpath);
+        } else {
+            let dirPath = await ask(`WHERE TO GENERATE?
 INSIDE ('${srcdec.dirPath}' DIRECTORY)
 >`, '');
-                __dpath = join(resolve(srcdec.dirPath), dirPath);
-            }
-            writeFileSafely(
-                join(__dpath, 'form1.uc.html'),
-                _runTemplate('templates/electron/sample1/form.uc.html.tp', JSON.parse(JSON.stringify(cfg))),
-                this.main.cliOptions);
-            console.log('.... new form CONFIG FILE GENERATED ...');
+            __dpath = join(resolve(srcdec.dirPath), dirPath);
         }
+        writeFileSafely(
+            join(__dpath, 'form1.uc.html'),
+            _runTemplate('templates/electron/sample1/form.uc.html.tp', JSON.parse(JSON.stringify(cfg))),
+            this.main.cliOptions);
+        console.log('.... new form CONFIG FILE GENERATED ...');
     }
+
 }
 
 function _runTemplate(rel: string, options: any) {

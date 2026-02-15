@@ -17,7 +17,7 @@ const $srcdec = $pref.dirDeclaration[$pref.srcDec];
         "moduleResolution": "Bundler",
         "target": "ESNext",
         "strict": true,
-        "baseUrl": "./<?= $srcdec.dirPath ?>",
+        "baseUrl": ".",
         "outDir": "./<?= $outdec.dirPath ?>",
         "rootDir": "./<?= $srcdec.dirPath ?>",
         "declaration": true,
@@ -34,6 +34,11 @@ const $srcdec = $pref.dirDeclaration[$pref.srcDec];
         "experimentalDecorators": true,
         "removeComments": false,
         "noImplicitAny": false,
-        "inlineSources": true
+        "inlineSources": true,
+        "paths": {
+            "uc-control/*": [
+                "./node_modules/uc-control/out/*"
+            ]
+        }
     },
 }

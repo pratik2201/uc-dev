@@ -1,5 +1,5 @@
 <WRAPPER x-caption="Form1">
-    <UCWINFRAME x-name="winFrame1" x-from="uc-control/out/controls/ucWinFrame.uc.html">
+    <UCWINFRAME x-name="winFrame1" x-from="uc-control/controls/ucWinFrame.uc.html">
         <H1>HI.</H1>
         <SPAN>YOU ARE WELCOME</SPAN>
         <DIV x-name="menuItems1"></DIV>
