@@ -1,4 +1,4 @@
-import { ITemplateMeta, splitCSSById } from "ap-shared-core/out/uc-control/Template.js";
+import { ITemplateContent, splitCSSById } from "ap-shared-core/out/uc-control/Template.js";
 import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
 import { parseDocument } from "htmlparser2";
 import { isTag } from "domhandler";
@@ -25,9 +25,9 @@ export class EModify {
     static nodeType(el: Element) { return getControlType(el); }
 }
 
-export function GetTemplateMetaByContent(htmlcontent: string, cssContent: string) {
+export function GetTemplateMetaByContent$main(htmlcontent: string, cssContent: string) {
     //let ele = ucUtil.PHP_REMOVE(htmlcontent)["#$"]() as HTMLElement;
-    let rtrn = new ITemplateMeta();
+    let rtrn = new ITemplateContent();
     let ele = EModify.GetHtmlElement(ucUtil.PHP_REMOVE(htmlcontent));
 
     let hasMultipleNode = !EModify.hasAttribute(ele, 'id');

@@ -11,10 +11,10 @@ import { ATTR_OF, ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
-import { IUsercontrolMeta } from "ap-shared-core/out/uc-control/Template.js";
-import { EModify, GetTemplateMetaByContent } from "./jsToHtml.js";
+import { IUsercontrolContent, type ICoupleNode } from "ap-shared-core/out/uc-control/Template.js";
+import { EModify, GetTemplateMetaByContent$main } from "./jsToHtml.js";
 import { correctpath } from "ap-shared-core/out/pathUtils.js";
-import { ResourceKeyBridge } from "uc-control/common/resources/enums.js";
+import { ResourceKeyBridge, UserResource } from "uc-control/common/resources/enums.js";
 import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
 import { fileURLToPath } from "url";
 export class BuildDesigner {
@@ -143,16 +143,22 @@ export class BuildDesigner {
         let accessKeys = `"` + ucUtil.distinct(Array.from(EModify.querySelectorAll(codeHT, `[${ATTR_OF.ACCESSIBLE_KEY}]`))
             .map(s => EModify.getAttribute(s, ATTR_OF.ACCESSIBLE_KEY))).join(`" | "`) + `"`;
 
-        let cssCode = '';
+        /*let cssCode = '';
         if (existsSync(srcPathOf.scss)) cssCode = this.gen.cssBulder.treeShakeCss(srcPathOf.scss);
-        let ucMeta: IUsercontrolMeta = {
+
+        let ucMeta: IUsercontrolContent = {
             htmlContents: htmlCode,
             cssContents: cssCode,
+        }*/
+         let cnt: ICoupleNode = {
+            htmlGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.html, { source: srcPathOf.html })),
+            cssGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.scss, { source: srcPathOf.scss })),
         }
+
         row.designer.guid = JSON.stringify(ResourceKeyBridge.extractKey(
             this.gen.cssBulder.build(undefined, {
                 source: srcPathOf.html,
-                content: JSON.stringify(ucMeta),
+                content: JSON.stringify(cnt),
                 //type: 'string'
             })));
 
@@ -186,7 +192,7 @@ export class BuildDesigner {
             if (EModify.hasAttribute(element, "x-from")) {
                 let _sspath = ucUtil.devEsc(EModify.getAttribute(element, "x-from"));
                 let _subpath = ImportMapResolver.resolve(_sspath, outPathOf.html);// resolveFilePath(outPathOf.html, _sspath);
-                _subpath = fileURLToPath(_subpath);              
+                _subpath = fileURLToPath(_subpath);
                 let uFInf = new codeFileInfo();
                 uFInf.parseUrl(_subpath, pref.outDec as any, outPathOf.html);
                 if (uFInf.pathOf == undefined) debugger;
@@ -262,23 +268,33 @@ export class BuildDesigner {
 
         this.common2(row.designer, finfo);
         let cssContent: string = '';
-        if (existsSync(srcPathof.scss)) cssContent = this.gen.cssBulder.treeShakeCss(srcPathof.scss);
+        if (existsSync(srcPathof.scss)) cssContent =
+            this.gen.cssBulder.
+                treeShakeCss(srcPathof.scss);
+
         //const guid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html))); 
-        let subTemplates = GetTemplateMetaByContent(compileedCode, cssContent);
+        if (cssContent.includes(`dgv-group[isActive="true"]`)) debugger;
+        let cnt: ICoupleNode = {
+            htmlGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html, { source: srcPathof.html })),
+            cssGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.scss, { source: srcPathof.scss })),
+        }
         row.designer.guid = JSON.stringify(
             ResourceKeyBridge.extractKey(
                 this.gen.cssBulder.build(undefined, {
                     source: srcPathof.html,
-                    content: JSON.stringify(subTemplates)
+                    content: JSON.stringify(cnt)
                 })
             )
         );
+        let s =
 
-        // data.outerCssContents =
-        //const cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.scss)));        
-        //const htmlGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html)));
-        //const guid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html)));
-        row.designer.baseClassName = 'Template';
+
+
+            // data.outerCssContents =
+            //const cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.scss)));        
+            //const htmlGuid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html)));
+            //const guid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html)));
+            row.designer.baseClassName = 'Template';
         /* if (_row.htmlFileContent == undefined) {
              subTemplates =   Template.GetObjectOfTemplate(
                  row.designer.cssGuid,
@@ -294,6 +310,7 @@ export class BuildDesigner {
 
 
 
+        let subTemplates = GetTemplateMetaByContent$main(compileedCode, cssContent);
         for (const [accessKey, template] of Object.entries(subTemplates.templates)) {
             let rolelwr = accessKey;  //template.accessKey;
             if (tpts.findIndex(s => ucUtil.equalIgnoreCase(s.name, rolelwr)) != -1) return;
@@ -382,9 +399,9 @@ export class BuildDesigner {
             des.htmlFilePath = dsToht;
         }
         if (pathOf.code != undefined) {
-            let dsTocd = ucUtil.resolveSubNode(relativeFilePath(pathOf.designer, pathOf.code));
+            let dsTocd = ucUtil.resolveSubNode('./' + relativeFilePath(pathOf.designer, pathOf.code));
             des.codeFilePath = ucUtil.changeExtension(dsTocd, this.SRC_CODE_EXT, this.OUT_CODE_EXT);
-            let tsToDes = ucUtil.resolveSubNode(relativeFilePath(pathOf.code, pathOf.designer));
+            let tsToDes = ucUtil.resolveSubNode('./' + relativeFilePath(pathOf.code, pathOf.designer));
             code.designerFilePath = ucUtil.changeExtension(tsToDes, this.SRC_CODE_EXT, this.OUT_CODE_EXT);
         }
 

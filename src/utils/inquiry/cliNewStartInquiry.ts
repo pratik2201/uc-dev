@@ -12,9 +12,6 @@ export class cliNewStartInquiry {
 
     async inquiry() {
         const cfg = await ImportUserConfig(resolve('ucconfig.js'));
-
-
-
         if (await askYesNo(`
 +-----------------------------+
 |        EMPTY PROJECT        |
@@ -22,8 +19,6 @@ export class cliNewStartInquiry {
 
 ADD BLANK FORM?
 >`, false) == false) return;
-
-
 
         const pref = cfg.preference;
         const srcdec = pref.dirDeclaration[pref.srcDec];

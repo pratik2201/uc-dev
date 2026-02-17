@@ -1,0 +1,17 @@
+{
+    "javascript.suggest.paths": true,
+    "javascript.preferences.useAliasesForRenames": false,
+    "typescript.preferences.useAliasesForRenames": false,
+    "typescript.updateImportsOnFileMove.enabled": "never",    
+    "javascript.updateImportsOnFileMove.enabled": "never",
+    "javascript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifier": "relative",
+    "typescript.preferences.importModuleSpecifierEnding": "js",
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "package.json": "ucconfig.js,.babelrc,vite.config.ts,electron.vite.config.js,LICENSE,ucconfig.json,tsconfig.build.json, jsconfig.json, package-lock.json, .browserslistrc, .dockerignore, .editorconfig, .env, .eslintignore, .eslintrc., .gitignore, .graphqlrc., .nvmrc, .prettierignore, .prettierrc.*, README.md, babel.config.json, cypress.json, jest.config.ts, jest.preset.js, nx.json, package.json, tsconfig.base.json, tsconfig.json, workspace.json, yarn.lock, vercel.json, netlify.toml, pnpm-lock.yaml",
+        "*.uc.ts": "${capture}.uc.*",
+        "*.tpt.ts": "${capture}.tpt.*",
+        "*.ts": "${capture}.js,${capture}.js.map",
+    },
+}

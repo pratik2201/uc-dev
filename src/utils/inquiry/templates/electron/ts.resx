@@ -27,9 +27,15 @@ app.on('ready', async () => {
     try {  
 
         IpcMainHelper.loadURL(pathToFileURL(join(__dirname, '<?= rendererHtmlPath ?>')).href, win, {
-             // in browser 
+            // in browser 
             // this will make resolve path from project root directory instead of loaded html file path            
-            baseURLForDataURL: pathToFileURL(resolve(process.cwd(),'index.html')).href             
+            baseURLForDataURL: pathToFileURL(resolve(process.cwd(), 'index.html')).href              
+        }); 
+
+        IpcMainHelper.loadURL(pathToFileURL(join(__dirname, '<?= rendererHtmlPath ?>')).href, win, {
+            // in browser 
+            // this will make resolve path from project root directory instead of loaded html file path            
+            baseURLForDataURL: pathToFileURL(resolve(process.cwd(), 'index.html')).href              
         }); 
         
         win.show();

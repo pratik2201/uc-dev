@@ -8,9 +8,8 @@ import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js"
 import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 
 export class cliTypeScriptInquiry {
-    constructor(public main: cliMain) { } 
-    async inquiry() { 
-        const cfg = await ImportUserConfig(resolve('ucconfig.js')); 
+    constructor(public main: cliMain) { }
+    async inquiry() {
         if (this.main.meta.useTypescript && !existsSync(resolve('tsconfig.json'))) {
             if (await askYesNo(
                 `
@@ -20,11 +19,16 @@ export class cliTypeScriptInquiry {
 ADD 'tsconfig.json' with required settings?
 >`, true)) {
                 try {
+
+                    const outDir = this.main.meta.outDir;
+                    const srcDir = this.main.meta.srcDir;
+                    //const ucPath = 
                     writeFileSafely(
                         resolve('tsconfig.json'),
                         runTemplate(resolveFilePath(import.meta.url, 'templates/typescript/json.tsconfig'),
-                            import.meta.url,
-                            JSON.parse(JSON.stringify(cfg))),
+                            import.meta.url, {
+                            outDir, srcDir
+                        }),
                         this.main.cliOptions);
                     console.log('.... TYPESCRIPT CONFIG FILE GENERATED ...');
                 } catch (e) {

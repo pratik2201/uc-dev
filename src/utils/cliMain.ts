@@ -17,7 +17,7 @@ export class cliOptions {
 }
 class metaInfo {
     projectDir: string;
-    
+
     srcDir: string;
     designerDir: string;
     outDir: string;
@@ -28,7 +28,7 @@ class metaInfo {
     resourceFilePath: string
     htmlFilePath: string;
     codeFilePath: string;
-    cssFilePath: string; 
+    cssFilePath: string;
 }
 export class cliMain {
     cliOptions = new cliOptions();
@@ -40,7 +40,7 @@ export class cliMain {
         JUST_UCBUILDER_INSTALLED: false,
     }
     meta = new metaInfo();
-   // useTypescript = true;
+    // useTypescript = true;
     hasConfigFound = false;
     ucConfig: UserUCConfig;
     // static TEMPLATE_DIR = resolve(`assets/ucbuilder/templates`);
@@ -51,7 +51,13 @@ export class cliMain {
     _cliElectronInq: cliElectronInquiry;
     _cliTypeScriptInq: cliTypeScriptInquiry;
     _cliQuickSetup: cliQuickSetup;
-    constructor() { }
+    constructor() {
+        this._cliUcconfigInq = new cliUcconfigInquiry(this);
+        this._cliTypeScriptInq = new cliTypeScriptInquiry(this);
+        this._cliElectronInq = new cliElectronInquiry(this);
+        this._cliNewStart = new cliNewStartInquiry(this);
+        this._cliQuickSetup = new cliQuickSetup(this);
+    }
     private async doNewSurveys() {
         this.meta.useTypescript = await askYesNo(`IS TYPESCRIPT PROJECT ? 
 ==>`, this.meta.useTypescript);
@@ -66,7 +72,7 @@ export class cliMain {
     }
 
     private async doInquiryForNewJoinee() {
-        
+
         if (this.QUERY.JUST_UCBUILDER_INSTALLED) {
             await this._cliUcconfigInq.inquiry();
             if (this._cliUcconfigInq.exist)
@@ -80,43 +86,51 @@ export class cliMain {
         }
 
     }
-    async init() {
+    async checkBasicNeed() {
         this.meta.projectDir = await getProjectDir(process.cwd());
-
         if (this.meta.projectDir == null) {
             throw Error('NO PROJECT FOUND');
         }
         this.dependancyChecker = new cliDependancyChecker(this);
         this.updateDependancies();
-        this._cliUcconfigInq = new cliUcconfigInquiry(this);
-        this._cliElectronInq = new cliElectronInquiry(this);
-        this._cliTypeScriptInq = new cliTypeScriptInquiry(this);
-        this._cliNewStart = new cliNewStartInquiry(this);
-        this._cliQuickSetup = new cliQuickSetup(this);
+        await this.dependancyChecker.ensureDependencies({
+            electron: true,
+            typescript: true,
+            ucbuilder: true,
+        })
+    }
+    async setup() {
 
-        if (!this._cliUcconfigInq.exist) {
-            await this.doNewSurveys();
-        } else {
-            await this.dependancyChecker.ensureDependencies({
-                electron: true,
-                ucbuilder: false,
-            });
-            await this._cliUcconfigInq.read();
-            this.meta.useTypescript = this.ucConfig.useTypeScript;
-            if (this.QUERY.JUST_ELECTRON_INSTALLED) {
-                await this._cliElectronInq.inquiry();
-            }
-            await this.dependancyChecker.ensureDependencies({
-                typescript: this.ucConfig.useTypeScript,
-            });
 
-            if (this.QUERY.JUST_TYPESCRIPT_INSTALLED) {
-                await this._cliTypeScriptInq.inquiry();
-            }
-        }
+
+        //
+        //
+        // 
+        await this._cliQuickSetup.inquiry(false);
+
+        /*if (!this._cliUcconfigInq.exist) {
+             await this.doNewSurveys();
+         } else {
+             await this.dependancyChecker.ensureDependencies({
+                 electron: true,
+                 ucbuilder: false,
+             });
+             await this._cliUcconfigInq.read();
+             this.meta.useTypescript = this.ucConfig.useTypeScript;
+             if (this.QUERY.JUST_ELECTRON_INSTALLED) {
+                 await this._cliElectronInq.inquiry();
+             }
+             await this.dependancyChecker.ensureDependencies({
+                 typescript: this.ucConfig.useTypeScript,
+             });
+ 
+             if (this.QUERY.JUST_TYPESCRIPT_INSTALLED) {
+                 await this._cliTypeScriptInq.inquiry();
+             }
+         }*/
     }
     async updateDependancies() {
-        if ( this.meta.projectDir != undefined) {
+        if (this.meta.projectDir != undefined) {
             this.dependentProjects = this.listProjectDependencies();
         }
     }
@@ -139,12 +153,14 @@ export class cliMain {
     }
 
     async startBuild() {
-        await this.init();
+
         if (this._cliUcconfigInq.exist) {
             await BuildingProcess.startBuild(this.meta.projectDir);
             if (BuildingProcess.FILE_COUNT_OF_PREV_BUILD == 0) {
                 await this._cliNewStart.inquiry();
             }
+        } else {
+            await this._cliQuickSetup.inquiry(true);
         }
     }
 }

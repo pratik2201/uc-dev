@@ -11,10 +11,12 @@ copt.force = args.includes("--force");
 copt.yes = args.includes("--yes");
 switch (cmd) {
     case "build":
+        await main.checkBasicNeed();
         await main.startBuild();
         break;
     case "setup":
-        await main.init();
+        await main.checkBasicNeed();
+        await main.setup();
         break;
     case "--help":
     default:

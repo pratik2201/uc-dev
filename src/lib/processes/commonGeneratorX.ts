@@ -79,7 +79,7 @@ export class commonGeneratorX {
                     _data = this.filex(`${srctype}${uctype}.designer`)(row);
                     writeFileSync(row.src.pathOf[designerFileSrctype], _data);
 
-                    if (uctype == '.uc') {
+                    /*if (uctype == '.uc') {
                         _data = this.filex(`js${uctype}.designer`)(row);
                         writeFileSync(ucUtil.changeExtension(row.src.pathOf[designerFileSrctype], '.ts', '.js'), _data);
                     }
@@ -87,7 +87,7 @@ export class commonGeneratorX {
                     if (uctype == '.tpt') {
                         _data = this.filex(`js${uctype}.designer`)(row);
                         writeFileSync(ucUtil.changeExtension(row.src.pathOf[designerFileSrctype], '.ts', '.js'), _data);
-                    }
+                    }*/
                     // if (row.htmlFileContent != undefined)
                     //     writeFileSync(`${row.src.pathOf.html}`, row.htmlFileContent);
 

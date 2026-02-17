@@ -43,7 +43,7 @@ class GuidResolver {
   private fileMap = new Map<string, string>();
   private seq = 0;
   constructor(
-    private projectName: string,
+    public projectName: string,
     private projectGuid: string,
     private mode: GuidSequenceType = "sequenceAndSameGuid",
     private padSize = 6
@@ -121,7 +121,7 @@ export class ResourceBuildEngine {
     name: undefined as string,
     guid: undefined as string,
     importMapGuid: undefined as string,
-    mainHtmlGuid:undefined as string,
+    mainHtmlGuid: undefined as string,
     encryptResource: false,
   }
   registerProject = (s: ProjectRowBase) => {
@@ -153,6 +153,9 @@ export class ResourceBuildEngine {
 
   build(_path: string, _blueprint?: Partial<UserResource>): string {
     // ---- STRING / KEY RESOURCE ----
+    _blueprint = _blueprint ?? {};
+
+
     // ---- CONTENT-ONLY RESOURCE ----
     if (
       (!_path || _path.trim() === "") &&
@@ -160,15 +163,23 @@ export class ResourceBuildEngine {
     ) {
       return this.buildContentOnly(_blueprint);
     }
+
     if (_path.startsWith('file:///')) _path = fileURLToPath(_path);
     const absPath = /*GetProject(path)*/ resolve(_path);
     const blueprint = new UserResource();
     Object.assign(blueprint, _blueprint);
+
     if (this.resourceMap.has(absPath)) {
       const res = this.resourceMap.get(absPath);
       if (blueprint?.name != undefined && blueprint.name != '') {
-        if (res.name == undefined || res.name == '') res.name = JSON.stringify(blueprint.name);
+        if (res.name == undefined || res.name == '') {
+          //   //console.log(['here',blueprint.name,JSON.stringify(blueprint.name)]);          
+          res.name = blueprint.name ? JSON.stringify(this.guidResolver.projectName + ':' + blueprint.name) : undefined;
+        
+        }
       }
+
+
       return ResourceKeyBridge.makeKey(res!.guid);
     }
 
@@ -202,9 +213,10 @@ export class ResourceBuildEngine {
       //source: ""
     } as UserResource);
 
-    res.name = JSON.stringify(res.name);
+    //res.name = (res.name);
 
     // use guid as key since no path exists
+    res.name = res.name ? JSON.stringify(this.guidResolver.projectName + ':' + res.name) : undefined;
     this.resourceMap.set(guid, res);
 
     return ResourceKeyBridge.makeKey(guid);
@@ -223,9 +235,8 @@ export class ResourceBuildEngine {
       content: "",
       source: absPath
     });
-    res.name = res.name ? JSON.stringify(res.name) : undefined;
 
-    // allocate first (circular safe)
+    res.name = res.name ? JSON.stringify(this.guidResolver.projectName + ':' + res.name) : undefined;
     this.resourceMap.set(absPath, res);
 
     // let css = readFileSync(absPath, "utf8");
@@ -293,7 +304,8 @@ export class ResourceBuildEngine {
 
     const guid = this.guidResolver.getBaseGuid(absPath);
 
-    const html = readFileSync(absPath, "utf8");
+    let html = readFileSync(absPath, "utf8");
+    html = ucUtil.devEsc(html);
     let content = this.doEncrypt ? encryptResource(html) : html;
 
     const res = new UserResource();
@@ -305,7 +317,7 @@ export class ResourceBuildEngine {
       source: absPath
     } as UserResource);
 
-    res.name = res.name ? JSON.stringify(res.name) : undefined;
+    res.name = res.name ? JSON.stringify(this.guidResolver.projectName + ':' + res.name) : undefined;
     this.resourceMap.set(absPath, res);
     return ResourceKeyBridge.makeKey(guid);
   }
@@ -340,7 +352,7 @@ export class ResourceBuildEngine {
       source: absPath
     } as UserResource);
 
-    res.name = res.name ? JSON.stringify(res.name) : undefined;
+    res.name = res.name ? JSON.stringify(this.guidResolver.projectName + ':' + res.name) : undefined;
 
     this.resourceMap.set(absPath, res);
 
@@ -369,7 +381,7 @@ export class ResourceBuildEngine {
         content: this.doEncrypt ? encryptResource(rel) : rel
       } as UserResource);
 
-      res.name = res.name ? JSON.stringify(res.name) : undefined;
+      res.name = res.name ? JSON.stringify(this.guidResolver.projectName + ':' + res.name) : undefined;
 
       this.resourceMap.set(rel, res);
       return ResourceKeyBridge.makeKey(guid);
