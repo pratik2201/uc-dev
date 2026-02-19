@@ -1,115 +1,72 @@
-# ucbuilder
 :Shree Ganeshay Namah:<br />
-**App Builder** – A modular UI framework for Electron-based applications.
+# uc-dev
+
+
+> CLI toolkit for UC project development
+
+`uc-dev` is a command-line utility that helps manage UC-based projects by automating setup and designer build workflows.
+
+⚠ Status: **Beta**
 
 ---
-# 🚀 BASIC INFO
-this module is used for manage sources and structure of electron project <br>
-this is **SINGLE BROWSER WINDOW** App system.
 
-what kind of project it work for ?
+## Installation
 
-    - it work for electron project 
-    - package type =  es module
-    
+### Global install (recommended)
 
-what it do in project ?
-    
-    - it generate designer files for you so you can easily access the control in ui.
-    - template is used for generate htmlnode as ui of perticular piece of code.
-    - all ui (usercontrols) will renderer in same browser window 
-    - each ui will have their seperated styles in scss file
-    - you can also import usercontrol from other projects.
+```bash
+npm install -g uc-dev
+```
+### Local install
+```bash
+npm install uc-dev
+```
+Commands
+build
 
+Generate designer files for the project.
+```bash
+uc-dev build
+```
+- this generate designer for all usercontrols and templates.
+- also generate a single resource file that hold project's resurces (all used contents in string format except source code) that make easy for bundling.
+- each resource will assigned uniqueid to access.
 
-# 🚀 INSTALLATION
-how to install and setup in project ?
-    
-    npm i ucbuilder
+Use this command whenever designer files change.
+
 ---
-`main.ts` (starting point of app).<br>
-  3 required changes.
-```ts
-import { app, BrowserWindow, ipcMain, screen } from "electron";
-import { IpcMainHelper } from "uucbuilder/out/main/ipc/IpcMainHelper.js"; // <-- import the library
-let win: Electron.BrowserWindow;
-app.on('ready', async () => {
-    ...   
-    // initelize main helper before `BrowserWindow` created
-    await IpcMainHelper.init(ipcMain);  //  (mandetory)
-    win = new BrowserWindow({
-        ...
-    });    
-    ...
-    //   loading file in browser (mandetory)
-    IpcMainHelper.loadURL(pathToFileURL(join(__dirname, '../../index.html')).href, win, {
-            baseURLForDataURL: pathToFileURL(join(__dirname, '../../')).href
-        });
-    
-});
+`setup`<br>
+Initializes a project for development.
+```bash
+uc-dev setup
+```
+What it does:
+- Installs required dependencies (also done before build)
+- Creates necessary directories
+- Configures project paths
+- Prepares development environment
+- Run once when starting a new project.
+
+---
+
+Typical Workflow
+```bash
+uc-dev setup
+uc-dev build
 ```
 ---
-`preload.ts` 
-```ts
-import { contextBridge, ipcRenderer } from "electron";
-import { IpcPreload } from "uc-control/out/main/ipc/IpcPreload.js";
-IpcPreload.init(contextBridge, ipcRenderer);   // mandetory
-```
+Development Notes
+
+- Commands are designed to be safe to re-run
+- Paths are resolved relative to the project
+- No manual configuration required after setup
+
 ---
-Third one is `ucconfig.js`  (configuration)
-```js
-import UcDefaultConfig from "uc-control/out/ipc/userConfigManage.js";
-export default UcDefaultConfig({    
-    preference: {                
-        dirDeclaration: {  //  add declaration of directory
-            src: {
-                dirPath: 'src',
-                fileDeclaration: {  //  add declaration of files
-                    code: { extension: '.ts' },
-                    designer: { extension: '.designer.ts' },
-                    dynamicDesign: { extension: '.html.ts' },
-                }
-            },
-            out: {
-                dirPath: 'out',
-                fileDeclaration: {
-                    code: { extension: '.js' },
-                    designer: { extension: '.designer.js' },
-                    dynamicDesign: { extension: '.html.js' },
-                }
-            }
-        },
-        fileCommonDeclaration: { //  set declaration of files
-            designer: { subDirPath: 'designerFiles' },
-            scss: { extension: '.scss' },
-            html: { subDirPath: 'htmlFiles', extension: '.html' }
-        },
-        outDir: "out",  //(set dirDeclaration key as value)
-        srcDir: "src",  //(set dirDeclaration key as value)
-        build: {           
-            RuntimeResources: [
-                {
-                    includeExtensions: [".html", ".scss", ".mjs", ".css", ".svg", ".png", ".jpg", ".ico"],
-                    fromDeclare: "src",
-                    toDeclares: ["out"]
-                }
-            ]
-        },
-    },
-});
-```
 
-full explained about config in youtube video.
+**LICENSE** <br>
+MIT
 
-Links
----
-github : [https://github.com/pratik2201/ucbuilder.git](https://github.com/pratik2201/ucbuilder.git)
+**FEEDBACK** <br>
+Report issues or suggestions to improve the CLI workflow.
 
- ## 📺 Video Tutorial
-
-A complete step-by-step video guide 
-
-🔔 Subscribe to get notified when it’s live:<br>
-youtube : [https://youtu.be/GzXJulsTS8A?si=qhwbj0o9QTLnEwjk](https://youtu.be/GzXJulsTS8A?si=qhwbj0o9QTLnEwjk)
-
-
+Happy building 🚀

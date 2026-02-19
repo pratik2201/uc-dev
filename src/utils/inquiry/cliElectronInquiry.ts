@@ -1,12 +1,13 @@
 import { relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
 import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { findProject } from "../cliFindProjects.js";
 import { cliMain } from "../cliMain.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
 import { extractPathConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
 export class cliElectronInquiry {
       constructor(public main: cliMain) { }
@@ -101,7 +102,7 @@ Main file
       }
 
 }
-function _runTemplate(rel: string, options: any) {
-      return runTemplate(resolveFilePath(import.meta.url, rel), import.meta.url, options);
-}
 
+function _runTemplate(rel: string, options: any) {
+    return runTemplate(join(dirname(fileURLToPath(import.meta.url)), 'utils/inquiry', rel), import.meta.url, options);
+}

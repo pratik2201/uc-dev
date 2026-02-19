@@ -6,6 +6,7 @@ import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
 import { cliMain } from "../cliMain.js";
 import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
 import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { fileURLToPath } from "node:url";
 
 export class cliNewStartInquiry {
     constructor(public main: cliMain) { }
@@ -39,11 +40,16 @@ INSIDE ('${srcdec.dirPath}' DIRECTORY)
             join(__dpath, 'form1.uc.html'),
             _runTemplate('templates/electron/sample1/form.uc.html.tp', JSON.parse(JSON.stringify(cfg))),
             this.main.cliOptions);
+        writeFileSafely(
+            join(__dpath, 'form1.uc.scss'),
+            _runTemplate('templates/electron/sample1/form.uc.scss.tp', JSON.parse(JSON.stringify(cfg))),
+            this.main.cliOptions);
         console.log('.... new form CONFIG FILE GENERATED ...');
     }
 
 }
 
+
 function _runTemplate(rel: string, options: any) {
-    return runTemplate(resolveFilePath(import.meta.url, rel), import.meta.url, options);
+    return runTemplate(join(dirname(fileURLToPath(import.meta.url)), 'utils/inquiry', rel), import.meta.url, options);
 }

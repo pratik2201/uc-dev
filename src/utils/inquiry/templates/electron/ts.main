@@ -26,7 +26,7 @@ app.on('ready', async () => {
     <?php } ?>
     try {  
 
-        IpcMainHelper.loadURL(pathToFileURL(join(__dirname, '<?= rendererHtmlPath ?>')).href, win, {
+        await IpcMainHelper.loadURL(pathToFileURL(join(__dirname, '<?= rendererHtmlPath ?>')).href, win, {
              // in browser 
             // this will make resolve path from project root directory instead of loaded html file path            
             baseURLForDataURL: pathToFileURL(resolve(process.cwd(),'index.html')).href             

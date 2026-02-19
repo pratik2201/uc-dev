@@ -1,22 +1,22 @@
+import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { codeOptionsBase, CommonRow, Control, DesignerOptionsBase, type ScopeType } from "ap-shared-core/out/uc-dev/buildRow.js";
 import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
-import { relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
-import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import { relativeFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { join, normalize, relative, resolve } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { commonGeneratorX } from "./commonGeneratorX.js";
 
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
 import { ATTR_OF, ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
-import { IUsercontrolContent, type ICoupleNode } from "ap-shared-core/out/uc-control/Template.js";
-import { EModify, GetTemplateMetaByContent$main } from "./jsToHtml.js";
 import { correctpath } from "ap-shared-core/out/pathUtils.js";
-import { ResourceKeyBridge, UserResource } from "uc-control/common/resources/enums.js";
+import { type ICoupleNode } from "ap-shared-core/out/uc-control/Template.js";
 import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
+import { ResourceKeyBridge } from "ap-shared-core/out/enums.js";
 import { fileURLToPath } from "url";
+import { EModify, GetTemplateMetaByContent$main } from "./jsToHtml.js";
 export class BuildDesigner {
     gen: commonGeneratorX;
     bldr: BuildingProcess;
@@ -90,51 +90,55 @@ export class BuildDesigner {
         let row = _row.sources['ts_uc'];
         let _this = this;
         _row.src = finfo;
-        // if (finfo.pathOf['html'].includes('ledger$form.uc')) debugger;
         let onSelect_xName = BuildingProcess.Event.onSelect_xName;
-
-
         const pref = _row.src?.projectInfo.config.preference;
         const srcPathOf = _row.src.allPathOf[pref.srcDec];
         const outPathOf = _row.src.allPathOf[pref.outDec];
-
         let htmlCode: string;
         const pathOf = finfo.pathOf;
-
         htmlCode = this.common0(_row);
-
-        let compileedCode = htmlCode;
-
         if (htmlCode == undefined) return undefined;
-        htmlCode = ucUtil.devEsc(htmlCode);
-        compileedCode = htmlCode;
-        //this.tmaker.mainImportMeta = nodeFn.url.pathToFileURL(srcPathOf.html);
-
-        try {
-
-            if (compileedCode.trim() != '') {
-                compileedCode = ucUtil.PHP_REMOVE(compileedCode);
-                /*try {
-                   let cccodeCallback = this.tmaker.compileTemplate(compileedCode);
-                   compileedCode = ucUtil.PHP_REMOVE(cccodeCallback({}));
-               } catch {
-                   console.error(`error at 'BuildDesigner.fillUc' in template ;\n error file '${srcPathOf.html} ' `)
-               }*/
-                // _row.htmlFileContent = code;
-                //row.designer.material.htmlContents = JSON.stringify(code);
-            } else {
-                console.log(`no content in '${srcPathOf.html}'`);
-                return;
-                // htmlCode = `<WRAPPER  x-caption="Form" ></WRAPPER>`;
-                // this.codeHT = EModify.GetHtmlElement(htmlCode) as HTMLElement;
-                //_row.dynamicFileContent = commonGenerator.readTemplate('ts.uc.dynamic');
-            }
-        } catch (ex) {
-            console.log(ex);
-            return undefined;
+        else if (htmlCode.trim() == '') {
+            htmlCode = `<WRAPPER x-caption="${finfo.name}">
+    <UCWINFRAME x-name="winFrame1" x-from="uc-control/controls/ucWinFrame.uc.html">
+        
+    </UCWINFRAME>
+</WRAPPER>`;
         }
+        if (!existsSync(finfo.allPathOf[pref.srcDec].scss)) {
+            writeFileSync(finfo.allPathOf[pref.srcDec].scss, `&{
+    position: relative; 
+    display:block;  width: 800px; height: 500px;
+    background-color: #aeaeae;  
+}`, 'utf8');
+        }
+        htmlCode = ucUtil.devEsc(htmlCode);
+        htmlCode = ucUtil.PHP_REMOVE(ucUtil.devEsc(htmlCode));
 
-        let codeHT = EModify.GetHtmlElement(compileedCode);
+        // try {
+        //     if (compileedCode.trim() != '') {
+        //         compileedCode = ucUtil.PHP_REMOVE(compileedCode);
+        //         /*try {
+        //            let cccodeCallback = this.tmaker.compileTemplate(compileedCode);
+        //            compileedCode = ucUtil.PHP_REMOVE(cccodeCallback({}));
+        //        } catch {
+        //            console.error(`error at 'BuildDesigner.fillUc' in template ;\n error file '${srcPathOf.html} ' `)
+        //        }*/
+        //         // _row.htmlFileContent = code;
+        //         //row.designer.material.htmlContents = JSON.stringify(code);
+        //     } else {
+        //         console.log(`no content in '${srcPathOf.html}'`);
+        //         return;
+        //         // htmlCode = `<WRAPPER  x-caption="Form" ></WRAPPER>`;
+        //         // this.codeHT = EModify.GetHtmlElement(htmlCode) as HTMLElement;
+        //         //_row.dynamicFileContent = commonGenerator.readTemplate('ts.uc.dynamic');
+        //     }
+        // } catch (ex) {
+        //     console.log(ex);
+        //     return undefined;
+        // }
+
+        let codeHT = EModify.GetHtmlElement(htmlCode);
 
         row.designer.baseClassName = 'Usercontrol';//.name;
         this.common1(row.designer, row.code, _row.src);
@@ -150,17 +154,16 @@ export class BuildDesigner {
             htmlContents: htmlCode,
             cssContents: cssCode,
         }*/
-         let cnt: ICoupleNode = {
+        // if (existsSync()) {
+        // }
+        let cnt: ICoupleNode = {
             htmlGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.html, { source: srcPathOf.html })),
             cssGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.scss, { source: srcPathOf.scss })),
         }
-
-        row.designer.guid = JSON.stringify(ResourceKeyBridge.extractKey(
-            this.gen.cssBulder.build(undefined, {
-                source: srcPathOf.html,
-                content: JSON.stringify(cnt),
-                //type: 'string'
-            })));
+        row.designer.htmlGuid = cnt.htmlGuid;
+        row.designer.cssGuid =
+            row.designer.guid = cnt.cssGuid;
+         
 
 
 
@@ -171,7 +174,7 @@ export class BuildDesigner {
         const imppath = _row.src?.projectInfo.projectName == 'uc-control' ?
             relativeFilePath(_row.src.allPathOf.out.designer, join(_row.src.projectInfo.projectPath, 'out/core.js'))
             : 'uc-control/core.js';
-        _importer.addImport(['Usercontrol', 'intenseGenerator', 'IUcOptions'], imppath);
+        _importer.addImport(['Usercontrol', 'intenseGenerator', 'IUcOptions', 'ResourceManage'], imppath);
 
 
         this.common2(row.designer, finfo);
@@ -262,7 +265,7 @@ export class BuildDesigner {
             return undefined;
         }
         this.common1(row.designer, row.code, _row.src);
-        row.designer.importer.addImport(['TemplateNode', 'Template', 'intenseGenerator', 'ITptOptions'],
+        row.designer.importer.addImport(['TemplateNode', 'Template', 'intenseGenerator', 'ITptOptions', 'ResourceManage'],
             'uc-control/core.js');
 
 
@@ -273,19 +276,23 @@ export class BuildDesigner {
                 treeShakeCss(srcPathof.scss);
 
         //const guid = JSON.stringify(ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html))); 
-        if (cssContent.includes(`dgv-group[isActive="true"]`)) debugger;
+        // if (cssContent.includes(`dgv-group[isActive="true"]`)) debugger;
         let cnt: ICoupleNode = {
             htmlGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.html, { source: srcPathof.html })),
             cssGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathof.scss, { source: srcPathof.scss })),
         }
-        row.designer.guid = JSON.stringify(
-            ResourceKeyBridge.extractKey(
-                this.gen.cssBulder.build(undefined, {
-                    source: srcPathof.html,
-                    content: JSON.stringify(cnt)
-                })
-            )
-        );
+
+        row.designer.htmlGuid = cnt.htmlGuid;
+        row.designer.cssGuid =
+            row.designer.guid = cnt.cssGuid;
+        // row.designer.guid = JSON.stringify(
+        //     ResourceKeyBridge.extractKey(
+        //         this.gen.cssBulder.build(undefined, {
+        //             source: srcPathof.html,
+        //             content: JSON.stringify(cnt)
+        //         })
+        //     )
+        // );
         let s =
 
 

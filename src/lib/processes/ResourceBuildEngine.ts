@@ -8,7 +8,7 @@ import { existsSync, readFileSync } from "fs";
 import { dirname, extname, join, normalize, resolve, sep } from "path";
 import { fileURLToPath } from "url";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { UserResource, ResourceKeyBridge, type BuildResourceType } from "uc-control/common/resources/enums.js";
+import { UserResource, ResourceKeyBridge, type BuildResourceType } from "ap-shared-core/out/enums.js";
 
 
 /* ------------------ helpers ------------------ */
@@ -30,7 +30,7 @@ function minifyCss(css: string) {
   return css
     .replace(/\s+/g, " ")
     .replace(/\s*([{}:;,>])\s*/g, "$1")
-    .replace(/;}/g, "}")
+    //.replace(/;}/g, "}")
     .trim();
 }
 

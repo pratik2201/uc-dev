@@ -3,7 +3,7 @@ import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
 import { join } from "path";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { ResourceKeyBridge } from "uc-control/common/resources/enums.js";
+import { ResourceKeyBridge } from "ap-shared-core/out/enums.js";
 import type { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { rmSync } from "fs";
 

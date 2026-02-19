@@ -49,7 +49,10 @@ function _DESIGNER(isAsync = false){
     }
     <?=$initializecomponent ?>? = <?= $async ?> (fargs:ITptOptions) => { 
         if(fargs.MakeEmptyTemplate)return;        
-        fargs.guid = <?= designer.guid ?>;
+        fargs.guid = "<?= designer.guid ?>";
+        fargs.htmlContent = ResourceManage.getContent("<?= designer.htmlGuid ?>");
+        fargs.cssContent = ResourceManage.getContent("<?= designer.cssGuid ?>");
+
         this.extended.initializebase(fargs);
         let oot = this.extended.resource;
         let tpts = oot.templates;
@@ -63,7 +66,7 @@ function _DESIGNER(isAsync = false){
         <?php }); ?>
 
         if (oot.outerCssContents.trim() != '')
-            this.pushTemplateCss(oot.outerCssContents,fargs.guid);
+            this.pushTemplateCss(oot.outerCssContents,fargs.guid as any);
 
         delete this.initializecomponent;
         delete this.initializecomponentAsync; 

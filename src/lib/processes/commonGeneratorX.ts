@@ -5,11 +5,12 @@ import { CommonRow } from "ap-shared-core/out/uc-dev/buildRow.js";
 import { ensureDirectoryExistence, relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join, normalize, resolve } from "path";
-import { fileURLToPath } from "url";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { cliMain } from "../../utils/cliMain.js";
-
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 interface CodeFilesNode {
     DESIGNER: string,
     CODE: string,
@@ -36,7 +37,8 @@ export class commonGeneratorX {
 
     static readTemplate(tptFileName: string) {
         //const cpath = fileURLToPath(import.meta.url);        
-        let fpath = resolveFilePath(import.meta.url, `templates/${tptFileName}`);//resolve(dirname(cpath), join(cliMain.TEMPLATE_DIR, tptFileName));
+        //let fpath = resolveFilePath(import.meta.url, `templates/${tptFileName}`);//resolve(dirname(cpath), join(cliMain.TEMPLATE_DIR, tptFileName));
+        let fpath = join(dirname(fileURLToPath(import.meta.url)),'lib/processes/templates', tptFileName);
         const data = readFileSync(fpath, 'utf-8');
         return data;
     }

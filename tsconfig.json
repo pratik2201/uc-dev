@@ -1,7 +1,6 @@
 {
   "include": [
-    "src"
-  ],
+    "src"  ],
   "exclude": [
     "node_modules",
     "out",
@@ -14,6 +13,7 @@
     "outDir": "out",
     "rootDir": "src",
     "strict": true,
+    
     "allowJs": true,
     "verbatimModuleSyntax": true,
     "strictNullChecks": false,

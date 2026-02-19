@@ -1,6 +1,6 @@
 import { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
 import { cliMain } from "../cliMain.js";
@@ -49,8 +49,8 @@ export class cliUcconfigInquiry {
 
 SETUP UC CONFIG FILE ?
 >`, false) == false) return;
-        
-        
+
+
         const fileExt = cfg.useTypeScript ? '.ts' : '.js';
         const meta = this.main.meta;
 
@@ -140,7 +140,7 @@ SETUP UC CONFIG FILE ?
         try {
             writeFileSafely(
                 resolve('ucconfig.js'),
-                runTemplate(resolveFilePath(import.meta.url, 'templates/js.ucconfig'), import.meta.url, JSON.parse(JSON.stringify(cfg))),
+                _runTemplate('templates/js.ucconfig', JSON.parse(JSON.stringify(cfg))),
                 this.main.cliOptions);
 
             if (cfg.browser.baseCssPath?.trim().length > 0) {
@@ -166,4 +166,6 @@ SETUP UC CONFIG FILE ?
         }
     }
 }
-
+function _runTemplate(rel: string, options: any) {
+    return runTemplate(join(dirname(fileURLToPath(import.meta.url)), 'utils/inquiry', rel), import.meta.url, options);
+}

@@ -9,13 +9,16 @@ const main = new cliMain();
 const copt = main.cliOptions;
 copt.force = args.includes("--force");
 copt.yes = args.includes("--yes");
+const ignreq = args.includes("--ignreq");
 switch (cmd) {
     case "build":
-        await main.checkBasicNeed();
+        if (!ignreq)
+            await main.checkBasicNeed(); 
         await main.startBuild();
         break;
     case "setup":
-        await main.checkBasicNeed();
+        if (!ignreq)
+            await main.checkBasicNeed();
         await main.setup();
         break;
     case "--help":
@@ -24,7 +27,7 @@ switch (cmd) {
 uc-dev
 Commands:
   build   build the designer files 
-  setup   setup project install required depandancy
+  setup   setup project for startup. install required depandancy and set directory paths
 `);
         break;
 }

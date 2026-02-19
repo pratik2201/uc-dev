@@ -1,6 +1,6 @@
 import { extractPathConfig, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
 import { cliMain } from "../cliMain.js";
@@ -130,7 +130,7 @@ Main file
             const _SRC_DIR = join(meta.projectDir, meta.srcDir);
             writeFileSafely(
                 resolve('ucconfig.js'),
-                runTemplate(resolveFilePath(import.meta.url, 'templates/js.ucconfig'), import.meta.url, JSON.parse(JSON.stringify(cfg))),
+                _runTemplate('templates/js.ucconfig', JSON.parse(JSON.stringify(cfg))),
                 this.main.cliOptions);
 
             if (cfg.browser.baseCssPath?.trim().length > 0) {
@@ -180,33 +180,32 @@ Main file
 
 
 
-            if (cfg.browser.baseHtmlPath?.trim().length > 0) {
-                const _projectBaseHtmlPath = resolve(cfg.browser.baseHtmlPath);
-                ensureDirectoryExistence(_projectBaseHtmlPath);
-                if (!existsSync(_projectBaseHtmlPath))
-                    writeFileSync(_projectBaseHtmlPath, '', { encoding: 'utf-8' });
-            }
+            
+
 
             const _ResourceStorageFile = resolve(dirdec[pref.srcDec].dirPath, pref.build.ResourceStorageFile);
             ensureDirectoryExistence(_ResourceStorageFile);
-
             writeFileSync(_ResourceStorageFile, 'export {};', { encoding: 'utf-8' });
-            console.log('.... UC CONFIG FILE GENERATED ...');
+         
+
+
 
             if (meta.useTypescript && !existsSync(resolve('tsconfig.json'))) {
                 this.main._cliTypeScriptInq.inquiry();
             }
+
+
             const vscodeSettingsFile = resolve('.vscode/settings.json');
             if (isVSCode() && !existsSync(vscodeSettingsFile)) {
-                if (await askYesNo(`USE TYPESCRIPT?
+                if (await askYesNo(`Add .vscode/json.settings file?
 >`, true)) {
                     writeFileSafely(
                         vscodeSettingsFile,
                         _runTemplate('templates/.vscode/json.settings', {}),
                         this.main.cliOptions);
-                }
-
+                } 
             }
+
         } catch (e) {
             console.log(e);
         }
@@ -220,6 +219,6 @@ function isVSCode() {
     );
 }
 function _runTemplate(rel: string, options: any) {
-    return runTemplate(resolveFilePath(import.meta.url, rel), import.meta.url, options);
+    return runTemplate(join(dirname(fileURLToPath(import.meta.url)),'utils/inquiry', rel), import.meta.url, options);
 }
 

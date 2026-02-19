@@ -1,17 +1,17 @@
 {
   "name": "uc-dev",
-  "version": "1.0.0-bata-0",
-  "description": "project builder for ucbuilder",
+  "version": "1.0.0-beta.1",
+  "description": "project builder for uc-control",
   "license": "ISC",
   "author": "",
   "type": "module",
-  "main": "./out/main/index.js",
   "scripts": {
     "clean": "rimraf out",
     "start": "electron .",
+    "build:es": "node copyRes.mjs && node build-es.js",
     "build:dts": "tsc --emitDeclarationOnly",
     "build": "tsc && node copyRes.mjs",
-    "rebuild": "npm run clean && npm run build && npm run build:dts",
+    "rebuild": "npm run clean && npm run build:es",
     "rebuild:start": "npm run rebuild && npm run start"
   },
   "devDependencies": {
@@ -19,16 +19,17 @@
     "ap-shared-core": "file:../ap-shared-core",
     "electron": "^39.1.1",
     "rimraf": "^6.0.1",
+    "esbuild": "^0.27.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.3",
-    "uc-control": "file:../uc-control"
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "chokidar": "^4.0.3",
     "css-select": "^6.0.0",
     "dom-serializer": "^2.0.0",
-    "htmlparser2": "^10.1.0"
+    "htmlparser2": "^10.1.0",
+    "uc-dev": "file:../uc-dev/uc-dev-1.0.0-beta.1.tgz"
   },
+   "files": ["out"],
   "bin": {
     "uc-dev": "./out/cli.js"
   }

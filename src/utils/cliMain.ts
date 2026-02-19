@@ -52,6 +52,7 @@ export class cliMain {
     _cliTypeScriptInq: cliTypeScriptInquiry;
     _cliQuickSetup: cliQuickSetup;
     constructor() {
+        this.meta.projectDir = process.cwd();
         this._cliUcconfigInq = new cliUcconfigInquiry(this);
         this._cliTypeScriptInq = new cliTypeScriptInquiry(this);
         this._cliElectronInq = new cliElectronInquiry(this);
@@ -87,12 +88,12 @@ export class cliMain {
 
     }
     async checkBasicNeed() {
-        this.meta.projectDir = await getProjectDir(process.cwd());
+        this.meta.projectDir = getProjectDir(process.cwd());
         if (this.meta.projectDir == null) {
             throw Error('NO PROJECT FOUND');
         }
         this.dependancyChecker = new cliDependancyChecker(this);
-        this.updateDependancies();
+        await this.updateDependancies();
         await this.dependancyChecker.ensureDependencies({
             electron: true,
             typescript: true,

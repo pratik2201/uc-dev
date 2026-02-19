@@ -71,7 +71,12 @@ function _DESIGNER(isAsync = false){
      */
     <?=$initializecomponent ?> = <?= $async ?> (fargs) => { 
         if(fargs.MakeEmptyTemplate)return;        
-        fargs.guid = <?= designer.guid ?>;
+        fargs.guid = "<?= designer.cssGuid ?>";
+        fargs.htmlContent = ResourceManage.getContent("<?= designer.htmlGuid ?>");
+        fargs.cssContent = ResourceManage.getContent("<?= designer.cssGuid ?>");
+
+        
+
         this.extended.initializebase(fargs);
         let oot = this.extended.resource;
         let tpts = oot.templates;

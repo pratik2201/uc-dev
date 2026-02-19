@@ -59,8 +59,10 @@ function _DESIGNER(isAsync = false){
      */
     <?=  $async ?> <?= $initializecomponent ?>(args, form){
         const ucExt = this.ucExtends;
-        args.guid = <?= $designer.guid ?>;
-        
+        args.guid = "<?= $designer.guid ?>";
+        args.htmlContent = ResourceManage.getContent("<?= $designer.htmlGuid ?>");
+        args.cssContent = ResourceManage.getContent("<?= $designer.cssGuid ?>");
+
         ucExt.initializecomponent(args);                
         const CONTROLS = ucExt.controls; 
 

@@ -1,7 +1,54 @@
-<WRAPPER x-caption="Form1">
+<wrapper x-caption="Welcome to UC Builder">
     <UCWINFRAME x-name="winFrame1" x-from="uc-control/controls/ucWinFrame.uc.html">
-        <H1>HI.</H1>
-        <SPAN>YOU ARE WELCOME</SPAN>
-        <DIV x-name="menuItems1"></DIV>
+        <div class="dashboard">
+
+            <header class="hero">
+                <h1>Welcome 👋</h1>
+                <p>Your UC project is ready. Start building something amazing.</p>
+                <button class="primary-btn">Create First Control</button>
+            </header>
+
+            <section class="stats">
+
+                <div class="card">
+                    <h3>User Controls</h3>
+                    <span class="value">0</span>
+                </div>
+
+                <div class="card">
+                    <h3>Forms</h3>
+                    <span class="value">1</span>
+                </div>
+
+                <div class="card">
+                    <h3>Status</h3>
+                    <span class="value success">Ready</span>
+                </div>
+
+            </section>
+
+            <section class="actions">
+
+                <div class="action-card">
+                    <h3>Create Control</h3>
+                    <p>Add reusable UI components.</p>
+                    <button>New Control</button>
+                </div>
+
+                <div class="action-card">
+                    <h3>Edit Layout</h3>
+                    <p>Design your form visually.</p>
+                    <button>Open Designer</button>
+                </div>
+
+                <div class="action-card">
+                    <h3>Documentation</h3>
+                    <p>Learn how UC Builder works.</p>
+                    <button>View Docs</button>
+                </div>
+
+            </section>
+
+        </div>
     </UCWINFRAME>
-</WRAPPER>
+</wrapper>
