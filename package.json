@@ -44,6 +44,6 @@
     "out"
   ],
   "bin": {
-    "uc-dev": "./out/cli.js"
+    "uc-dev": "out/cli.js"
   }
 }
