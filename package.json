@@ -1,5 +1,9 @@
 {
   "name": "uc-dev",
+  "keywords": ["uc-dev","uc-cli","uc-builder","uc-develope", "developer-tools",
+                "project-setup",
+                "builder","workflow", "automation",
+                "designer-build","electron-tools"],
   "version": "1.0.0-beta.1",
   "description": "project builder for uc-control",
   "license": "ISC",
@@ -16,7 +20,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
-    "ap-shared-core": "file:../ap-shared-core",
     "electron": "^39.1.1",
     "rimraf": "^6.0.1",
     "esbuild": "^0.27.2",
@@ -26,8 +29,7 @@
   "dependencies": {
     "css-select": "^6.0.0",
     "dom-serializer": "^2.0.0",
-    "htmlparser2": "^10.1.0",
-    "uc-dev": "file:../uc-dev/uc-dev-1.0.0-beta.1.tgz"
+    "htmlparser2": "^10.1.0"
   },
    "files": ["out"],
   "bin": {

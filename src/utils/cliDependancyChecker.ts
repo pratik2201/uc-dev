@@ -80,7 +80,7 @@ export class cliDependancyChecker {
 
     const ok = await askYesNo(
       "Install missing dependencies?",
-      true,
+      false,
       this.main.cliOptions.yes
     );
     const rtrn = [...missing];
