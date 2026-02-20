@@ -1,10 +1,19 @@
 {
   "name": "uc-dev",
-  "keywords": ["uc-dev","uc-cli","uc-builder","uc-develope", "developer-tools",
-                "project-setup",
-                "builder","workflow", "automation",
-                "designer-build","electron-tools"],
-  "version": "1.0.0-beta.1",
+  "keywords": [
+    "uc-dev",
+    "uc-cli",
+    "uc-builder",
+    "uc-develope",
+    "developer-tools",
+    "project-setup",
+    "builder",
+    "workflow",
+    "automation",
+    "designer-build",
+    "electron-tools"
+  ],
+  "version": "1.0.0-beta.2",
   "description": "project builder for uc-control",
   "license": "ISC",
   "author": "",
@@ -31,7 +40,9 @@
     "dom-serializer": "^2.0.0",
     "htmlparser2": "^10.1.0"
   },
-   "files": ["out"],
+  "files": [
+    "out"
+  ],
   "bin": {
     "uc-dev": "./out/cli.js"
   }
