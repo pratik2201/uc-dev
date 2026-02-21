@@ -1,4 +1,4 @@
-import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
 import { codeOptionsBase, CommonRow, Control, DesignerOptionsBase, type ScopeType } from "ap-shared-core/out/uc-dev/buildRow.js";
 import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
 import { relativeFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
@@ -7,12 +7,12 @@ import { BuildingProcess } from "../BuildingProcess.js";
 import { commonGeneratorX } from "./commonGeneratorX.js";
 
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
-import { ATTR_OF, ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
+import { ATTR_OF, ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
 import { correctpath } from "ap-shared-core/out/pathUtils.js";
-import { type ICoupleNode } from "ap-shared-core/out/uc-control/Template.js";
+import { type ICoupleNode } from "ap-shared-core/out/uc-runtime/Template.js";
 import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
 import { ResourceKeyBridge } from "ap-shared-core/out/enums.js";
 import { fileURLToPath } from "url";
@@ -100,7 +100,7 @@ export class BuildDesigner {
         if (htmlCode == undefined) return undefined;
         else if (htmlCode.trim() == '') {
             htmlCode = `<WRAPPER x-caption="${finfo.name}">
-    <UCWINFRAME x-name="winFrame1" x-from="uc-control/controls/ucWinFrame.uc.html">
+    <UCWINFRAME x-name="winFrame1" x-from="uc-runtime/controls/ucWinFrame.uc.html">
         
     </UCWINFRAME>
 </WRAPPER>`;
@@ -171,9 +171,9 @@ export class BuildDesigner {
 
         //let im = row.designer.importClasses;
         const _importer = row.designer.importer;
-        const imppath = _row.src?.projectInfo.projectName == 'uc-control' ?
+        const imppath = _row.src?.projectInfo.projectName == 'uc-runtime' ?
             relativeFilePath(_row.src.allPathOf.out.designer, join(_row.src.projectInfo.projectPath, 'out/core.js'))
-            : 'uc-control/core.js';
+            : 'uc-runtime/core.js';
         _importer.addImport(['Usercontrol', 'intenseGenerator', 'IUcOptions', 'ResourceManage'], imppath);
 
 
@@ -266,7 +266,7 @@ export class BuildDesigner {
         }
         this.common1(row.designer, row.code, _row.src);
         row.designer.importer.addImport(['TemplateNode', 'Template', 'intenseGenerator', 'ITptOptions', 'ResourceManage'],
-            'uc-control/core.js');
+            'uc-runtime/core.js');
 
 
         this.common2(row.designer, finfo);

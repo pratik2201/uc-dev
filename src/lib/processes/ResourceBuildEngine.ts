@@ -1,9 +1,9 @@
 
 import { correctpath } from "ap-shared-core/out/pathUtils.js";
 import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
-import { BuildTimeGuidMeta, type GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
-import { encryptResource } from "ap-shared-core/out/uc-control/resources/cryptoResource.js";
-import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
+import { BuildTimeGuidMeta, type GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
+import { encryptResource } from "ap-shared-core/out/uc-runtime/resources/cryptoResource.js";
+import { ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
 import { existsSync, readFileSync } from "fs";
 import { dirname, extname, join, normalize, resolve, sep } from "path";
 import { fileURLToPath } from "url";

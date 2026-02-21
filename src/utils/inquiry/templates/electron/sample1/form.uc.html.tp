@@ -1,5 +1,4 @@
 <wrapper x-caption="Welcome to UC Builder">
-    <UCWINFRAME x-name="winFrame1" x-from="uc-control/controls/ucWinFrame.uc.html">
         <div class="dashboard">
 
             <header class="hero">
@@ -48,7 +47,5 @@
                 </div>
 
             </section>
-
         </div>
-    </UCWINFRAME>
 </wrapper>

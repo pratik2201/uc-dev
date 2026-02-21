@@ -1,5 +1,5 @@
 import { app, BrowserWindow, screen } from "electron";
-import { IpcMainHelper } from "uc-control/core-main.js";
+import { IpcMainHelper } from "uc-runtime/core-main.js";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath, pathToFileURL } from "url";
 const __filename = fileURLToPath(import.meta.url);

@@ -4,7 +4,7 @@ import { join } from "path";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { ResourceKeyBridge } from "ap-shared-core/out/enums.js";
-import type { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import type { UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
 import { rmSync } from "fs";
 
 export async function collectFiles() {

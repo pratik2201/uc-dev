@@ -14,24 +14,21 @@
     "electron-tools"
   ],
   "version": "1.0.0-beta.2",
-  "description": "project builder for uc-control",
+  "description": "Electron CLI project builder for uc-runtime apps",
   "license": "ISC",
   "author": "",
   "type": "module",
   "scripts": {
     "clean": "rimraf out",
-    "start": "electron .",
     "build:es": "node copyRes.mjs && node build-es.js",
-    "build:dts": "tsc --emitDeclarationOnly",
-    "build": "tsc && node copyRes.mjs",
-    "rebuild": "npm run clean && npm run build:es",
-    "rebuild:start": "npm run rebuild && npm run start"
+    "build:dts": "tsc --emitDeclarationOnly",   
+    "rebuild": "npm run clean && npm run build:es"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "electron": "^39.1.1",
-    "rimraf": "^6.0.1",
     "esbuild": "^0.27.2",
+    "rimraf": "^6.0.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   },

@@ -1,4 +1,4 @@
-import { UcDefaultConfig } from "uc-control/core-main.js";
+import { UcDefaultConfig } from "uc-runtime/core-main.js";
  <?php 
        const $prf = preference;
        const $build = $prf.build;

@@ -35,8 +35,8 @@
       "./node_modules/@types"
     ],
     "paths": {
-      "uc-control/*": [
-        "../uc-control/*"
+      "uc-runtime/*": [
+        "../uc-runtime/*"
       ]
     },
     //"composite": true

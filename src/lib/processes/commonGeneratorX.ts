@@ -1,6 +1,6 @@
 import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
-import { extractPathConfig, type IFileDeclarationTypesMap } from "ap-shared-core/out/uc-control/configResources.js";
-import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
+import { extractPathConfig, type IFileDeclarationTypesMap } from "ap-shared-core/out/uc-runtime/configResources.js";
+import { ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
 import { CommonRow } from "ap-shared-core/out/uc-dev/buildRow.js";
 import { ensureDirectoryExistence, relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
@@ -131,8 +131,8 @@ export class commonGeneratorX {
             projectList: this.cssBulder.projectList,
             resources,
             PACKAGE_LIST: chandler.PACKAGE_LIST,
-            importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-control' ? '../core-main.js' : 'uc-control/core-main.js',
-            declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-control' ? 'uc-control/src/core-main' : 'uc-control/core-main'
+            importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? '../core-main.js' : 'uc-runtime/core-main.js',
+            declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? 'uc-runtime/src/core-main' : 'uc-runtime/core-main'
         };
 
         const srcDec = x.srcDec;

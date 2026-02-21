@@ -1,4 +1,4 @@
-import { extractPathConfig, UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import { extractPathConfig, UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
@@ -7,7 +7,7 @@ import { cliMain } from "../cliMain.js";
 import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
 import { ensureDirectoryExistence, relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { fileURLToPath } from "node:url";
-import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
+import { ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
 
 export class cliQuickSetup {
     constructor(public main: cliMain) { }
@@ -98,7 +98,7 @@ Main file
                 ];
             }
         }
-        cfg.browser.resolveProjects = ['uc-control', 'uc-dev'] as any;
+        cfg.browser.resolveProjects = ['uc-runtime', 'uc-dev'] as any;
         pref.build.ResourceStorageFile = meta.resourceFilePath;
 
         pref.srcDec = 'src';
@@ -156,6 +156,8 @@ Main file
                 }),
                 this.main.cliOptions);
 
+            meta.cssFilePath
+            
             const preloadScriptFilePath = join(meta.projectDir, meta.srcDir, meta.preloadScriptFilePath);
             writeFileSafely(
                 preloadScriptFilePath,

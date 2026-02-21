@@ -1,4 +1,4 @@
-import { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import { UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
@@ -110,7 +110,7 @@ SETUP UC CONFIG FILE ?
                 ];
             }
         }
-        cfg.browser.resolveProjects = ['uc-control', 'uc-dev'] as any;
+        cfg.browser.resolveProjects = ['uc-runtime', 'uc-dev'] as any;
         pref.build.ResourceStorageFile = resourceStorageFile;
 
         pref.srcDec = 'src';

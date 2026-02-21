@@ -1,5 +1,5 @@
-import { ITemplateContent, splitCSSById } from "ap-shared-core/out/uc-control/Template.js";
-import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
+import { ITemplateContent, splitCSSById } from "ap-shared-core/out/uc-runtime/Template.js";
+import { ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
 import { parseDocument } from "htmlparser2";
 import { isTag } from "domhandler";
 import type { Document, Element } from "domhandler";

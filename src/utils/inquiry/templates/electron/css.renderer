@@ -1,0 +1,70 @@
+:exclude { 
+    html,
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+        -webkit-user-select: none;
+        user-select: none;
+        -moz-user-select: none;
+        font-size: small;
+        object-fit: contain;
+        height: 100%; margin: 0; position: fixed; left: 0px; 
+        top: 0px;  bottom: 0px; right: 0px;
+    } 
+    body * {
+        font-size: inherit;
+        outline: 0;         
+    } 
+    .disabled,
+    [disabled="true"] {
+        pointer-events: none;
+        opacity: 0.4;
+    }
+}
+
+/*
+  QUICK INSTRUCTION FOR BASE CSS
+  ------------------------------------------------------------------------
+  IMPORTING FILES
+  @use/@import "[relativePath]"; //  add code of that file at that place
+  
+  ------------------------------------------------------------------------  
+  SELECT ROOT ELEMENT OF EACH USERCONTROL OF CURRENT PROJECT
+  & { ..style code }
+  '&' will select all usercontrol's root element `wrapper`;
+  
+  ------------------------------------------------------------------------  
+  VARIABLES
+    $[g]-varName:value;  // declaration
+    color:$g-varName; // use
+    where g stand for 'global'
+    i.e    
+      $g-dockWidth: 150px;
+      div.dock{
+        width:$g-dockWidth;
+      }
+  -----------------------------------------------------------------------
+  KEEP UNEFFECTED CSS `:exclude`
+  :exclude{  .... css code .... }
+
+  i.e
+    :exclude{
+        body{
+          overflow:hidden;
+        }
+    }
+  -----------------------------------------------------------------------
+  DECLARE ANY PROJECT'S STYLE 
+  root:[projectName OR blank]{
+      .... css cpde ...
+  }
+  i.e
+    root:            //   affect current projects' eleents
+    {  
+        * { box-sizing:border-box; }
+    }  
+    root:ucControls{      //   affect ucControls project's elements
+        body{
+          overflow:hidden;
+        }
+    }
+*/

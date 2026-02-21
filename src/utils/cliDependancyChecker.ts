@@ -21,7 +21,15 @@ export class cliDependancyChecker {
       return false;
     }
   }
-
+  getInstalledDep(opts: string[]) {
+    const _this = this;
+    const _deps: string[] = [];
+    opts.forEach(dep => {
+      if (!_this.isInstalled(dep))
+        _deps.push(dep);
+    });
+    return _deps;
+  }
   detectPackageManager(): string {
     if (existsSync("pnpm-lock.yaml")) return "pnpm add -D";
     if (existsSync("yarn.lock")) return "yarn add -D";
@@ -51,30 +59,13 @@ export class cliDependancyChecker {
     });
   }
 
-  async ensureDependencies(opts: {
-    electron?: boolean;
-    ucbuilder?: boolean;
-    typescript?: boolean;
-  }) {
-    const missing: string[] = [];
-
-    if (opts.electron && !this.isInstalled("electron")) {
-      missing.push("electron");
-    }
-
-    if (opts.ucbuilder && !this.isInstalled("uc-control")) {
-      missing.push("uc-control");
-    }
-
-    if (opts.typescript && !this.isInstalled("typescript")) {
-      missing.push("typescript", "@types/node", "@types/electron");
-    }
-
+  async ensureDependencies(opts: string[]) {
+    const _this = this;
+    let missing = this.getInstalledDep(opts);
     if (missing.length === 0) {
       console.log("✓ Dependencies OK");
       return missing;
     }
-
     console.log("✖ Missing dependencies:");
     missing.forEach(p => console.log("  -", p));
 
@@ -83,26 +74,16 @@ export class cliDependancyChecker {
       false,
       this.main.cliOptions.yes
     );
-    const rtrn = [...missing];
     if (!ok) {
+      return missing;
       throw new Error("Cannot continue without required dependencies.");
     }
-
     await this.installPackages(missing);
-    this.main.QUERY.JUST_ELECTRON_INSTALLED = rtrn.includes('electron');
-    this.main.QUERY.JUST_TYPESCRIPT_INSTALLED = rtrn.includes('typescript');
-    this.main.QUERY.JUST_UCBUILDER_INSTALLED = rtrn.includes('uc-control');
     await this.main.updateDependancies();
-    // recheck
-    const stillMissing = missing.filter(p => !this.isInstalled(p));
-    if (stillMissing.length) {
-      throw new Error(
-        `Failed to install: ${stillMissing.join(", ")}`
-      );
-    }
-
+    const installedDeps = this.getInstalledDep(opts);
+    missing = missing.filter(s => !installedDeps.includes(s));
     console.log("✓ Dependencies installed");
-    return rtrn;
+    return missing;
   }
 
 

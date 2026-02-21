@@ -4,7 +4,7 @@ import { findProject, getProjectDir } from "./cliFindProjects.js";
 import { existsSync, readFileSync } from "fs";
 import { askYesNo } from "./prompt.js";
 import { cliUcconfigInquiry } from "./inquiry/cliUcconfigInquiry.js";
-import type { UserUCConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import type { UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
 import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
 import { cliElectronInquiry } from "./inquiry/cliElectronInquiry.js";
 import { BuildingProcess } from "../lib/BuildingProcess.js";
@@ -34,10 +34,11 @@ export class cliMain {
     cliOptions = new cliOptions();
 
     QUERY = {
-        JUST_ELECTRON_INSTALLED: false,
+        JUST_INSTALLED: [] as string[],
+        //JUST_ELECTRON_INSTALLED: false,
         rendererIndexFilePath: undefined,
-        JUST_TYPESCRIPT_INSTALLED: false,
-        JUST_UCBUILDER_INSTALLED: false,
+        //JUST_TYPESCRIPT_INSTALLED: false,
+        //JUST_UCBUILDER_INSTALLED: false,
     }
     meta = new metaInfo();
     // useTypescript = true;
@@ -62,27 +63,27 @@ export class cliMain {
     private async doNewSurveys() {
         this.meta.useTypescript = await askYesNo(`IS TYPESCRIPT PROJECT ? 
 ==>`, this.meta.useTypescript);
-        await this.dependancyChecker.ensureDependencies({
-            electron: true,
-            typescript: this.meta.useTypescript,
-            ucbuilder: true,
-        });
-        this.QUERY.JUST_UCBUILDER_INSTALLED = true;
+        const depNeed = ['uc-runtime'];
+        if (this.meta.useTypescript)
+            depNeed.push('typescript', '@types/node');
+
+        await this.dependancyChecker.ensureDependencies(depNeed);
+
         await this.doInquiryForNewJoinee();
 
     }
 
     private async doInquiryForNewJoinee() {
 
-        if (this.QUERY.JUST_UCBUILDER_INSTALLED) {
+        if (this.QUERY.JUST_INSTALLED['uc-runtime'] != undefined) {
             await this._cliUcconfigInq.inquiry();
             if (this._cliUcconfigInq.exist)
                 await this._cliUcconfigInq.read();
         }
-        if (this.QUERY.JUST_ELECTRON_INSTALLED) {
-            await this._cliElectronInq.inquiry();
-        }
-        if (this.QUERY.JUST_TYPESCRIPT_INSTALLED) {
+        //if (this.QUERY.JUST_INSTALLED['electron']) {
+        await this._cliElectronInq.inquiry();
+
+        if (this.QUERY.JUST_INSTALLED['typescript'] != undefined) {
             await this._cliTypeScriptInq.inquiry();
         }
 
@@ -94,41 +95,13 @@ export class cliMain {
         }
         this.dependancyChecker = new cliDependancyChecker(this);
         await this.updateDependancies();
-        await this.dependancyChecker.ensureDependencies({
-            electron: true,
-            typescript: true,
-            ucbuilder: true,
-        })
+        const depNeed = ['uc-runtime'];
+        if (this.meta.useTypescript)
+            depNeed.push('typescript', '@types/node');
+        await this.dependancyChecker.ensureDependencies(depNeed);
     }
     async setup() {
-
-
-
-        //
-        //
-        // 
         await this._cliQuickSetup.inquiry(false);
-
-        /*if (!this._cliUcconfigInq.exist) {
-             await this.doNewSurveys();
-         } else {
-             await this.dependancyChecker.ensureDependencies({
-                 electron: true,
-                 ucbuilder: false,
-             });
-             await this._cliUcconfigInq.read();
-             this.meta.useTypescript = this.ucConfig.useTypeScript;
-             if (this.QUERY.JUST_ELECTRON_INSTALLED) {
-                 await this._cliElectronInq.inquiry();
-             }
-             await this.dependancyChecker.ensureDependencies({
-                 typescript: this.ucConfig.useTypeScript,
-             });
- 
-             if (this.QUERY.JUST_TYPESCRIPT_INSTALLED) {
-                 await this._cliTypeScriptInq.inquiry();
-             }
-         }*/
     }
     async updateDependancies() {
         if (this.meta.projectDir != undefined) {

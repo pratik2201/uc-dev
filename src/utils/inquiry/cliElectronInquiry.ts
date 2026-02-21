@@ -1,11 +1,11 @@
 import { relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
-import { ucUtil } from "ap-shared-core/out/uc-control/ucUtil.js";
+import { ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
 import { dirname, join, resolve } from "node:path";
 import { findProject } from "../cliFindProjects.js";
 import { cliMain } from "../cliMain.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
-import { extractPathConfig } from "ap-shared-core/out/uc-control/configResources.js";
+import { extractPathConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 

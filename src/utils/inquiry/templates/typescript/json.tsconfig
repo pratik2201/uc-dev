@@ -31,8 +31,8 @@
         "noImplicitAny": false,
         "inlineSources": true,
         "paths": {
-            "uc-control/*": [
-                "./node_modules/uc-control/out/*"
+            "uc-runtime/*": [
+                "./node_modules/uc-runtime/dist/*"
             ]
         }
     },
