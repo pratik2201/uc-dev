@@ -13,7 +13,7 @@
     "designer-build",
     "electron-tools"
   ],
-  "version": "1.0.0",
+  "version": "1.0.0-beta.3",
   "description": "Electron CLI project builder for uc-runtime apps",
   "license": "ISC",
   "author": "",
@@ -21,7 +21,7 @@
   "scripts": {
     "clean": "rimraf out",
     "build:es": "node copyRes.mjs && node build-es.js",
-    "build:dts": "tsc --emitDeclarationOnly",
+    "build:dts": "tsc --emitDeclarationOnly",   
     "rebuild": "npm run clean && npm run build:es"
   },
   "devDependencies": {
