@@ -16,7 +16,7 @@
   "version": "1.0.0-beta.3",
   "description": "Electron CLI project builder for uc-runtime apps",
   "license": "ISC",
-  "author": "",
+  "author": "AP",
   "type": "module",
   "scripts": {
     "clean": "rimraf out",
@@ -25,12 +25,9 @@
     "rebuild": "npm run clean && npm run build:es"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
-    "electron": "^39.1.1",
     "esbuild": "^0.27.2",
-    "rimraf": "^6.0.1",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.9.3"
+    "ap-shared-core": "file:../ap-shared-core",
+    "rimraf": "^6.0.1"
   },
   "dependencies": {
     "css-select": "^6.0.0",
