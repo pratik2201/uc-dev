@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "esbuild": "^0.27.2",
-    "ap-shared-core": "file:../ap-shared-core",
     "rimraf": "^6.0.1"
   },
   "dependencies": {
