@@ -1,11 +1,11 @@
-import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
+import { TemplateMaker } from "ap-shared-core/core-common.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import readline from "node:readline";
 import { fileURLToPath } from "node:url";
 import { commonGeneratorX } from "../lib/processes/commonGeneratorX.js";
 import { cliOptions } from "./cliMain.js";
-import { ensureDirectoryExistence } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { ensureDirectoryExistence } from "ap-shared-core/core-main.js";
 
 export function ask(question: string, def?: string): Promise<string> {
   const rl = readline.createInterface({

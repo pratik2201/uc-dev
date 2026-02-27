@@ -1,0 +1,17 @@
+<X:TEMPLATE>
+  <WRAPPER id="cards">
+    <div class="card">
+      <h3>
+        <?= cardName ?>
+      </h3>
+      <span class="value <?= isSuccess===true?'success':'' ?>">
+        <?= value ?>
+      </span>
+    </div>
+  </WRAPPER>
+  <WRAPPER id="actionCards">
+    <h3><?= actionName ?></h3>
+    <p><?= description ?></p>
+    <button><?= buttonText ?></button>
+  </WRAPPER>
+</X:TEMPLATE>

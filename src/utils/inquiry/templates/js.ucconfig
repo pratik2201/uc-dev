@@ -1,14 +1,32 @@
 import { UcDefaultConfig } from "uc-runtime/core-main.js";
  <?php 
        const $prf = preference;
+       const $cli = cli;
        const $build = $prf.build;
        const $dirDec = $prf.dirDeclaration;
        const $srcDec = $prf.srcDec;
        const $outDec = $prf.outDec;
     ?>
 export default UcDefaultConfig({
-    useTypeScript:<?= useTypeScript ?>,
     guid: "<?= guid ?>", 
+    cli:{
+        useElectron: <?= $cli.useElectron ?>, 
+        useTypeScript: <?= $cli.useTypeScript ?>, 
+        codeFileExt: "<?= $cli.codeFileExt ?>", 
+        outputFileExt: "<?= $cli.outputFileExt ?>", 
+        designerDir: "<?= $cli.designerDir ?>",
+        srcDir: "<?= $cli.srcDir ?>", 
+        outDir: "<?= $cli.outDir ?>", 
+        
+        ResourceStorageFile: "<?= $cli.ResourceStorageFile ?>", 
+        baseCssPath: "<?= $cli.baseCssPath ?>",
+        baseHtmlPath:"<?= $cli.baseHtmlPath ?>",
+        baseCodePath:"<?= $cli.baseCodePath ?>",
+        mainProcessFilePath:"<?= $cli.mainProcessFilePath ?>",
+        preloadScriptFilePath:"<?= $cli.preloadScriptFilePath ?>",
+        devtools:<?= $cli.devtools ?>,
+        removeMenu:<?= $cli.removeMenu ?>,
+    },
     browser: {
         resolveProjects: [ <?php browser.resolveProjects.forEach(v => {
                          ?> "<?= v ?>", <?php
@@ -17,15 +35,11 @@ export default UcDefaultConfig({
             <?php for(const [k,v] of Object.entries(browser.importmap)) { ?>
                 <?= JSON.stringify(k) ?>:<?= JSON.stringify(v) ?>
             <?php } ?>
-        },
-        baseCssPath: "<?= browser.baseCssPath ?>",
-        baseHtmlPath:"<?= browser.baseHtmlPath ?>",
-        baseCodePath:"<?= browser.baseCodePath ?>",
+        },       
     },
     projectBaseCssPath: "<?= projectBaseCssPath ?>",   
     preference: {
         build: { 
-            ResourceStorageFile: "<?= $build.ResourceStorageFile ?>", 
             ignorePath: [ <?php $build.ignorePath.forEach(v => {
                          ?> "<?= v ?>", <?php
                                  }); ?> ],

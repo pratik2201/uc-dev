@@ -54,7 +54,7 @@
     }
   -----------------------------------------------------------------------
   DECLARE ANY PROJECT'S STYLE 
-  root:[projectName OR blank]{
+  root:[projectName or blank for currentproject]{
       .... css cpde ...
   }
   i.e

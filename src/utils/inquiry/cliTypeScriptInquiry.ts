@@ -1,31 +1,37 @@
-import { UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
+import { extractPathConfig, UserUCConfig } from "ap-shared-core/core-common.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
-import { cliMain } from "../cliMain.js";
-import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
-import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { cliMain } from "../cliMain.js"; 
+import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/core-main.js";
 import { fileURLToPath } from "node:url";
 
 export class cliTypeScriptInquiry {
+     static async AskIsTypescript(defValue = true) {
+        return await askYesNo(`IS TYPESCRIPT PROJECT ? 
+==>`, defValue);
+    }
     constructor(public main: cliMain) { }
     async inquiry() {
-        if (this.main.meta.useTypescript && !existsSync(resolve('tsconfig.json'))) {
+        const x = extractPathConfig(this.main.config);
+        if (x.cli.useTypeScript && !existsSync(resolve('tsconfig.json'))) {
             if (await askYesNo(
                 `
 ADD 'tsconfig.json' with required settings?
 >`, true)) {
                 try {
-                    const outDir = this.main.meta.outDir;
-                    const srcDir = this.main.meta.srcDir;
-                    writeFileSafely(
-                        resolve('tsconfig.json'),
-                        _runTemplate('templates/typescript/json.tsconfig', {
-                            outDir, srcDir
-                        }),
-                        this.main.cliOptions);
-                    console.log('Done...');
+                    const outDir = x.outDec.dirPath;
+                    const srcDir = x.srcDec.dirPath;
+                    // writeFileSafely(
+                    //     resolve('tsconfig.json'),
+                    //     _runTemplate('templates/typescript/json.tsconfig', {
+                    //         outDir,
+                    //         srcDir,
+                    //         isUcControlsInstalled:this.main.dependentProjects.includes('uc-controls')
+                    //     }),
+                    //     this.main.cliOptions);
+                    // console.log('Done...');
                 } catch (e) {
                     console.log(e);
                 }

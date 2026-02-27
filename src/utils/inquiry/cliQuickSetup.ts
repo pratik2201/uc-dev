@@ -1,13 +1,13 @@
-import { extractPathConfig, UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
+import { extractPathConfig, UserUCConfig } from "ap-shared-core/core-common.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
-import { cliMain } from "../cliMain.js";
-import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
-import { ensureDirectoryExistence, relativeFilePath, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { cliMain } from "../cliMain.js"; 
+import { ensureDirectoryExistence, relativeFilePath, resolveFilePath } from "ap-shared-core/core-main.js";
 import { fileURLToPath } from "node:url";
-import { ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
+import { ucUtil } from "ap-shared-core/core.js";
+import { cliTypeScriptInquiry } from "./cliTypeScriptInquiry.js";
 
 export class cliQuickSetup {
     constructor(public main: cliMain) { }
@@ -21,17 +21,15 @@ export class cliQuickSetup {
 +----------------------------------------+
 |              QUICK SETUP               |
 +----------------------------------------+`);
-        const meta = this.main.meta;
-
-        meta.useTypescript = await askYesNo(`USE TYPESCRIPT?
->`, true);
-        const fileExt = meta.useTypescript ? '.ts' : '.js';
-        cfg.useTypeScript = this.main.meta.useTypescript;
-
-        meta.srcDir = await ask(`SOURCE DIRECTORY (SPECIFY DIRPATH)
+        //const meta = this.main.meta;
+        const cli = cfg.cli;
+        cli.useTypeScript = cli.useTypeScript ?? await cliTypeScriptInquiry.AskIsTypescript(true);
+        const fileExt = cli.useTypeScript ? '.ts' : '.js';
+        
+        /*meta.srcDir = await ask(`SOURCE DIRECTORY (SPECIFY DIRPATH)
 >`, "src");
 
-        meta.outDir = meta.useTypescript ? await ask(`OUTPUT DIRECTORY (SPECIFY DIRPATH)
+        meta.outDir = cli.useTypeScript ? await ask(`OUTPUT DIRECTORY (SPECIFY DIRPATH)
 >`, "out") : meta.srcDir;
 
         meta.designerDir = await ask(`DESIGNER DIRECTORY (SPECIFY DIRPATH (INSIDE '${meta.srcDir}'))
@@ -40,6 +38,17 @@ export class cliQuickSetup {
         meta.resourceFilePath = await ask(`RESOURCE FILE PATH (SPECIFY FILEPATH (INSIDE '${meta.srcDir}'))
 >`, `${meta.designerDir}/Resources${fileExt}`);
 
+        
+         meta.htmlFilePath = meta.htmlFilePath ?? await ask(`HTML file that will initialy load in browser
+==>`, 'index.html');
+
+        meta.cssFilePath = meta.cssFilePath ?? await ask(`Base .scss (stylesheet) file
+==>`, 'styles.scss');
+
+        meta.codeFilePath =  meta.codeFilePath ?? await ask(`Renderer Ts/Js File Loaded in Html file (Entry Point)
+==>`, `renderer/index${fileExt}`);
+
+        
         console.log('-------------------- ELECTRON SETUP -------------------');
 
 
@@ -51,15 +60,7 @@ Main file
         meta.preloadScriptFilePath = await ask(`Preload file
 ==>`, `preload/index${fileExt}`);
 
-        meta.htmlFilePath = await ask(`HTML file that will initialy load in browser
-==>`, 'index.html');
-
-        meta.cssFilePath = await ask(`Base .scss (stylesheet) file
-==>`, 'styles.scss');
-
-        meta.codeFilePath = await ask(`Renderer Ts/Js File Loaded in Html file (Entry Point)
-==>`, `renderer/index${fileExt}`);
-
+       
 
         let filesToMove = meta.useTypescript ? '.jpg,.png,.html,.scss,.ico,.svg' : "";
         let ignoreInBuild = `node_modules;.git;.vscode${meta.useTypescript ? ';' + meta.outDir : ''}`;
@@ -71,11 +72,10 @@ Main file
         //         }
 
 
-        const browser = cfg.browser;
-        browser.baseHtmlPath = meta.htmlFilePath;
-        browser.baseCssPath = meta.cssFilePath;
+         cfg.cli.baseHtmlPath = meta.htmlFilePath;
+        cfg.cli.baseCssPath = meta.cssFilePath;
 
-        browser.baseCodePath = meta.codeFilePath;
+        cfg.cli.baseCodePath = meta.codeFilePath;
 
 
 
@@ -99,7 +99,7 @@ Main file
             }
         }
         cfg.browser.resolveProjects = ['uc-runtime', 'uc-dev'] as any;
-        pref.build.ResourceStorageFile = meta.resourceFilePath;
+        cfg.cli.ResourceStorageFile = meta.resourceFilePath;
 
         pref.srcDec = 'src';
         pref.dirDeclaration['src'] = {
@@ -128,20 +128,20 @@ Main file
         //const x = extractPathConfig(cfg);
         try {
             const _SRC_DIR = join(meta.projectDir, meta.srcDir);
-            writeFileSafely(
+            await writeFileSafely(
                 resolve('ucconfig.js'),
                 _runTemplate('templates/js.ucconfig', JSON.parse(JSON.stringify(cfg))),
                 this.main.cliOptions);
 
-            if (cfg.browser.baseCssPath?.trim().length > 0) {
-                const _projectBaseCssPath = resolve(cfg.browser.baseCssPath);
+            if (cfg.cli.baseCssPath?.trim().length > 0) {
+                const _projectBaseCssPath = resolve(cfg.cli.baseCssPath);
                 ensureDirectoryExistence(_projectBaseCssPath);
                 if (!existsSync(_projectBaseCssPath))
                     writeFileSync(_projectBaseCssPath, '', { encoding: 'utf-8' });
             }
 
             const rendererIndexFilePath = join(meta.projectDir, meta.outDir, meta.codeFilePath);
-            writeFileSafely(
+            await writeFileSafely(
                 join(_SRC_DIR, meta.codeFilePath),
                 _runTemplate('templates/electron/ts.renderer', {
                     startUpCode: ``
@@ -149,17 +149,17 @@ Main file
                 this.main.cliOptions);
 
             const rendererHtmlFilePath = join(meta.projectDir, meta.htmlFilePath);
-            writeFileSafely(
+            await writeFileSafely(
                 rendererHtmlFilePath,
                 _runTemplate('templates/electron/html.renderer', {
                     indexFilePath: ucUtil.changeExtension(relativeFilePath(rendererHtmlFilePath, rendererIndexFilePath), '.ts', '.js')
                 }),
                 this.main.cliOptions);
 
-            meta.cssFilePath
             
+
             const preloadScriptFilePath = join(meta.projectDir, meta.srcDir, meta.preloadScriptFilePath);
-            writeFileSafely(
+            await writeFileSafely(
                 preloadScriptFilePath,
                 _runTemplate('templates/electron/ts.preload', {}),
                 this.main.cliOptions);
@@ -167,7 +167,7 @@ Main file
 
             const resourceFilePath = join(meta.projectDir, meta.srcDir, meta.resourceFilePath);
             const mainIndexFilePath = join(meta.projectDir, meta.srcDir, meta.mainProcessFilePath);
-            writeFileSafely(
+            await writeFileSafely(
                 mainIndexFilePath,
                 _runTemplate('templates/electron/ts.main', {
                     nodeIntegration: false,
@@ -182,18 +182,18 @@ Main file
 
 
 
-            
 
 
-            const _ResourceStorageFile = resolve(dirdec[pref.srcDec].dirPath, pref.build.ResourceStorageFile);
+
+            const _ResourceStorageFile = resolve(dirdec[pref.srcDec].dirPath, cfg.cli.ResourceStorageFile);
             ensureDirectoryExistence(_ResourceStorageFile);
             writeFileSync(_ResourceStorageFile, 'export {};', { encoding: 'utf-8' });
-         
+
 
 
 
             if (meta.useTypescript && !existsSync(resolve('tsconfig.json'))) {
-                this.main._cliTypeScriptInq.inquiry();
+                await this.main._cliTypeScriptInq.inquiry();
             }
 
 
@@ -201,16 +201,17 @@ Main file
             if (isVSCode() && !existsSync(vscodeSettingsFile)) {
                 if (await askYesNo(`Add .vscode/json.settings file?
 >`, true)) {
-                    writeFileSafely(
+                    await writeFileSafely(
                         vscodeSettingsFile,
                         _runTemplate('templates/.vscode/json.settings', {}),
                         this.main.cliOptions);
-                } 
+                }
             }
 
         } catch (e) {
             console.log(e);
         }
+        */
     }
 }
 function isVSCode() {
@@ -221,6 +222,6 @@ function isVSCode() {
     );
 }
 function _runTemplate(rel: string, options: any) {
-    return runTemplate(join(dirname(fileURLToPath(import.meta.url)),'utils/inquiry', rel), import.meta.url, options);
+    return runTemplate(join(dirname(fileURLToPath(import.meta.url)), 'utils/inquiry', rel), import.meta.url, options);
 }
 

@@ -1,5 +1,5 @@
 import { INIT_RENDERER } from "uc-runtime/core.js";  ///  put this line  at the top of the code
-
+await INIT_RENDERER();
 // START YOUR JOURNEY  
 
 

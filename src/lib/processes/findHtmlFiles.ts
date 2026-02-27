@@ -1,11 +1,11 @@
-import { getCloneableObject, safeStringify } from "ap-shared-core/out/objectUtil.js";
-import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
-import { join } from "path";
-import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
-import { BuildingProcess } from "../BuildingProcess.js";
-import { ResourceKeyBridge } from "ap-shared-core/out/enums.js";
-import type { UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
+ 
+import type { UserUCConfig } from "ap-shared-core/core-common.js";
+import { getCloneableObject, ResourceKeyBridge, safeStringify } from "ap-shared-core/core-common.js";
+import { codeFileInfo } from "ap-shared-core/core-main.js";
 import { rmSync } from "fs";
+import { join } from "path";
+import { BuildingProcess } from "../BuildingProcess.js";
+import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
 export async function collectFiles() {
     const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;
@@ -67,7 +67,7 @@ function registerMain() {
     const browser = cfg.browser;
     const prf = cfg.preference;
     const srcdir = prf.dirDeclaration[prf.srcDec].dirPath;
-    let stylePath = join(_mainProj.projectPath, browser.baseCssPath);
+    let stylePath = join(_mainProj.projectPath, cfg.cli.baseCssPath);
     const mp = ResourceBuildEngine.MAIN_PROJECT;
     mp.importMapGuid = ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
         content: safeStringify(chandler.importmap),
@@ -75,8 +75,8 @@ function registerMain() {
     }));
     mp.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
 
-    if (browser.baseHtmlPath != undefined) {
-        let htmlPath = join(_mainProj.projectPath, browser.baseHtmlPath);
+    if (cfg.cli.baseHtmlPath != undefined) {
+        let htmlPath = join(_mainProj.projectPath, cfg.cli.baseHtmlPath);
         mp.mainHtmlGuid = ResourceKeyBridge.extractKey(_cssbuilder.build(htmlPath, {}));
     }
     mp.ucConfigGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {

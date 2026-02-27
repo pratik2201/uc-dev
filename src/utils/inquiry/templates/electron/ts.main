@@ -11,12 +11,12 @@ app.on('ready', async () => {
     win = new BrowserWindow({
         width: mainScreen.size.width,
         height: mainScreen.size.height,
-        titleBarStyle: 'hidden',
+        //titleBarStyle: 'hidden',
         webPreferences: {
-            nodeIntegration: <?= nodeIntegration ?>,
-            contextIsolation: <?= contextIsolation ?>,
-            sandbox: false,  
+            nodeIntegration: false,
+            contextIsolation: true,
             spellcheck: false,
+            sandbox: false,
             webSecurity: true,
             preload: join(__dirname, '<?= preloadPath ?>'),
         },

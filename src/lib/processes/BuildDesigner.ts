@@ -1,20 +1,14 @@
-import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
-import { codeOptionsBase, CommonRow, Control, DesignerOptionsBase, type ScopeType } from "ap-shared-core/out/uc-dev/buildRow.js";
-import { codeFileInfo } from "ap-shared-core/out/uc-dev/codeFileInfo.js";
-import { relativeFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
 import { join, normalize, relative, resolve } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { commonGeneratorX } from "./commonGeneratorX.js";
 
-import { TemplateMaker } from "ap-shared-core/out/template/TemplateMaker.js";
-import { ATTR_OF, ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
+import { ATTR_OF, Control, correctpath, DesignerOptionsBase, ResourceKeyBridge, ScopeType, TemplateMaker } from "ap-shared-core/core-common.js";
+import { ICoupleNode, ucUtil } from "ap-shared-core/core.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 
-import { correctpath } from "ap-shared-core/out/pathUtils.js";
-import { type ICoupleNode } from "ap-shared-core/out/uc-runtime/Template.js";
-import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
-import { ResourceKeyBridge } from "ap-shared-core/out/enums.js";
+import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/core-common.js";
+import { codeFileInfo, codeOptionsBase, CommonRow, ImportMapResolver, relativeFilePath } from "ap-shared-core/core-main.js";
 import { fileURLToPath } from "url";
 import { EModify, GetTemplateMetaByContent$main } from "./jsToHtml.js";
 export class BuildDesigner {

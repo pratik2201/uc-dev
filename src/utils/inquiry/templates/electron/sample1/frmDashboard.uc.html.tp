@@ -1,0 +1,17 @@
+<wrapper x-caption="Welcome to UC Builder">
+        <div class="dashboard">
+
+            <header class="hero">
+                <h1>Welcome 👋</h1>
+                <p>Your UC project is ready. Start building something amazing.</p>
+                <button class="primary-btn">Create First Control</button>
+            </header>
+
+            <section class="stats" x-name="stateList1">
+            </section>
+
+            <section class="actions" x-name="actionList1">
+
+            </section>
+        </div>
+</wrapper>

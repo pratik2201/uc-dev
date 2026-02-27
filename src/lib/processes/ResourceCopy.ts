@@ -1,13 +1,10 @@
 
-import { join, relative, dirname, normalize, isAbsolute, resolve } from "path";
-import { BuildingProcess } from "../BuildingProcess.js";
-import { copyFileSync, mkdirSync, readdirSync, statSync } from "fs";
-import { normalizeJSON, safeStringify } from "ap-shared-core/out/objectUtil.js";
-import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { UserResource } from "ap-shared-core/core-common.js";
+import { ensureDirectoryExistence, recursive, resolveFilePath } from "ap-shared-core/core-main.js";
+import { copyFileSync } from "fs";
+import { join, relative } from "path";
 import { pathToFileURL } from "url";
-import { UserResource } from "ap-shared-core/out/enums.js";
-import { recursive } from "ap-shared-core/out/uc-dev/ConfigHandler.js";
-
+import { BuildingProcess } from "../BuildingProcess.js";
 export class ResourceCopy {
 
     sourceFileList: string[] = [];

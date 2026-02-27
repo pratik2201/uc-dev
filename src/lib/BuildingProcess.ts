@@ -1,9 +1,7 @@
-import { CommonRow } from "ap-shared-core/out/uc-dev/buildRow.js";
-import { PathBridge } from "ap-shared-core/out/uc-dev/pathBridge.js";
+import { CommonRow, ConfigHandler, PathBridge } from "ap-shared-core/core-main.js";
 import path from "path";
 import url from "url";
 import { BuildDesigner } from "./processes/BuildDesigner.js";
-import { ConfigHandler } from "ap-shared-core/out/uc-dev/ConfigHandler.js";
 import { ResourceCopy } from "./processes/ResourceCopy.js";
 import { collectFiles } from "./processes/findHtmlFiles.js";
 export class BuildingProcess {
@@ -22,6 +20,7 @@ export class BuildingProcess {
         await this.configHandler.fillConfig(pth);
         this.buildDesigner = new BuildDesigner();
         this.resourceCopy.fillFiles();
+
 
         this.configHandler.allConfig
             .forEach(s => this.buildDesigner.gen.cssBulder.registerProject(s));

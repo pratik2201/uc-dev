@@ -1,0 +1,48 @@
+import { frmDashboard$Designer } from '<?= designerReletivePath ?>';
+import { ResourceManage } from 'uc-runtime/core.js';
+import { tptDashboard } from './tptDashboard.tpt.js';
+
+export class frmDashboard extends frmDashboard$Designer {
+    async $() {
+        const cards = [{
+            cardName: 'User Controls',
+            value:'111',
+        }, {
+            cardName: 'Forms',
+            value:'80'
+        }, {
+            cardName: 'Status',
+            value:'ready',
+            isSuccess:true,
+        }];
+        const tpt = await tptDashboard.CreateAsync({ parentUc: this });
+        cards.forEach(row => {
+            this.stateList1.appendChild(tpt.cards.extended.generateNode(row));
+        });
+
+
+        const actions = [{
+            actionName: 'Create Control',
+            description:'Add reusable UI components.',
+            buttonText:'New Control'
+        }, {
+            actionName: 'Edit Layout',
+            description:'Design your form visually.',
+            buttonText:'Open Designer'
+        }, {
+            actionName: 'Documentation',
+            description:'Learn how UC Builder works.',
+            buttonText:'View Docs',
+        }];
+        
+        actions.forEach(row => {
+            this.actionList1.appendChild(tpt.actionCards.extended.generateNode(row));
+        });
+
+        //const res = ResourceManage.keys();
+        //console.log(res);
+        //const resName = ;
+        //console.log(ResourceManage.getContent("sharepnl:210B865E-13C6-4ED7-A63A-E67CC25F1393"));
+
+    }
+}

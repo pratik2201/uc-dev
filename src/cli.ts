@@ -6,10 +6,12 @@ const args = process.argv.slice(2);
 const cmd = args[0];
 //const sub = args[1];
 const main = new cliMain();
+await main.readConfig();
 const copt = main.cliOptions;
 copt.force = args.includes("--force");
 copt.yes = args.includes("--yes");
 const ignreq = args.includes("--ignreq");
+
 switch (cmd) {
     case "build":
         if (!ignreq)
@@ -17,8 +19,8 @@ switch (cmd) {
         await main.startBuild();
         break;
     case "setup":
-        if (!ignreq)
-            await main.checkBasicNeed();
+        //if (!ignreq)
+        //    await main.checkBasicNeed();
         await main.setup();
         break;
     case "--help":

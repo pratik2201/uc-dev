@@ -33,7 +33,12 @@
         "paths": {
             "uc-runtime/*": [
                 "./node_modules/uc-runtime/dist/*"
-            ]
+            ],
+            <?php if(isUcControlsInstalled){ ?>
+            "uc-controls/*": [
+                "./node_modules/uc-controls/out/*"
+            ],
+            <?php } ?>
         }
     },
 }

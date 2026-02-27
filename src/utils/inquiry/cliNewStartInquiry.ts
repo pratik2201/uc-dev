@@ -1,11 +1,10 @@
-import { UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
+import { UserUCConfig } from "ap-shared-core/core-common.js";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
-import { cliMain } from "../cliMain.js";
-import { ImportUserConfig } from "ap-shared-core/out/uc-dev/userConfigManage.js";
-import { ensureDirectoryExistence, resolveFilePath } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { cliMain } from "../cliMain.js"; 
+import { ensureDirectoryExistence, ImportUserConfig, resolveFilePath } from "ap-shared-core/core-main.js";
 import { fileURLToPath } from "node:url";
 
 export class cliNewStartInquiry {
@@ -20,12 +19,12 @@ export class cliNewStartInquiry {
 
 ADD BLANK FORM?
 >`, false) == false) return;
-
+            
         const pref = cfg.preference;
         const srcdec = pref.dirDeclaration[pref.srcDec];
         let __dpath = "";
-        if (this.main.QUERY.rendererIndexFilePath != undefined) {
-            const renderDirPath = dirname(this.main.QUERY.rendererIndexFilePath);
+        if (cfg.cli.baseCodePath != undefined) {
+            const renderDirPath = dirname(cfg.cli.baseCodePath);
             let ddirdpath = await ask(`WHERE TO GENERATE?
 INSIDE ('${renderDirPath}' DIRECTORY)
 >`, '');

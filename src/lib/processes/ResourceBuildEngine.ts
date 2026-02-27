@@ -1,14 +1,13 @@
+ 
+import { encryptResource, ImportMapResolver } from "ap-shared-core/core-main.js";
+import { BuildTimeGuidMeta,type GuidSequenceType,  correctpath, ProjectRowBase, UserUCConfig } from "ap-shared-core/core-common.js";
 
-import { correctpath } from "ap-shared-core/out/pathUtils.js";
-import { ImportMapResolver } from "ap-shared-core/out/uc-dev/ImportMapResolver.js";
-import { BuildTimeGuidMeta, type GuidSequenceType, ProjectRowBase, UserUCConfig } from "ap-shared-core/out/uc-runtime/configResources.js";
-import { encryptResource } from "ap-shared-core/out/uc-runtime/resources/cryptoResource.js";
-import { ucUtil } from "ap-shared-core/out/uc-runtime/ucUtil.js";
+import { ucUtil } from "ap-shared-core/core.js";
 import { existsSync, readFileSync } from "fs";
 import { dirname, extname, join, normalize, resolve, sep } from "path";
 import { fileURLToPath } from "url";
 import { BuildingProcess } from "../BuildingProcess.js";
-import { UserResource, ResourceKeyBridge, type BuildResourceType } from "ap-shared-core/out/enums.js";
+import { UserResource, ResourceKeyBridge, type BuildResourceType } from "ap-shared-core/core-common.js";
 
 
 /* ------------------ helpers ------------------ */
@@ -127,11 +126,15 @@ export class ResourceBuildEngine {
   registerProject = (s: ProjectRowBase) => {
     // let stylePath = join(s.projectPath, s.config.projectBaseCsdsPath);
     // let resourcePath = join(s.projectPath, s.config.projectBadseCssPath);
-
+    
 
     const pref = s.config.preference;
+     console.log(s.config.cli.ResourceStorageFile);
+   
+    console.log(s.config.cli.ResourceStorageFile);
+    
     const resRelFilePath = correctpath(ucUtil.changeExtension(
-      normalize(join(s.projectName, pref.build.ResourceStorageFile)), '.ts', '.js'));
+      normalize(join(s.projectName, s.config.cli.ResourceStorageFile ??'')), '.ts', '.js'));
     this.projectList.push({
       project: s,
       projectGuid: s.config.guid,

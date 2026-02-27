@@ -21,9 +21,9 @@ export class cliDependancyChecker {
       return false;
     }
   }
-  getInstalledDep(opts: string[]) {
+  getMissingDep(opts: string[]) {
     const _this = this;
-    const _deps: string[] = [];
+    const _deps: string[] = []; 
     opts.forEach(dep => {
       if (!_this.isInstalled(dep))
         _deps.push(dep);
@@ -61,7 +61,9 @@ export class cliDependancyChecker {
 
   async ensureDependencies(opts: string[]) {
     const _this = this;
-    let missing = this.getInstalledDep(opts);
+    console.log(opts);
+    
+    let missing = this.getMissingDep(opts);
     if (missing.length === 0) {
       console.log("✓ Dependencies OK");
       return missing;
@@ -75,13 +77,12 @@ export class cliDependancyChecker {
       this.main.cliOptions.yes
     );
     if (!ok) {
-      return missing;
       throw new Error("Cannot continue without required dependencies.");
     }
     await this.installPackages(missing);
     await this.main.updateDependancies();
-    const installedDeps = this.getInstalledDep(opts);
-    missing = missing.filter(s => !installedDeps.includes(s));
+    const stillMissingDep = this.getMissingDep(opts);
+    missing = missing.filter(s => !stillMissingDep.includes(s));
     console.log("✓ Dependencies installed");
     return missing;
   }

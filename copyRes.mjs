@@ -1,5 +1,4 @@
-import { recursive } from "ap-shared-core/out/uc-dev/ConfigHandler.js";
-import { ensureDirectoryExistence } from "ap-shared-core/out/uc-dev/pathUtil.js";
+import { recursive,ensureDirectoryExistence } from "ap-shared-core/core-main.js"; 
 import { copyFileSync } from "fs";
 import { join, resolve } from "path";
 function copyRes() {
