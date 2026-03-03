@@ -1,5 +1,5 @@
 import { TemplateMaker } from "ap-shared-core/core-common.js";
-import { extractPathConfig,  type IFileDeclarationTypesMap} from "ap-shared-core/core-common.js";
+import { extractPathConfig, type IFileDeclarationTypesMap } from "ap-shared-core/core-common.js";
 import { ucUtil } from "ap-shared-core/core.js";
 import { CommonRow } from "ap-shared-core/core-main.js";
 import { ensureDirectoryExistence, relativeFilePath, resolveFilePath } from "ap-shared-core/core-main.js";
@@ -38,7 +38,7 @@ export class commonGeneratorX {
     static readTemplate(tptFileName: string) {
         //const cpath = fileURLToPath(import.meta.url);        
         //let fpath = resolveFilePath(import.meta.url, `templates/${tptFileName}`);//resolve(dirname(cpath), join(cliMain.TEMPLATE_DIR, tptFileName));
-        let fpath = join(dirname(fileURLToPath(import.meta.url)),'templates', tptFileName);
+        let fpath = join(dirname(fileURLToPath(import.meta.url)), 'lib/processes/templates', tptFileName);
         const data = readFileSync(fpath, 'utf-8');
         return data;
     }
@@ -58,6 +58,7 @@ export class commonGeneratorX {
         let _this = this;
         let _data = "";
         BuildingProcess.FILE_COUNT_OF_PREV_BUILD = this.rows.length;
+
         if (this.generateResources()) {
             if (this.rows.length == 0) {
                 console.log(`NO FILE TO GENERATE`);
@@ -79,6 +80,7 @@ export class commonGeneratorX {
 
                     ensureDirectoryExistence(row.src.pathOf[designerFileSrctype]);
                     _data = this.filex(`${srctype}${uctype}.designer`)(row);
+                    
                     writeFileSync(row.src.pathOf[designerFileSrctype], _data);
 
                     /*if (uctype == '.uc') {
@@ -136,17 +138,24 @@ export class commonGeneratorX {
         };
 
         const srcDec = x.srcDec;
+           // console.log(['=>',x.cli.ResourceStorageFile]);
         let resSrcFile = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageFile);
         rowForRes.projectList.forEach(s => {
 
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
             const y = extractPathConfig(s.project.config);
+            //console.log([s.project.projectPath, y.cli.ResourceStorageFile]);
+
             const resFpath = join(s.project.projectPath, y.srcDec.dirPath, y.cli.ResourceStorageFile)
             s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(resFpath);
         });
         ensureDirectoryExistence(resSrcFile);
+
         let resContent = this.filex('ts.resources')(rowForRes);
+
+        //console.log(resSrcFile);
+
         writeFileSync(resSrcFile, resContent, 'utf-8');
         if (!proj.config.cli.useTypeScript) {
             let resSrcTypeFile = ucUtil.changeExtension(resSrcFile, '.js', '.d.ts');

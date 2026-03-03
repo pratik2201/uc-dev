@@ -12,13 +12,10 @@ export class cliMenuSource {
   async mainMenu() {
     printHeader();
     console.log(`
-+---------+
-|  QUICK  |
-| +-------+----------------
-|  
-+------
-`);
-    
++-------------------------+
+|           QUICK         |
++-------------------------+
+`); 
     const menuSrc: MenuItem[] = [];
     const dm = new CliMenu("S e l e c t ", menuSrc);
     menuSrc.push({
@@ -35,9 +32,7 @@ export class cliMenuSource {
       label: "Electron Setup",
       action: async () => {
         await this.main._cliElectronInq.generate();
-        console.log('----------------------ss-----------------------');
-        
-        //await dm.start();
+        console.log('----------------------ss-----------------------'); 
       }
     }, {
       label: "typescript Setup",

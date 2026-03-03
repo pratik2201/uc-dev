@@ -1,7 +1,8 @@
-import { <?=designer.className?> } from '<?=designerFilePath?>';
-export class <?=codefile.className?> extends <?=designer.className?> {
-    constructor() {
-        super(arguments);
-        
+<?php let code = sources.ts_tpt.code; ?>
+import { <?=code.designerClassName?> } from '<?=code.designerFilePath?>';
+export class <?=code.className?> extends <?=code.designerClassName?>{    
+    constructor() { 
+        super();
+                
     }
 }

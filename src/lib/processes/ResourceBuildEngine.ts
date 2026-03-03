@@ -128,10 +128,10 @@ export class ResourceBuildEngine {
     // let resourcePath = join(s.projectPath, s.config.projectBadseCssPath);
     
 
-    const pref = s.config.preference;
-     console.log(s.config.cli.ResourceStorageFile);
+    //const pref = s.config.preference;
+     //console.log(s.config.cli.ResourceStorageFile);
    
-    console.log(s.config.cli.ResourceStorageFile);
+    //console.log(s.config.cli.ResourceStorageFile);
     
     const resRelFilePath = correctpath(ucUtil.changeExtension(
       normalize(join(s.projectName, s.config.cli.ResourceStorageFile ??'')), '.ts', '.js'));

@@ -22,7 +22,7 @@
     "clean": "rimraf out",
     "build:es": "node copyRes.mjs && node build-es.js",
     "build:dts": "tsc -p tsconfig-declare.json --emitDeclarationOnly",
-    "errorcheck":"tsc -p tsconfig.json",
+    "errorcheck":"tsc",
     "rebuild": "npm run errorcheck && npm run clean && npm run build:es"
   },
   "devDependencies": {

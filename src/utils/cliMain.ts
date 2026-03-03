@@ -1,19 +1,20 @@
-import path, { join, resolve } from "path";
-import { cliDependancyChecker } from "./cliDependancyChecker.js";
-import { findProject, getProjectDir } from "./cliFindProjects.js";
-import { existsSync, readFileSync } from "fs";
-import { ask, askYesNo } from "./prompt.js";
-import { cliUcconfigInquiry } from "./inquiry/cliUcconfigInquiry.js";
 import { extractPathConfig, IFileDeclaration, UserUCConfig } from "ap-shared-core/core-common.js";
- 
-import { cliElectronInquiry } from "./inquiry/cliElectronInquiry.js";
+import { existsSync, readFileSync } from "fs";
+import path, { join } from "path";
+import { cliDependancyChecker } from "./cliDependancyChecker.js";
+import { getProjectDir } from "./cliFindProjects.js";
+import { cliUcconfigInquiry } from "./inquiry/cliUcconfigInquiry.js";
+import { ask, askYesNo } from "./prompt.js";
+import { ImportUserConfig } from "ap-shared-core/core-main.js";
 import { BuildingProcess } from "../lib/BuildingProcess.js";
-import { cliTypeScriptInquiry } from "./inquiry/cliTypeScriptInquiry.js";
+import { cliMenuSource } from "./cliMenuSource.js";
+import { cliElectronInquiry } from "./inquiry/cliElectronInquiry.js";
 import { cliNewStartInquiry } from "./inquiry/cliNewStartInquiry.js";
 import { cliQuickSetup } from "./inquiry/cliQuickSetup.js";
-import { cliMenuSource } from "./cliMenuSource.js";
-import { cliSurveys } from "./inquiry/cliSurveys.js"; 
-import { ImportUserConfig } from "ap-shared-core/core-main.js";
+import { cliSurveys } from "./inquiry/cliSurveys.js";
+import { cliTypeScriptInquiry } from "./inquiry/cliTypeScriptInquiry.js";
+import { cli_menu_MainMenu } from "./inquiry/cli_menu_MainMenu.js";
+
 export class cliOptions {
     yes? = false;
     force? = false;
@@ -39,13 +40,7 @@ export class cliMain {
     menu: cliMenuSource;
     QUERY = {
         JUST_INSTALLED: [] as string[],
-
-        //JUST_ELECTRON_INSTALLED: false,
-        //renderferIndexFilePath: undefined,
-        //JUST_TYPESCRIPT_INSTALLED: false,
-        //JUST_UCBUILDER_INSTALLED: false,
     }
-    meta = new metaInfo();
     projectDir = undefined;
     hasConfigFound = false;
     dependancyChecker: cliDependancyChecker;
@@ -57,8 +52,8 @@ export class cliMain {
     _cliTypeScriptInq: cliTypeScriptInquiry;
     _cliQuickSetup: cliQuickSetup;
     constructor() {
-        this.meta.projectDir = this.projectDir = process.cwd();
-        
+        this.projectDir = this.projectDir = process.cwd();
+
         this._cliSurveys = new cliSurveys(this);
         this._cliUcconfigInq = new cliUcconfigInquiry(this);
         this._cliTypeScriptInq = new cliTypeScriptInquiry(this);
@@ -69,26 +64,24 @@ export class cliMain {
     }
     readConfig = async () => {
         try {
-            const cfgPath = join(this.meta.projectDir, 'ucconfig.js');
+            const cfgPath = join(this.projectDir, 'ucconfig.js');
+            //console.log(cfgPath);
             if (existsSync(cfgPath)) {
                 this.config = await ImportUserConfig(cfgPath);
                 if (this.config != undefined) {
-                    const meta = this.meta;
                     const x = extractPathConfig(this.config);
                     const browser = this.config.browser;
-                    if (x.cli?.mainProcessFilePath)
+                    /*if (x.cli?.mainProcessFilePath)
                         meta.mainProcessFilePath = join(meta.projectDir, x.srcDec.dirPath, x.cli.mainProcessFilePath);
                     if (x.cli?.preloadScriptFilePath)
                         meta.preloadScriptFilePath = join(meta.projectDir, x.srcDec.dirPath, x.cli.preloadScriptFilePath);
                     if (x.cli?.preloadScriptFilePath)
                         meta.preloadScriptFilePath = join(meta.projectDir, x.srcDec.dirPath, x.cli.preloadScriptFilePath);
-
                     meta.htmlFilePath = x.cli?.baseHtmlPath;
-                    meta.cssFilePath = x.cli?.baseCssPath;
+                    meta.cssFilePath = x.cli?.baseCssPath;*/
                 }
             } else {
                 this.config = new UserUCConfig();
-
             }
         } catch {
 
@@ -98,7 +91,6 @@ export class cliMain {
         const pref = this.config.preference;
         const dirDec = pref.dirDeclaration;
         const ext = this.config.cli.useTypeScript ? '.ts' : '.js';
-        console.log('hello');
 
         let srcDec = dirDec[pref.srcDec];
         if (srcDec == undefined) {
@@ -184,8 +176,8 @@ Sub Directory Path (inside source directory) : `, fdec.subDirPath ?? '');
     }
     async checkBasicNeed() {
 
-        this.meta.projectDir = getProjectDir(process.cwd());
-        if (this.meta.projectDir == null) {
+        this.projectDir = getProjectDir(process.cwd());
+        if (this.projectDir == null) {
             throw Error('NO PROJECT FOUND');
         }
         this.dependancyChecker = new cliDependancyChecker(this);
@@ -193,27 +185,23 @@ Sub Directory Path (inside source directory) : `, fdec.subDirPath ?? '');
         const depNeed = ['uc-runtime'];
         if (!this.dependentProjects.includes('typescript'))
             this.config.cli.useTypeScript = await cliTypeScriptInquiry.AskIsTypescript(true);
-        if (!this.dependentProjects.includes('uc-controls'))
-            depNeed.push('uc-controls')
+        //if (!this.dependentProjects.includes('uc-controls'))
+        //    depNeed.push('uc-controls')
 
         if (this.config.cli.useTypeScript)
             depNeed.push('typescript', '@types/node');
         await this.dependancyChecker.ensureDependencies(depNeed);
     }
 
-    async setup() {
-        await this._cliSurveys.inquiry();
-      await this.menu.mainMenu();
-        //await this._cliQuickSetup.inquiry(false);
-    }
+
     updateDependancies() {
-        if (this.meta.projectDir != undefined) {
+        if (this.projectDir != undefined) {
             this.dependentProjects = this.listProjectDependencies();
         }
     }
 
     listProjectDependencies(): string[] {
-        const pkgPath = path.resolve(this.meta.projectDir, "package.json");
+        const pkgPath = path.resolve(this.projectDir, "package.json");
         if (!existsSync(pkgPath)) {
             throw new Error("package.json not found in project directory");
         }
@@ -231,12 +219,12 @@ Sub Directory Path (inside source directory) : `, fdec.subDirPath ?? '');
 
     async startBuild() {
         if (this._cliUcconfigInq.exist) {
-            await BuildingProcess.startBuild(this.meta.projectDir);
-            if (BuildingProcess.FILE_COUNT_OF_PREV_BUILD == 0) {
+            await BuildingProcess.startBuild(this.projectDir);
+            /*if (BuildingProcess.FILE_COUNT_OF_PREV_BUILD == 0) {
                 await this._cliNewStart.inquiry();
-            }
+            }*/
         } else {
-            await this._cliQuickSetup.inquiry(true);
+            await cli_menu_MainMenu(this, undefined);//this._cliQuickSetup.inquiry(true);
         }
     }
 }

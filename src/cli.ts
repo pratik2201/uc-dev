@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { cliMain } from "./utils/cliMain.js";
+import { cliMain } from "./utils/cliMain.js"; 
+import { cli_menu_MainMenu } from "./utils/inquiry/cli_menu_MainMenu.js";
 
 const args = process.argv.slice(2);
 const cmd = args[0];
@@ -15,13 +16,13 @@ const ignreq = args.includes("--ignreq");
 switch (cmd) {
     case "build":
         if (!ignreq)
-            await main.checkBasicNeed(); 
+            await main.checkBasicNeed();
         await main.startBuild();
         break;
     case "setup":
-        //if (!ignreq)
-        //    await main.checkBasicNeed();
-        await main.setup();
+        if (!ignreq)
+            await main.checkBasicNeed();
+        await cli_menu_MainMenu(main);
         break;
     case "--help":
     default:

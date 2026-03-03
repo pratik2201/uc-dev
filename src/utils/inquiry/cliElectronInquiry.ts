@@ -1,24 +1,24 @@
-import { relativeFilePath, resolveFilePath } from "ap-shared-core/core-main.js"; 
+import { correctpath, extractPathConfig } from "ap-shared-core/core-common.js";
+import { relativeFilePath } from "ap-shared-core/core-main.js";
 import { ucUtil } from "ap-shared-core/core.js";
-import { dirname, join, relative, resolve } from "node:path";
-import { findProject } from "../cliFindProjects.js";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { cliMain } from "../cliMain.js";
 import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
-import { correctpath, extractPathConfig } from "ap-shared-core/core-common.js";
-import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { cliTypeScriptInquiry } from "./cliTypeScriptInquiry.js"; 
+import { cli_sample_style1 } from "./cli_sample_style1.js";
 
 export class cliElectronInquiry {
       constructor(public main: cliMain) { }
 
-      async generate() {
+      async generate(hasAddedSampleForm = false) {
             const cfg = this.main.config;
             const cli = cfg.cli;
             const mainFilePath = resolve(join(cli.srcDir, cli.mainProcessFilePath));
             const preloadFilePath = resolve(join(cli.srcDir, cli.preloadScriptFilePath));
             const baseHtmlPath = resolve(cli.baseHtmlPath);
             const baseCodePath = resolve(join(cli.srcDir, cli.baseCodePath));
+           
+            const baseCodeOutPath = resolve(join(cli.outDir, cli.baseCodePath));
             const ResourceStorageFile = resolve(join(cli.srcDir, cli.ResourceStorageFile));
             const baseCssPath = resolve(cli.baseCssPath);
 
@@ -30,9 +30,9 @@ export class cliElectronInquiry {
                   _runTemplate('templates/electron/ts.main', {
                         removeMenu: cli.removeMenu,
                         devtools: cli.devtools,
-                        preloadPath: correctpath(relativeFilePath(mainFilePath, preloadFilePath)),
+                        preloadPath: ucUtil.changeExtension(correctpath(relativeFilePath(mainFilePath, preloadFilePath)), '.ts', '.js'),
                         rendererHtmlPath: correctpath(relativeFilePath(mainFilePath, baseHtmlPath)),
-                        resourcePath: correctpath(relativeFilePath(mainFilePath, ResourceStorageFile)),
+                        resourcePath: ucUtil.changeExtension(correctpath(relativeFilePath(mainFilePath, ResourceStorageFile)), '.ts', '.js'),
                   }),
                   this.main.cliOptions);
             /**
@@ -54,7 +54,9 @@ export class cliElectronInquiry {
             writeFileSafely(
                   baseHtmlPath,
                   _runTemplate('templates/electron/html.renderer', {
-                        indexFilePath: correctpath(relativeFilePath(baseHtmlPath, baseCodePath)),
+                        indexFilePath:
+
+                              ucUtil.changeExtension(correctpath(relativeFilePath(baseHtmlPath, baseCodeOutPath)), '.ts', '.js'),
                   }),
                   this.main.cliOptions);
 
@@ -63,82 +65,29 @@ export class cliElectronInquiry {
              */
             writeFileSafely(
                   baseCssPath,
-                  _runTemplate('templates/electron/css.renderer', {
-
-                  }),
+                  _runTemplate('templates/electron/css.renderer', {}),
                   this.main.cliOptions);
 
-            const needSampleForm = await askYesNo('add Sample Form?', true);
-            if (needSampleForm) {
-                  const sampleroot = dirname(join(cli.srcDir, cli.baseCodePath));
 
-                  const sample = {
-                        frmDashboard: {
-                              html: resolve(join(sampleroot, 'frmDashboard.uc.html')),
-                              scss: resolve(join(sampleroot, 'frmDashboard.uc.scss')),
-                              code: resolve(join(sampleroot, 'frmDashboard.uc.ts')),
-                        },
-                        tptDashboard: {
-                              html: resolve(join(sampleroot, 'tptmDashboard.tpt.html')),
-                              scss: resolve(join(sampleroot, 'tptmDashboard.tpt.scss')),
-                              code: resolve(join(sampleroot, 'tptmDashboard.tpt.ts')),
-                        }
-                  }
-                  const relHtmlPath = relative(resolve(cli.srcDir), sample.frmDashboard.html);
-                  const designerRoot = ucUtil.changeExtension(resolve(join(cli.srcDir, cli.designerDir, relHtmlPath)), '.html', '.designer.js');
-
-                  //const designerRoot = resolve(join(cli.srcDir,
-                  //      cli.designerDir, 'frmDashboard.uc.designer.ts'));
-
-                  /**
-                   * sample form usercontrol GENERATE
-                   */
-                  writeFileSafely(
-                        sample.frmDashboard.html,
-                        _runTemplate('templates/electron/sample1/frmDashboard.uc.html.tp', {}),
-                        this.main.cliOptions);
-                  writeFileSafely(
-                        sample.frmDashboard.scss,
-                        _runTemplate('templates/electron/sample1/frmDashboard.uc.scss.tp', {}),
-                        this.main.cliOptions);
-                  const designerReletivePath = relative(dirname(sample.frmDashboard.code), designerRoot);
-                  writeFileSafely(
-                        sample.frmDashboard.code,
-                        _runTemplate('templates/electron/sample1/frmDashboard.uc.ts.tp', {
-                              designerReletivePath:
-                                    correctpath(designerReletivePath)
-                        }),
-                        this.main.cliOptions);
-
-
-                  writeFileSafely(
-                        sample.tptDashboard.html,
-                        _runTemplate('templates/electron/sample1/tptDashboard.tpt.html.tp', {}),
-                        this.main.cliOptions);
-
-                  writeFileSafely(
-                        sample.tptDashboard.scss,
-                        _runTemplate('templates/electron/sample1/tptDashboard.tpt.scss.tp', {}),
-                        this.main.cliOptions);
-
-
-
-            }
-
+            //const needSampleForm = await askYesNo('add Sample Form?', true);
+             
             /**
-             * RENDERER CODE FILE GENERATE
-             */
+              * RENDERER CODE FILE GENERATE
+              */
             writeFileSafely(
                   baseCodePath,
                   _runTemplate('templates/electron/ts.renderer', {
                         startUpCode: (
-                              needSampleForm ? `
+                              hasAddedSampleForm ? `
 const { frmDashboard } = await import("./frmDashboard.uc.js");
 const frm = await frmDashboard.CreateAsync({ targetElement: document.body });
 await frm.ucExtends.showDialog();`: ''
                         )
                   }),
                   this.main.cliOptions);
+
+
+            return true;
       }
       async askAboutBasePath() {
             const x = extractPathConfig(this.main.config);

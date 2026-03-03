@@ -17,7 +17,10 @@ export class BuildingProcess {
     static async startBuild(pth: string) {
         console.log(`Build Started`);
         PathBridge.init(path, url, this.configHandler.allConfig);
+        
         await this.configHandler.fillConfig(pth);
+        
+     
         this.buildDesigner = new BuildDesigner();
         this.resourceCopy.fillFiles();
 

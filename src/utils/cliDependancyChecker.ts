@@ -61,7 +61,7 @@ export class cliDependancyChecker {
 
   async ensureDependencies(opts: string[]) {
     const _this = this;
-    console.log(opts);
+   // console.log(opts);
     
     let missing = this.getMissingDep(opts);
     if (missing.length === 0) {

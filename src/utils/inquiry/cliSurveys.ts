@@ -1,4 +1,4 @@
- 
+
 import { cliMain } from "../cliMain.js";
 import { ask, askYesNo, runTemplate } from "../prompt.js";
 import { cliTypeScriptInquiry } from "./cliTypeScriptInquiry.js";
@@ -30,7 +30,7 @@ export class cliSurveys {
       cli.devtools = await askYesNo(`use Devtools :`, cli.devtools);
       cli.removeMenu = await askYesNo(`Remove Menu :`, cli.removeMenu);
     } else {
-      cli.baseCodePath = await ask(`base code filepath (in ${cli.srcDir} directory):`, cli.baseCodePath ?? `index${cli.codeFileExt}`);      
+      cli.baseCodePath = await ask(`base code filepath (in ${cli.srcDir} directory):`, cli.baseCodePath ?? `index${cli.codeFileExt}`);
     }
 
     cli.baseCssPath = await ask(`base css filepath (in project root) :`, cli.baseCssPath ?? 'styles.scss');
@@ -43,26 +43,13 @@ export class cliSurveys {
       cli.ResourceStorageFile ?? correctpath(join(cli.designerDir, `Resources${cli.codeFileExt}`))
     );
 
-    const cmd = await ask(`
-------------------
-What to Do Now ?
-  E = Generate Electron Stuff
-  U = Generate 'ucconfig.js'
-  V = Generate '.vscode/settings.json'
-  T = Generate 'tsconfig.json' for project
-  B = Back
-  `, 'u');
-    switch (cmd.toLowerCase().trim()) {
-      case 'u':
-        await this.main._cliUcconfigInq.generateUcConfig();
-        break;
-      case 'e':
-        await this.main._cliElectronInq.generate();
-        break;
-      case 'v':
-        await this.main._cliElectronInq.generate();
-        break;
+    if (cli.useTypeScript) {
+      cli.filesToMove = await ask(`RUNTIME EXTRA FILES (SPECIFY EXTENSIONS)
+>`, '.jpg,.png,.html,.scss,.ico,.svg') ?? '';
     }
+    cli.ignoreInBuild = await ask(`IGNORE THESE PATH IN DESIGNER BUILD TIME (SPECIFY PATH FROM ROOT)
+>`, `node_modules;.git;.vscode${cli.useTypeScript ? ';' + cli.outDir : ''}`) ?? '';
+    await this.main._cliUcconfigInq.generateUcConfig();
     //console.log(JSON.stringify(cli));
 
     //   let x = extractPathConfig(cfg);

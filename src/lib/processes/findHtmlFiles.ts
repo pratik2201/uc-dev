@@ -1,4 +1,4 @@
- 
+
 import type { UserUCConfig } from "ap-shared-core/core-common.js";
 import { getCloneableObject, ResourceKeyBridge, safeStringify } from "ap-shared-core/core-common.js";
 import { codeFileInfo } from "ap-shared-core/core-main.js";
@@ -18,15 +18,13 @@ export async function collectFiles() {
     let ext = htmlFileDec.extension;
     let filteed = allFileList.filter(s =>
         s.startsWith(htmlDirPath) &&
-        (s.endsWith(`.uc${ext}`) ||
-            s.endsWith(`tpt${ext}`))
+        (s.endsWith(`.uc${ext}`) || s.endsWith(`tpt${ext}`))
     );
     const designerFileDec = srcDirDec.fileDeclaration.designer;
     const designerDirPath = join(projPath, srcDirDec.dirPath, designerFileDec.subDirPath);
     let designerList = allFileList.filter(s =>
         s.startsWith(designerDirPath) &&
-        (s.endsWith(`.uc${designerFileDec.extension}`) ||
-            s.endsWith(`tpt${designerFileDec.extension}`))
+        (s.endsWith(`.uc${designerFileDec.extension}`) || s.endsWith(`tpt${designerFileDec.extension}`))
     )
     const cInfos: codeFileInfo[] = [];
     const oldUsedDesigners: string[] = [];
@@ -39,11 +37,12 @@ export async function collectFiles() {
     });
 
     const toRemoveOldUnUsedDesigners = designerList.filter(s => !oldUsedDesigners.includes(s));
-    toRemoveOldUnUsedDesigners.forEach(s => {
+    for (let index = 0; index < toRemoveOldUnUsedDesigners.length; index++) {
+        const s = toRemoveOldUnUsedDesigners[index];
         rmSync(s, { force: true });
         console.log(`!! '${s}' file deleted`);
-    });
-
+    }
+    
 
     BuildingProcess.buildDesigner.cInfoToBuild.length = 0;
     BuildingProcess.buildDesigner.cInfoToBuild.push(...cInfos);
