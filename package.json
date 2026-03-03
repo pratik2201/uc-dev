@@ -13,7 +13,7 @@
     "designer-build",
     "electron-tools"
   ],
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0",
   "description": "Electron CLI project builder for uc-runtime apps",
   "license": "ISC",
   "author": "AP",
@@ -22,7 +22,7 @@
     "clean": "rimraf out",
     "build:es": "node copyRes.mjs && node build-es.js",
     "build:dts": "tsc -p tsconfig-declare.json --emitDeclarationOnly",
-    "errorcheck":"tsc",
+    "errorcheck": "tsc",
     "rebuild": "npm run errorcheck && npm run clean && npm run build:es"
   },
   "devDependencies": {
@@ -32,7 +32,6 @@
     "rimraf": "^6.0.1"
   },
   "dependencies": {
-    
     "css-select": "^6.0.0",
     "dom-serializer": "^2.0.0",
     "htmlparser2": "^10.1.0"
