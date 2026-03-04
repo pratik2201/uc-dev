@@ -31,9 +31,9 @@ export class cliDependancyChecker {
     return _deps;
   }
   detectPackageManager(): string {
-    if (existsSync("pnpm-lock.yaml")) return "pnpm add -D";
-    if (existsSync("yarn.lock")) return "yarn add -D";
-    return "npm install -D";
+    if (existsSync("pnpm-lock.yaml")) return "pnpm add ";
+    if (existsSync("yarn.lock")) return "yarn add ";
+    return "npm install ";
   }
 
   installPackages(pkgs: string[]): Promise<void> {
