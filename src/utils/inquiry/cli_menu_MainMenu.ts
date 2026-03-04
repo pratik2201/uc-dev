@@ -4,6 +4,7 @@ import { cliMain } from "../cliMain.js";
 import { ask, runTemplate, writeFileSafely } from "../prompt.js";
 import { makeMenu } from "./cli_menuLayout.js";
 import { cli_menu_generate } from "./cli_menu_generate.js";
+import { cli_menu_dependancy } from "./cli_menu_dependancy.js";
 
 export async function cli_menu_MainMenu(main: cliMain, back_menu_callback: (_main: cliMain) => Promise<void> = async () => { }) {
 
@@ -11,11 +12,15 @@ export async function cli_menu_MainMenu(main: cliMain, back_menu_callback: (_mai
   P = Perameters
   B = Build Designers and Resource File  
   G = Generate
+  D = Dependancy
   Q = Quit
     `, 'q');
   switch (cmd.toLowerCase().trim()) {
     case 'b':
       await main.startBuild();
+      break;
+    case 'd':
+      await cli_menu_dependancy(main, cli_menu_MainMenu);
       break;
     case 'p':
       await main._cliSurveys.inquiry();

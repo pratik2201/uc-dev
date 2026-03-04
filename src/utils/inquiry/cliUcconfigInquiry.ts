@@ -1,12 +1,10 @@
 import { extractPathConfig, UserUCConfig } from "ap-shared-core/core-common.js";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { ImportUserConfig } from "ap-shared-core/core-main.js";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { commonGeneratorX } from "../../lib/processes/commonGeneratorX.js";
-import { ask, askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
-import { cliMain } from "../cliMain.js";
-import { ensureDirectoryExistence, ImportUserConfig, resolveFilePath } from "ap-shared-core/core-main.js";
 import { fileURLToPath } from "node:url";
-import { cliTypeScriptInquiry } from "./cliTypeScriptInquiry.js";
+import { cliMain } from "../cliMain.js";
+import { askYesNo, runTemplate, writeFileSafely } from "../prompt.js";
 
 export class cliUcconfigInquiry {
     constructor(public main: cliMain) { }

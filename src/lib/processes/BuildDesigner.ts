@@ -1,16 +1,13 @@
-import { join, normalize, relative, resolve } from "path";
-import { BuildingProcess } from "../BuildingProcess.js";
-import { commonGeneratorX } from "./commonGeneratorX.js";
-
-import { ATTR_OF, Control, correctpath, DesignerOptionsBase, ResourceKeyBridge, ScopeType, TemplateMaker } from "ap-shared-core/core-common.js";
+import { ATTR_OF, Control, correctpath, DesignerOptionsBase, IFileDeclaration, IUCConfigPreference, ProjectRowBase, ResourceKeyBridge, ScopeType, TemplateMaker, UserUCConfig } from "ap-shared-core/core-common.js";
+import { codeFileInfo, codeOptionsBase, CommonRow, ImportMapResolver, relativeFilePath } from "ap-shared-core/core-main.js";
 import { ICoupleNode, ucUtil } from "ap-shared-core/core.js";
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
-
-import { IFileDeclaration, IUCConfigPreference, ProjectRowBase, UserUCConfig } from "ap-shared-core/core-common.js";
-import { codeFileInfo, codeOptionsBase, CommonRow, ImportMapResolver, relativeFilePath } from "ap-shared-core/core-main.js";
+import { join, normalize, relative, resolve } from "path";
 import { fileURLToPath } from "url";
+import { BuildingProcess } from "../BuildingProcess.js";
+import { commonGeneratorX } from "./commonGeneratorX.js";
 import { EModify, GetTemplateMetaByContent$main } from "./jsToHtml.js";
+import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 export class BuildDesigner {
     gen: commonGeneratorX;
     bldr: BuildingProcess;

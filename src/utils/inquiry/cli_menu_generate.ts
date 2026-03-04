@@ -10,7 +10,6 @@ export async function cli_menu_generate(main: cliMain, back_menu_callback: (_mai
   const cmd = await makeMenu('G E N E R A T E', `
   E = Electron Stuffs
   S = Sample Style1
-  U = 'ucconfig.js' file
   V = '.vscode/settings.json' file
   T = 'tsconfig.json' for project
   A = Do All Above
@@ -20,7 +19,6 @@ export async function cli_menu_generate(main: cliMain, back_menu_callback: (_mai
   async function _select(selectedOption: string) {
     switch (selectedOption.toLowerCase().trim()) {
       case 'a':
-        await _select('u');
         await _select('v');
         await _select('t');
         await _select('s');
@@ -30,7 +28,6 @@ export async function cli_menu_generate(main: cliMain, back_menu_callback: (_mai
         break;
       case 'p': await main._cliSurveys.inquiry(); break;
       case 's': await cli_sample_style1(main); hasAddedSampleForm = true; break;
-      case 'u': await main._cliUcconfigInq.generateUcConfig(); break;
       case 'e': await main._cliElectronInq.generate(hasAddedSampleForm); break;
       case 't':
         const cli = main.config.cli;

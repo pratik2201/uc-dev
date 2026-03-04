@@ -1,10 +1,9 @@
 
+import { correctpath } from "ap-shared-core/core-common.js";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 import { cliMain } from "../cliMain.js";
 import { ask, askYesNo, runTemplate } from "../prompt.js";
-import { cliTypeScriptInquiry } from "./cliTypeScriptInquiry.js";
-import { dirname, join } from "path";
-import { correctpath, extractPathConfig } from "ap-shared-core/core-common.js";
-import { fileURLToPath } from "url";
 
 export class cliSurveys {
   constructor(public main: cliMain) { }
