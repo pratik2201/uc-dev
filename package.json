@@ -13,7 +13,7 @@
     "designer-build",
     "electron-tools"
   ],
-  "version": "2.0.0",
+  "version": "1.0.0-beta.3",
   "description": "Electron CLI project builder for uc-runtime apps",
   "license": "ISC",
   "author": "AP",
@@ -26,7 +26,7 @@
     "rebuild": "npm run errorcheck && npm run clean && npm run build:es"
   },
   "devDependencies": {
-    "ap-shared-core": "file:../ap-shared-core",
+    
     "electron": "^39.1.1",
     "esbuild": "^0.27.2",
     "rimraf": "^6.0.1"

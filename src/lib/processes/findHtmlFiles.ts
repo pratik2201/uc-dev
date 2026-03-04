@@ -42,7 +42,7 @@ export async function collectFiles() {
         rmSync(s, { force: true });
         console.log(`!! '${s}' file deleted`);
     }
-    
+
 
     BuildingProcess.buildDesigner.cInfoToBuild.length = 0;
     BuildingProcess.buildDesigner.cInfoToBuild.push(...cInfos);
@@ -74,9 +74,11 @@ function registerMain() {
     }));
     mp.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
 
-    if (cfg.cli.baseHtmlPath != undefined) {
+    if (cfg.cli.baseHtmlPath != undefined && cfg.cli.baseHtmlPath.length > 0) {
         let htmlPath = join(_mainProj.projectPath, cfg.cli.baseHtmlPath);
-        mp.mainHtmlGuid = ResourceKeyBridge.extractKey(_cssbuilder.build(htmlPath, {}));
+        const mainHtmlRes = _cssbuilder.build(htmlPath, {});
+        if (mainHtmlRes != undefined)
+            mp.mainHtmlGuid = ResourceKeyBridge.extractKey(mainHtmlRes);
     }
     mp.ucConfigGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
         content: JSON.stringify(_mainProj.config)
