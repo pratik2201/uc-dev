@@ -20,8 +20,8 @@ switch (cmd) {
         await main.startBuild();
         break;
     case "setup":
-        if (!ignreq)
-            await main.checkBasicNeed();
+        //if (!ignreq)
+        //    await main.checkBasicNeed();
         await cli_menu_MainMenu(main);
         break;
     case "--help":

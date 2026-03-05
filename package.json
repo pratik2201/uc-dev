@@ -26,7 +26,6 @@
     "rebuild": "npm run errorcheck && npm run clean && npm run build:es"
   },
   "devDependencies": {    
-    
     "electron": "^39.1.1",
     "esbuild": "^0.27.2",
     "rimraf": "^6.0.1"
