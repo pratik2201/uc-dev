@@ -174,7 +174,7 @@ Sub Directory Path (inside source directory) : `, fdec.subDirPath ?? '');
             await this._cliTypeScriptInq.inquiry();
         }
     }
-    async checkBasicNeed() {
+    async checkBasicNeed(inquiry = true) {
 
         this.projectDir = getProjectDir(process.cwd());
         if (this.projectDir == null) {
@@ -183,14 +183,11 @@ Sub Directory Path (inside source directory) : `, fdec.subDirPath ?? '');
         this.dependancyChecker = new cliDependancyChecker(this);
         await this.updateDependancies();
         const depNeed = ['uc-runtime'];
-        if (!this.dependentProjects.includes('typescript'))
-            this.config.cli.useTypeScript = await cliTypeScriptInquiry.AskIsTypescript(true);
-        //if (!this.dependentProjects.includes('uc-controls'))
-        //    depNeed.push('uc-controls')
-
-        if (this.config.cli.useTypeScript)
-            depNeed.push('typescript', '@types/node');
-        await this.dependancyChecker.ensureDependencies(depNeed);
+        if (inquiry) {
+            if (this.config.cli.useTypeScript)
+                depNeed.push('typescript', '@types/node');
+            await this.dependancyChecker.ensureDependencies(depNeed);
+        }
     }
 
 
