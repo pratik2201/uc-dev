@@ -31,6 +31,7 @@
     "rimraf": "^6.0.1"
   },
   "dependencies": {
+    "ap-shared-core": "file:../ap-shared-core",
     "css-select": "^6.0.0",
     "dom-serializer": "^2.0.0",
     "htmlparser2": "^10.1.0"
