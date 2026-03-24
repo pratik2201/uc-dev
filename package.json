@@ -13,7 +13,7 @@
     "designer-build",
     "electron-tools"
   ],
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Electron CLI project builder for uc-runtime apps",
   "license": "ISC",
   "author": "AP",
@@ -31,7 +31,6 @@
     "rimraf": "^6.0.1"
   },
   "dependencies": {
-    
     "css-select": "^6.0.0",
     "dom-serializer": "^2.0.0",
     "htmlparser2": "^10.1.0"
