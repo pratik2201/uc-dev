@@ -9,10 +9,9 @@
     "compileOnSave": true,
     "compilerOptions": { 
         "module": "ESNext",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "target": "ESNext",
         "strict": true,
-        "baseUrl": ".",
         "outDir": "./<?= outDir ?>",
         "rootDir": "./<?= srcDir ?>",
         "declaration": true,
