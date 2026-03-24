@@ -12,7 +12,7 @@ const copt = main.cliOptions;
 copt.force = args.includes("--force");
 copt.yes = args.includes("--yes");
 const ignreq = args.includes("--ignreq");
-
+debugger;
 switch (cmd) {
     case "build":
         if (!ignreq)

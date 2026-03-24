@@ -138,7 +138,8 @@ export class commonGeneratorX {
         };
 
         const srcDec = x.srcDec;
-           // console.log(['=>',x.cli.ResourceStorageFile]);
+        // console.log(['=>',x.cli.ResourceStorageFile]);
+        debugger;
         let resSrcFile = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageFile);
         rowForRes.projectList.forEach(s => {
 
@@ -147,7 +148,8 @@ export class commonGeneratorX {
             const y = extractPathConfig(s.project.config);
             //console.log([s.project.projectPath, y.cli.ResourceStorageFile]);
 
-            const resFpath = join(s.project.projectPath, y.srcDec.dirPath, y.cli.ResourceStorageFile)
+            let resFpath = join(s.project.projectPath, y.outDec.dirPath, y.cli.ResourceStorageFile);
+            resFpath = ucUtil.changeExtension(resFpath, '.ts', '.js');
             s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(resFpath);
         });
         ensureDirectoryExistence(resSrcFile);
