@@ -13,7 +13,7 @@
     "designer-build",
     "electron-tools"
   ],
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Electron CLI project builder for uc-runtime apps",
   "license": "ISC",
   "author": "AP",
