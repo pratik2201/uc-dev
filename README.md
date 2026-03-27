@@ -41,15 +41,26 @@ Launches interactive setup menu.
 ```bash
 uc-dev setup
 ```
+
+if you fire  `uc-dev setup` in blank directory than it will ask you project name and 
+will create the initial startup project for you. :-)
+
+OR
+
+will show 
 📋 MAIN MENU
 ```bash
 --M A I N - M E N U-----------
-  P = Parameters
-  B = Build Designers
+  P = Perameters
+  B = Build Designers and Resource File
   G = Generate
+  D = Dependancy
+  S = Quick Startup
   Q = Quit
 What to Do Now ? (q):
 ```
+ *note (`Quit` not work in some menus)
+
 ### 🔹 P = Parameters 
 Configure project directories and related settings:
 src directory
@@ -59,9 +70,10 @@ designer directory
 other setup-related paths
 These values are later used when generating files.
 
-### 🔹 B = Build Designers
-
+### 🔹 B = Build Designers and Resource File
 Shortcut for:  `uc-dev build`
+
+
 ### 🔹 G = Generate
 Opens Generate Submenu
 ```bash
