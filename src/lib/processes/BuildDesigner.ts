@@ -90,11 +90,8 @@ export class BuildDesigner {
         htmlCode = this.common0(_row);
         if (htmlCode == undefined) return undefined;
         else if (htmlCode.trim() == '') {
-            htmlCode = `<WRAPPER x-caption="${finfo.name}">
-    <UCWINFRAME x-name="winFrame1" x-from="uc-runtime/controls/ucWinFrame.uc.html">
-        
-    </UCWINFRAME>
-</WRAPPER>`;
+            htmlCode = `<WRAPPER x-caption="${finfo.name}"></WRAPPER>`;
+            writeFileSync(finfo.allPathOf[pref.srcDec].html, htmlCode, 'utf8');
         }
         if (!existsSync(finfo.allPathOf[pref.srcDec].scss)) {
             writeFileSync(finfo.allPathOf[pref.srcDec].scss, `&{
@@ -154,7 +151,7 @@ export class BuildDesigner {
         row.designer.htmlGuid = cnt.htmlGuid;
         row.designer.cssGuid =
             row.designer.guid = cnt.cssGuid;
-         
+
 
 
 

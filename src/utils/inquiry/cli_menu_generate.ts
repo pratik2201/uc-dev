@@ -5,17 +5,31 @@ import { ask, runTemplate, writeFileSafely } from "../prompt.js";
 import { makeMenu } from "./cli_menuLayout.js";
 import { cli_sample_style1 } from "./cli_sample_style1.js";
 
-export async function cli_menu_generate(main: cliMain, back_menu_callback: (_main: cliMain) => Promise<void> = async () => { }) {
+export async function cli_menu_generate (
+  back_menu_callback: (_main: cliMain) => Promise<void> = async () => { },
+  defCommand?: string
+) {
   let hasAddedSampleForm = false;
-  const cmd = await makeMenu('G E N E R A T E', `
-  E = Electron Stuffs
-  S = Sample Style1
-  V = '.vscode/settings.json' file
-  T = 'tsconfig.json' for project
-  A = Do All Above
-  Q = Quit
-  `, 'q');
-  await _select(cmd);
+  const main = cliMain.ref;
+  
+  let cmdlist = '';
+  if (defCommand == undefined) {
+    cmdlist = await makeMenu('G E N E R A T E', `
+      E = Electron Stuffs
+      S = Sample Style1
+      V = '.vscode/settings.json' file
+      T = 'tsconfig.json' for project
+      A = Do All Above
+      Q = Quit
+      `, 'q');
+  } else {
+    cmdlist = defCommand;
+  }
+  //await _select(cmdlist);
+  for (let index = 0; index < cmdlist.length; index++) {
+    await _select(cmdlist[index]);
+  }
+
   async function _select(selectedOption: string) {
     switch (selectedOption.toLowerCase().trim()) {
       case 'a':
@@ -26,7 +40,7 @@ export async function cli_menu_generate(main: cliMain, back_menu_callback: (_mai
           await _select('e');
         await main.startBuild();
         break;
-      case 'p': await main._cliSurveys.inquiry(); break;
+      //case 'p': await main._cliSurveys.inquiry(); break;
       case 's': await cli_sample_style1(main); hasAddedSampleForm = true; break;
       case 'e': await main._cliElectronInq.generate(hasAddedSampleForm); break;
       case 't':
@@ -43,7 +57,7 @@ export async function cli_menu_generate(main: cliMain, back_menu_callback: (_mai
               .find(s => s == 'uc-controls') != undefined,
           }),
           main.cliOptions);
-        await cli_menu_generate(main);
+        //await cli_menu_generate();
         break;
       case 'v':
         /**
@@ -58,7 +72,7 @@ export async function cli_menu_generate(main: cliMain, back_menu_callback: (_mai
         await back_menu_callback(main);
         return;
     }
-    await cli_menu_generate(main);
+    //await cli_menu_generate();
   }
 
 }

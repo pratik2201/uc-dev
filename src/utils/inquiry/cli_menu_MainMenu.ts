@@ -5,6 +5,7 @@ import { ask, runTemplate, writeFileSafely } from "../prompt.js";
 import { makeMenu } from "./cli_menuLayout.js";
 import { cli_menu_generate } from "./cli_menu_generate.js";
 import { cli_menu_dependancy } from "./cli_menu_dependancy.js";
+import { cli_menu_quickStartup } from "./cli_menu_quickStartup.js";
 
 export async function cli_menu_MainMenu(main: cliMain, back_menu_callback: (_main: cliMain) => Promise<void> = async () => { }) {
 
@@ -13,6 +14,7 @@ export async function cli_menu_MainMenu(main: cliMain, back_menu_callback: (_mai
   B = Build Designers and Resource File  
   G = Generate
   D = Dependancy
+  S = Quick Startup
   Q = Quit
     `, 'q');
   switch (cmd.toLowerCase().trim()) {
@@ -20,14 +22,18 @@ export async function cli_menu_MainMenu(main: cliMain, back_menu_callback: (_mai
       await main.startBuild();
       break;
     case 'd':
-      await cli_menu_dependancy(main, cli_menu_MainMenu);
+      await cli_menu_dependancy( cli_menu_MainMenu);
       break;
     case 'p':
       await main._cliSurveys.inquiry();
       await cli_menu_MainMenu(main);
       break;
     case 'g':
-      await cli_menu_generate(main, cli_menu_MainMenu);
+      await cli_menu_generate(cli_menu_MainMenu);
+      break;
+    case 's':
+      await cli_menu_quickStartup(main, cli_menu_MainMenu);
+      await cli_menu_MainMenu(main);
       break;
     case 'q':
       return;

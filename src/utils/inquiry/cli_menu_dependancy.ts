@@ -5,17 +5,37 @@ import { ask, runTemplate, writeFileSafely } from "../prompt.js";
 import { makeMenu } from "./cli_menuLayout.js";
 import { cli_sample_style1 } from "./cli_sample_style1.js";
 
-export async function cli_menu_dependancy(main: cliMain, back_menu_callback: (_main: cliMain) => Promise<void> = async () => { }) {
+export async function cli_menu_dependancy(back_menu_callback: (_main: cliMain) => Promise<void> = async () => { }, defCommand?: string) {
   let hasAddedSampleForm = false;
-  const cmd = await makeMenu('D E P E N D A N C Y', `
-  E = Electron
-  T = Type Script
-  R = rimraf
-  U = uc-runtime
-  D = uc-dev
-  C = uc-controls
-  `, 'etrudc');
-  await _select(cmd);
+  const main = cliMain.ref;
+  // const cmd = await makeMenu('D E P E N D A N C Y', `
+  // E = Electron
+  // T = Type Script
+  // R = rimraf
+  // U = uc-runtime
+  // D = uc-dev
+  // C = uc-controls
+  // `, 'etruc');
+  // await _select(cmd);
+  let cmdlist = '';
+  if (defCommand == undefined) {
+    cmdlist = await makeMenu('D E P E N D A N C Y', `
+      E = Electron
+      T = Type Script
+      R = rimraf
+      U = uc-runtime
+      D = uc-dev
+      C = uc-controls
+      `, 'etruc');
+  } else {
+    cmdlist = defCommand;
+  }
+  await _select(cmdlist);
+  //for (let index = 0; index < cmdlist.length; index++) {
+  //}
+
+
+   
   async function _select(selectedOption: string) {
     const packages: string[] = [];
     if (selectedOption.includes('e')) packages.push('electron');
@@ -27,7 +47,7 @@ export async function cli_menu_dependancy(main: cliMain, back_menu_callback: (_m
     if (packages.length > 0)
       await main.dependancyChecker.installPackages(packages);
     console.log('INSTALLED..');
-    
+
   }
 
 }

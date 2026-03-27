@@ -7,6 +7,27 @@ import { ask, askYesNo, runTemplate } from "../prompt.js";
 
 export class cliSurveys {
   constructor(public main: cliMain) { }
+  setDefault() {
+    const cfg = this.main.config;
+    const cli = cfg.cli;
+    cli.useElectron = true;
+    cli.useTypeScript = true;
+    cli.srcDir = 'src';
+    cli.outDir = 'out';
+    cli.designerDir = 'designerFiles';
+    cli.codeFileExt = '.ts';
+    cli.outputFileExt = '.js';
+    cli.mainProcessFilePath = `main/index${cli.codeFileExt}`;
+    cli.preloadScriptFilePath = `preload/index${cli.codeFileExt}`;
+    cli.baseCodePath = `renderer/index${cli.codeFileExt}`;
+    cli.devtools = true;
+    cli.removeMenu = true;
+    cli.baseCssPath = 'styles.scss';
+    cli.baseHtmlPath = 'index.html';
+    cli.ResourceStorageFile = `Resources${cli.codeFileExt}`;
+    cli.filesToMove = '.jpg,.png,.html,.scss,.ico,.svg';
+    cli.ignoreInBuild = `node_modules;.git;.vscode;${cli.outDir}`;
+  }
   async inquiry() {
     const projectDir = this.main.projectDir;
     const cfg = this.main.config;
@@ -31,17 +52,11 @@ export class cliSurveys {
     } else {
       cli.baseCodePath = await ask(`base code filepath (in ${cli.srcDir} directory):`, cli.baseCodePath ?? `index${cli.codeFileExt}`);
     }
-
     cli.baseCssPath = await ask(`base css filepath (in project root) :`, cli.baseCssPath ?? 'styles.scss');
-    cli.baseHtmlPath = await ask(`base html filepath (in project root):`, cli.baseHtmlPath ?? 'index.html');
-    const renderDir = dirname(cli.baseCodePath);
-    //cli.baseCodePath = await ask(`base code (in ${cli.srcDir} directory):`,
-    //  cli.baseCodePath ?? (!cli.useElectron ? `index${cli.codeFileExt}` : correctpath(join(renderDir, `index${cli.codeFileExt}`))));
-
+    cli.baseHtmlPath = await ask(`base html filepath (in project root):`, cli.baseHtmlPath ?? 'index.html'); 
     cli.ResourceStorageFile = await ask(`ResourceFile Path (in ${cli.srcDir} directory): `,
       cli.ResourceStorageFile ?? correctpath(join(cli.designerDir, `Resources${cli.codeFileExt}`))
     );
-
     if (cli.useTypeScript) {
       cli.filesToMove = await ask(`RUNTIME EXTRA FILES (SPECIFY EXTENSIONS)
 >`, '.jpg,.png,.html,.scss,.ico,.svg') ?? '';
@@ -49,50 +64,6 @@ export class cliSurveys {
     cli.ignoreInBuild = await ask(`IGNORE THESE PATH IN DESIGNER BUILD TIME (SPECIFY PATH FROM ROOT)
 >`, `node_modules;.git;.vscode${cli.useTypeScript ? ';' + cli.outDir : ''}`) ?? '';
     await this.main._cliUcconfigInq.generateUcConfig();
-    //console.log(JSON.stringify(cli));
-
-    //   let x = extractPathConfig(cfg);
-    //   if (x.srcDec == undefined || x.outDec == undefined) {
-    //     await this.main.setupSrcOutDir();
-    //     x = extractPathConfig(cfg);
-    //     // const srcDir = await ask(`Source Dir`, 'src');
-    //     // x.pref.dirDeclaration[srcDir] = {
-    //     //       dirPath: 'src',
-    //     //       fileDeclaration: {
-    //     //             html: { extension: '.html' }
-    //     //       }
-    //     // }
-    //   }
-    //   //const meta = this.main.meta;
-    //   x.cli.useTypeScript = x.cli.useTypeScript ?? await cliTypeScriptInquiry.AskIsTypescript(true);
-    //   const fileExt = x.cli.useTypeScript ? '.ts' : '.js';
-    //   x.cli.useElectron = await askYesNo(`SETUP ELECTRON ? 
-    // ==> `, x.cli.useElectron);
-    //   if (!x.cli.useElectron) return;
-    //   console.log(`
-    //     + --------------------------+
-    // | ELECTRON SETUP |
-    //   +--------------------------+
-    //   `);
-    //   x.cli.mainProcessFilePath = await ask(`Main file(inside '${x.srcDec.dirPath}')
-    //   ==> `, x.cli.mainProcessFilePath ?? `main / index.ts`);
-    //   x.cli.preloadScriptFilePath = await ask(`Preload file
-    //   ==> `, x.cli.preloadScriptFilePath ?? `preload / index${fileExt}`);
-    //   x.cli.baseCodePath = await ask(`Renderer Ts file(load with HTML file)
-    // ==> `, x.cli.baseCodePath ?? `renderer / index${fileExt} `);
-    //   x.cli.baseHtmlPath = (x.cli.baseHtmlPath ?? '') ?? await ask(`Renderer HTML file
-    //     ==> `, x.cli.baseHtmlPath ?? 'renderer/index.html');
-
-    //   x.cli.contextIsolation = await askYesNo(`Enable contextIsolation ? 
-    // ==> `, x.cli.contextIsolation);
-    //   x.cli.devtools = await askYesNo(`Enable devtools on load ?
-    // ==> `, x.cli.devtools);
-    //   x.cli.nodeIntegration = await askYesNo(`Enable nodeIntegration ?
-    // ==> `, x.cli.nodeIntegration);
-    //   x.cli.removeMenu = await askYesNo(`Remove Menu ?
-    // ==> `, x.cli.removeMenu);
-    //   console.log('.... ELECTRON SETUP DONE ...');
-
   }
 }
 function _runTemplate(rel: string, options: any) {

@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 
-import { cliMain } from "./utils/cliMain.js"; 
+import { cliMain } from "./utils/cliMain.js";
+import fs from "fs";
 import { cli_menu_MainMenu } from "./utils/inquiry/cli_menu_MainMenu.js";
+import { cli_menu_quickStartup } from "./utils/inquiry/cli_menu_quickStartup.js";
 
 const args = process.argv.slice(2);
 const cmd = args[0];
 //const sub = args[1];
 const main = new cliMain();
+cliMain.ref = main;
 await main.readConfig();
 const copt = main.cliOptions;
 copt.force = args.includes("--force");
@@ -20,8 +23,14 @@ switch (cmd) {
         await main.startBuild();
         break;
     case "setup":
-        if (!ignreq)
-          await main.checkBasicNeed(false);
+        if (isDirEmpty(main.projectDir)) {
+            if (!ignreq)
+                await main.checkBasicNeed(false);
+            await cli_menu_quickStartup(main, cli_menu_MainMenu); 
+        } else {
+            if (!ignreq)
+                await main.checkBasicNeed(false); 
+        }
         await cli_menu_MainMenu(main);
         break;
     case "--help":
@@ -35,3 +44,7 @@ Commands:
         break;
 }
 
+function isDirEmpty(path: string): boolean {
+    const files = fs.readdirSync(path);
+    return files.length === 0;
+}

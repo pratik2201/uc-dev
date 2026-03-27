@@ -14,6 +14,7 @@ import { cliQuickSetup } from "./inquiry/cliQuickSetup.js";
 import { cliSurveys } from "./inquiry/cliSurveys.js";
 import { cliTypeScriptInquiry } from "./inquiry/cliTypeScriptInquiry.js";
 import { cli_menu_MainMenu } from "./inquiry/cli_menu_MainMenu.js";
+import { makesure_package_exist } from "./inquiry/cli_menu_quickStartup.js";
 
 export class cliOptions {
     yes? = false;
@@ -35,6 +36,7 @@ class metaInfo {
 }
 
 export class cliMain {
+    static ref: cliMain;
     cliOptions = new cliOptions();
     config: UserUCConfig = new UserUCConfig();
     menu: cliMenuSource;
@@ -178,7 +180,11 @@ Sub Directory Path (inside source directory) : `, fdec.subDirPath ?? '');
 
         this.projectDir = getProjectDir(process.cwd());
         if (this.projectDir == null) {
-            throw Error('NO PROJECT FOUND');
+            await makesure_package_exist();
+            this.projectDir = getProjectDir(process.cwd());
+            if (this.projectDir == null) {
+                throw Error('NO PROJECT FOUND');
+            }
         }
         this.dependancyChecker = new cliDependancyChecker(this);
         await this.updateDependancies();
@@ -210,7 +216,6 @@ Sub Directory Path (inside source directory) : `, fdec.subDirPath ?? '');
             ...pkgJson.optionalDependencies,
             ...pkgJson.devDependencies
         };
-
         return Object.keys(deps ?? {});
     }
 
