@@ -134,7 +134,9 @@ export class ResourceBuildEngine {
     //console.log(s.config.cli.ResourceStorageFile);
     
     const resRelFilePath = correctpath(ucUtil.changeExtension(
-      normalize(join(s.projectName, s.config.cli.ResourceStorageFile ??'')), '.ts', '.js'));
+      normalize(join(s.projectName, s.config.cli.ResourceStorageFile ?? '')), '.ts', '.js')
+    );
+    
     this.projectList.push({
       project: s,
       projectGuid: s.config.guid,

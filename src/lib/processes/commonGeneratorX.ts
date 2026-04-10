@@ -1,4 +1,4 @@
-import { TemplateMaker } from "ap-shared-core/core-common.js";
+import { correctpath, TemplateMaker } from "ap-shared-core/core-common.js";
 import { extractPathConfig, type IFileDeclarationTypesMap } from "ap-shared-core/core-common.js";
 import { ucUtil } from "ap-shared-core/core.js";
 import { CommonRow } from "ap-shared-core/core-main.js";
@@ -8,7 +8,7 @@ import { dirname, join, normalize, resolve } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
 import { cliMain } from "../../utils/cliMain.js";
-import path from "node:path";
+import path, { relative } from "node:path";
 import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 interface CodeFilesNode {
@@ -80,7 +80,7 @@ export class commonGeneratorX {
 
                     ensureDirectoryExistence(row.src.pathOf[designerFileSrctype]);
                     _data = this.filex(`${srctype}${uctype}.designer`)(row);
-                    
+
                     writeFileSync(row.src.pathOf[designerFileSrctype], _data);
 
                     /*if (uctype == '.uc') {
@@ -128,26 +128,29 @@ export class commonGeneratorX {
             s.isGlobalCss = s.isGlobalCss == undefined ? false : (s.isGlobalCss ?? false);
             s.project = s.project ?? proj.projectName
         });
+
         const rowForRes = {
             mainProject: ResourceBuildEngine.MAIN_PROJECT,
             projectList: this.cssBulder.projectList,
             resources,
+            ipcFileList: [],
             PACKAGE_LIST: chandler.PACKAGE_LIST,
             importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? '../core-main.js' : 'uc-runtime/core-main.js',
             declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? 'uc-runtime/src/core-main' : 'uc-runtime/core-main'
         };
-
+        const ipclist = BuildingProcess.resourceCopy.sourceFileList.filter(s => s.endsWith('.ipc.ts'));
+        const resPath = normalize(dirname(join(proj.projectPath, x.srcDec.dirPath, proj.config.cli.ResourceStorageFile)));
+        ipclist.forEach(ipcFilePath => { 
+            rowForRes.ipcFileList.push(ucUtil.changeExtension(correctpath(relative(resPath, ipcFilePath)), '.ts', '.js'));
+        });
         const srcDec = x.srcDec;
         // console.log(['=>',x.cli.ResourceStorageFile]);
         debugger;
         let resSrcFile = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageFile);
         rowForRes.projectList.forEach(s => {
-
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
-            const y = extractPathConfig(s.project.config);
-            //console.log([s.project.projectPath, y.cli.ResourceStorageFile]);
-
+            const y = extractPathConfig(s.project.config); 
             let resFpath = join(s.project.projectPath, y.outDec.dirPath, y.cli.ResourceStorageFile);
             resFpath = ucUtil.changeExtension(resFpath, '.ts', '.js');
             s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(resFpath);

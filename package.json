@@ -28,7 +28,8 @@
   "devDependencies": {
     "electron": "^39.1.1",
     "esbuild": "^0.27.2",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",    
+    "ap-shared-core": "file:../ap-shared-core"
   },
   "dependencies": {
     "css-select": "^6.0.0",

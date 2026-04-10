@@ -8,7 +8,7 @@ export class BuildingProcess {
     static configHandler = new ConfigHandler();
     static resourceCopy = new ResourceCopy();
     static buildDesigner: BuildDesigner;
-    
+
     static FILE_COUNT_OF_PREV_BUILD = 0;
     static Event = {
         onSelect_xName: (ele: Element, row: CommonRow) => { }
@@ -17,14 +17,14 @@ export class BuildingProcess {
     static async startBuild(pth: string) {
         console.log(`Build Started`);
         PathBridge.init(path, url, this.configHandler.allConfig);
-        
+
         await this.configHandler.fillConfig(pth);
-        
-     
+
+
         this.buildDesigner = new BuildDesigner();
         this.resourceCopy.fillFiles();
 
-
+        
         this.configHandler.allConfig
             .forEach(s => this.buildDesigner.gen.cssBulder.registerProject(s));
 

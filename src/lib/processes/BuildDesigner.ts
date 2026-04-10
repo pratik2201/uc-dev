@@ -217,7 +217,11 @@ export class BuildDesigner {
         let htmlcode = this.common0(_row);
         if (htmlcode == undefined) return undefined;
         htmlcode = ucUtil.devEsc(htmlcode);
-
+        if (!existsSync(finfo.allPathOf[pref.srcDec].scss)) {
+            writeFileSync(finfo.allPathOf[pref.srcDec].scss, this.gen.filex('ts.tpt.style')({}), 'utf8');
+        }
+        console.log('sss');
+        
         let compileedCode = ucUtil.PHP_REMOVE(htmlcode);
         /*try {
             let cccodeCallback = this.tmaker.compileTemplate(htmlcode);

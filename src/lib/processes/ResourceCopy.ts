@@ -10,6 +10,8 @@ export class ResourceCopy {
     sourceFileList: string[] = [];
     fillFiles() {
         this.sourceFileList = recursive(BuildingProcess.configHandler.MAIN_PROJECT_PATH);
+ 
+
     }
     registerResource = async () => {
         const _builder = BuildingProcess.buildDesigner.gen.cssBulder;
@@ -39,7 +41,7 @@ export class ResourceCopy {
             const fpath = filteed[index];
             await walk(fpath);
         }
-        //filteed.forEach(async (fpath) => { await walk(fpath); });
+       
     }
     copyAssets = () => {
         const cfg = BuildingProcess.configHandler.MAIN_CONFIG.config;

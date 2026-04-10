@@ -47,6 +47,13 @@ await import(<?= res.resourceRelativePath ?>);<?php
     }    
 } ?>
 
+
+<?php 
+for (const res of ipcFileList) {
+?>
+try { (await import("<?= res ?>")).default(); } catch(ex){ console.log(ex); } <?php           
+} ?>
+
 AssemblyManager.Register({
      name: <?= mainProject.name ?>,
      guid: "<?= mainProject.guid ?>",

@@ -62,6 +62,7 @@ export function GetTemplateMetaByContent$main(htmlcontent: string, cssContent: s
         rtrnKeys = ["primary"];
         isSimpleMode = true;
     }
+    
     splitCSSById(cssContent, rtrn);
     return rtrn;
 }
