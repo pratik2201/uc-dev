@@ -56,7 +56,7 @@ try { (await import("<?= res ?>")).default(); } catch(ex){ console.log(ex); } <?
 
 AssemblyManager.Register({
      name: <?= mainProject.name ?>,
-     guid: "<?= mainProject.guid ?>",
-     cssGuid: <?= mainProject.cssGuid ?>,
-     ucConfigGuid: <?= mainProject.ucConfigGuid ?>
+     ProjectGUID: "<?= mainProject.ProjectGUID ?>",
+     ProjectCSS: <?= mainProject.ProjectCSS ?>,
+     ProjectUcConfig: <?= mainProject.ProjectUcConfig ?>
 });

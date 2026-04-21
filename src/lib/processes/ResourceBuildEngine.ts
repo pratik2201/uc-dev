@@ -115,10 +115,10 @@ export class ResourceBuildEngine {
     return this.resources.get(guid);
   }
   static MAIN_PROJECT = {
-    cssGuid: undefined as string,
-    ucConfigGuid: undefined as string,
+    ProjectCSS: undefined as string,
+    ProjectUcConfig: undefined as string,
     name: undefined as string,
-    guid: undefined as string,
+    ProjectGUID: undefined as string,
     importMapGuid: undefined as string,
     mainHtmlGuid: undefined as string,
     encryptResource: false,

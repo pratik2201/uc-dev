@@ -33,8 +33,15 @@ export class BuildDesigner {
     SRC_CODE_EXT: string;
     OUT_CODE_EXT: string;
     dynamicTemplate: Function;
+    stampCounter = {
+        TEMPLATE: 0,
+        LOCAL: 0,
+        ROOT: 0,
+        INTERNAL: 0
+    }
     constructor() {
         this.bldr = BuildingProcess;
+
         this.gen = new commonGeneratorX();
         this.project = BuildingProcess.configHandler.MAIN_CONFIG;
 
@@ -103,28 +110,7 @@ export class BuildDesigner {
         htmlCode = ucUtil.devEsc(htmlCode);
         htmlCode = ucUtil.PHP_REMOVE(ucUtil.devEsc(htmlCode));
 
-        // try {
-        //     if (compileedCode.trim() != '') {
-        //         compileedCode = ucUtil.PHP_REMOVE(compileedCode);
-        //         /*try {
-        //            let cccodeCallback = this.tmaker.compileTemplate(compileedCode);
-        //            compileedCode = ucUtil.PHP_REMOVE(cccodeCallback({}));
-        //        } catch {
-        //            console.error(`error at 'BuildDesigner.fillUc' in template ;\n error file '${srcPathOf.html} ' `)
-        //        }*/
-        //         // _row.htmlFileContent = code;
-        //         //row.designer.material.htmlContents = JSON.stringify(code);
-        //     } else {
-        //         console.log(`no content in '${srcPathOf.html}'`);
-        //         return;
-        //         // htmlCode = `<WRAPPER  x-caption="Form" ></WRAPPER>`;
-        //         // this.codeHT = EModify.GetHtmlElement(htmlCode) as HTMLElement;
-        //         //_row.dynamicFileContent = commonGenerator.readTemplate('ts.uc.dynamic');
-        //     }
-        // } catch (ex) {
-        //     console.log(ex);
-        //     return undefined;
-        // }
+        
 
         let codeHT = EModify.GetHtmlElement(htmlCode);
 
@@ -134,16 +120,7 @@ export class BuildDesigner {
         const elements = Array.from(EModify.querySelectorAll(codeHT, `[${ATTR_OF.X_NAME}]`));
         let accessKeys = `"` + ucUtil.distinct(Array.from(EModify.querySelectorAll(codeHT, `[${ATTR_OF.ACCESSIBLE_KEY}]`))
             .map(s => EModify.getAttribute(s, ATTR_OF.ACCESSIBLE_KEY))).join(`" | "`) + `"`;
-
-        /*let cssCode = '';
-        if (existsSync(srcPathOf.scss)) cssCode = this.gen.cssBulder.treeShakeCss(srcPathOf.scss);
-
-        let ucMeta: IUsercontrolContent = {
-            htmlContents: htmlCode,
-            cssContents: cssCode,
-        }*/
-        // if (existsSync()) {
-        // }
+ 
         let cnt: ICoupleNode = {
             htmlGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.html, { source: srcPathOf.html })),
             cssGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.scss, { source: srcPathOf.scss })),
@@ -221,7 +198,7 @@ export class BuildDesigner {
             writeFileSync(finfo.allPathOf[pref.srcDec].scss, this.gen.filex('ts.tpt.style')({}), 'utf8');
         }
         console.log('sss');
-        
+
         let compileedCode = ucUtil.PHP_REMOVE(htmlcode);
         /*try {
             let cccodeCallback = this.tmaker.compileTemplate(htmlcode);

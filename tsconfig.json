@@ -3,6 +3,7 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "ESNext",
+    "types": ["node"],
     "strict": true,
     "noEmit": true,
     "allowJs": true,

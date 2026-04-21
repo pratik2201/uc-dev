@@ -65,9 +65,7 @@ function _DESIGNER(isAsync = false){
         this.<?=$tpt.name?>.extended.takeoff();
         <?php }); ?>
 
-        if (oot.outerCssContents.trim() != '')
-            this.pushTemplateCss(oot.outerCssContents,fargs.guid as any);
-
+        
         delete this.initializecomponent;
         delete this.initializecomponentAsync; 
         delete this.extended.initializebase;

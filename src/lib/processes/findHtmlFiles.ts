@@ -72,7 +72,7 @@ function registerMain() {
         content: safeStringify(chandler.importmap),
         encrypt: cfg.encryptResource,
     }));
-    mp.cssGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
+    mp.ProjectCSS = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
 
     if (cfg.cli.baseHtmlPath != undefined && cfg.cli.baseHtmlPath.length > 0) {
         let htmlPath = join(_mainProj.projectPath, cfg.cli.baseHtmlPath);
@@ -80,9 +80,9 @@ function registerMain() {
         if (mainHtmlRes != undefined)
             mp.mainHtmlGuid = ResourceKeyBridge.extractKey(mainHtmlRes);
     }
-    mp.ucConfigGuid = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
+    mp.ProjectUcConfig = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(undefined, {
         content: JSON.stringify(_mainProj.config)
     })));
     mp.name = JSON.stringify(_mainProj.projectName);
-    mp.guid = _mainProj.config.guid;
+    mp.ProjectGUID = _mainProj.config.guid;
 }
