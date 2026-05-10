@@ -54,12 +54,12 @@ export function GetTemplateMetaByContent$main(htmlcontent: string, cssContent: s
     let rtrnKeys = Object.keys(rtrn.templates);
     let isSimpleMode = false;
     if (rtrnKeys.length == 0) {
-        rtrn.templates["primary"] = {
-            //accessKey: "primary",
+        rtrn.templates["PRIMARY_TEMPLATE"] = {
+            //accessKey: "PRIMARY_TEMPLATE",
             //objectKey: undefined,
             htmlContents: ucUtil.PHP_ADD(EModify.outerHTML(ele)),
         };
-        rtrnKeys = ["primary"];
+        rtrnKeys = ["PRIMARY_TEMPLATE"];
         isSimpleMode = true;
     }
     

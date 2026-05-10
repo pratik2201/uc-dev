@@ -223,7 +223,7 @@ export class BuildDesigner {
                 //             htmlcode = `
                 // <X:TEMPLATE>
                 //     <WRAPPER id="header"></WRAPPER>
-                //     <WRAPPER id="primary"></WRAPPER>
+                //     <WRAPPER id="PRIMARY_TEMPLATE"></WRAPPER>
                 //     <WRAPPER id="footer"></WRAPPER>
                 // </X:TEMPLATE>`;
                 //             this.codeHT = GetHtmlElement(htmlcode);
