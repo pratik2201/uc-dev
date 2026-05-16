@@ -2,7 +2,7 @@
 import type { UserUCConfig } from "ap-shared-core/core-common.js";
 import { getCloneableObject, ResourceKeyBridge, safeStringify } from "ap-shared-core/core-common.js";
 import { codeFileInfo } from "ap-shared-core/core-main.js";
-import { rmSync } from "fs";
+import { existsSync, rmSync } from "fs";
 import { join } from "path";
 import { BuildingProcess } from "../BuildingProcess.js";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
@@ -53,7 +53,10 @@ export async function collectFiles() {
         await BuildingProcess.buildDesigner.init(cInfo);
     }
 
+    //BuildingProcess.buildDesigner.gen.cssBulder.build();
+    
     BuildingProcess.buildDesigner.gen.rows.push(...BuildingProcess.buildDesigner.rows);
+
     BuildingProcess.buildDesigner.gen.generateFiles();
     //console.log(BuildingProcess.buildDesigner.gen.cssBulder.resources);
 

@@ -1,4 +1,4 @@
-import { correctpath, TemplateMaker } from "ap-shared-core/core-common.js";
+import { correctpath, ResourceKeyBridge, TemplateMaker } from "ap-shared-core/core-common.js";
 import { extractPathConfig, type IFileDeclarationTypesMap } from "ap-shared-core/core-common.js";
 import { ucUtil } from "ap-shared-core/core.js";
 import { CommonRow } from "ap-shared-core/core-main.js";
@@ -112,12 +112,21 @@ export class commonGeneratorX {
 
     }
 
+    baseHtmlGuid: string = '';
     cssBulder: ResourceBuildEngine;
     generateResources() {
         const chandler = BuildingProcess.configHandler;
         const proj = chandler.MAIN_CONFIG;
         const x = extractPathConfig(proj.config);
-        //const pref = proj.config.preference;
+        let baseHtmlGuid: string;
+        if (x.cli.baseHtmlPath != undefined) {
+            if (existsSync(x.cli.baseHtmlPath)) {
+                console.log(x.cli.baseHtmlPath);
+                const htmlPath = join(proj.projectPath, x.cli.baseHtmlPath);
+                baseHtmlGuid = ResourceKeyBridge.extractKey(this.cssBulder.build(htmlPath, { source: htmlPath }));
+            }
+        }
+
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -132,6 +141,9 @@ export class commonGeneratorX {
         const rowForRes = {
             mainProject: ResourceBuildEngine.MAIN_PROJECT,
             projectList: this.cssBulder.projectList,
+            baseHtmlGuid,
+            baseHtmlLoadUrlOptions: JSON.stringify(proj.config.cli.baseHtmlLoadUrlOptions ?? {}, null, 4) ,
+            useElectron: proj.config.cli.useElectron,
             resources,
             ipcFileList: [],
             PACKAGE_LIST: chandler.PACKAGE_LIST,
@@ -140,7 +152,7 @@ export class commonGeneratorX {
         };
         const ipclist = BuildingProcess.resourceCopy.sourceFileList.filter(s => s.endsWith('.ipc.ts'));
         const resPath = normalize(dirname(join(proj.projectPath, x.srcDec.dirPath, proj.config.cli.ResourceStorageFile)));
-        ipclist.forEach(ipcFilePath => { 
+        ipclist.forEach(ipcFilePath => {
             rowForRes.ipcFileList.push(ucUtil.changeExtension(correctpath(relative(resPath, ipcFilePath)), '.ts', '.js'));
         });
         const srcDec = x.srcDec;
@@ -150,7 +162,7 @@ export class commonGeneratorX {
         rowForRes.projectList.forEach(s => {
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
-            const y = extractPathConfig(s.project.config); 
+            const y = extractPathConfig(s.project.config);
             let resFpath = join(s.project.projectPath, y.outDec.dirPath, y.cli.ResourceStorageFile);
             resFpath = ucUtil.changeExtension(resFpath, '.ts', '.js');
             s.importResource = s.projectGuid != chandler.MAIN_CONFIG.config.guid && existsSync(resFpath);

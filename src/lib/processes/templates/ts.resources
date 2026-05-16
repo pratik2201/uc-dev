@@ -1,5 +1,8 @@
+<?php if(useElectron){ ?>
+import { UserResource, ResourceStorage, Assembly, AssemblyManager,IpcMainHelper } from "<?= importPath ?>";
+<?php }else{ ?>
 import { UserResource, ResourceStorage, Assembly, AssemblyManager } from "<?= importPath ?>";
-
+<?php } ?>
 declare module "<?= declareClassPath ?>" {
    export interface ResourceNamedRegistry{
       <?php
@@ -60,3 +63,13 @@ AssemblyManager.Register({
      ProjectCSS: <?= mainProject.ProjectCSS ?>,
      ProjectUcConfig: <?= mainProject.ProjectUcConfig ?>
 });
+
+
+<?php if(useElectron){ ?>
+await IpcMainHelper.init();
+    <?php if(baseHtmlGuid){ ?>
+export async function loadContent(win: Electron.BrowserWindow) {
+    IpcMainHelper.loadContent(ResourceStorage.getContent("<?= baseHtmlGuid ?>"), win,   <?= baseHtmlLoadUrlOptions ?>);
+}       
+    <?php } ?>
+<?php } ?>

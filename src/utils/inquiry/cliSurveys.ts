@@ -1,6 +1,6 @@
 
 import { correctpath } from "ap-shared-core/core-common.js";
-import { dirname, join } from "path";
+import { dirname, join, normalize, relative } from "path";
 import { fileURLToPath } from "url";
 import { cliMain } from "../cliMain.js";
 import { ask, askYesNo, runTemplate } from "../prompt.js";
@@ -53,7 +53,25 @@ export class cliSurveys {
       cli.baseCodePath = await ask(`base code filepath (in ${cli.srcDir} directory):`, cli.baseCodePath ?? `index${cli.codeFileExt}`);
     }
     cli.baseCssPath = await ask(`base css filepath (in project root) :`, cli.baseCssPath ?? 'styles.scss');
-    cli.baseHtmlPath = await ask(`base html filepath (in project root):`, cli.baseHtmlPath ?? 'index.html'); 
+    cli.baseHtmlPath = await ask(`base html filepath (in project root):`, cli.baseHtmlPath ?? 'index.html');
+
+    /*const baseParentdir = normalize(dirname(join(projectDir, cli.baseHtmlPath)));
+    const projectParentdir = normalize(projectDir);
+    if (baseParentdir != projectParentdir) {
+      const relpath = relative(baseParentdir, projectParentdir);
+      cli.baseHtmlLoadUrlOptions = {
+        baseURLForDataURL: await ask(`  (in project root):`, cli.baseHtmlPath ?? 'index.html');
+      }
+    }*/
+    /*cli.baseHtmlLoadUrlOptions = {
+      baseURLForDataURL
+    }*/
+    // if (cli.useElectron) {
+    //   cli.baseHtmlLoadUrlOptions = Object.assign({}, cli.baseHtmlLoadUrlOptions);
+    //  cli.baseHtmlLoadUrlOptions
+    // }
+    cli.baseHtmlPath = await ask(`base html filepath (in project root):`, cli.baseHtmlPath ?? 'index.html');
+
     cli.ResourceStorageFile = await ask(`ResourceFile Path (in ${cli.srcDir} directory): `,
       cli.ResourceStorageFile ?? correctpath(join(cli.designerDir, `Resources${cli.codeFileExt}`))
     );
