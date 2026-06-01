@@ -11,7 +11,8 @@ export class ResourceCopy {
     fillFiles() {
         this.sourceFileList = recursive(BuildingProcess.configHandler.MAIN_PROJECT_PATH);
  
-
+       
+        
     }
     registerResource = async () => {
         const _builder = BuildingProcess.buildDesigner.gen.cssBulder;

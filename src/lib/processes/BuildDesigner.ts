@@ -8,6 +8,7 @@ import { BuildingProcess } from "../BuildingProcess.js";
 import { commonGeneratorX } from "./commonGeneratorX.js";
 import { EModify, GetTemplateMetaByContent$main } from "./jsToHtml.js";
 import { ResourceBuildEngine } from "./ResourceBuildEngine.js";
+import { Template } from "../../../../ap-shared-core/out/uc-dev/buildRow.js";
 export class BuildDesigner {
     gen: commonGeneratorX;
     bldr: BuildingProcess;
@@ -110,7 +111,7 @@ export class BuildDesigner {
         htmlCode = ucUtil.devEsc(htmlCode);
         htmlCode = ucUtil.PHP_REMOVE(ucUtil.devEsc(htmlCode));
 
-        
+
 
         let codeHT = EModify.GetHtmlElement(htmlCode);
 
@@ -120,7 +121,7 @@ export class BuildDesigner {
         const elements = Array.from(EModify.querySelectorAll(codeHT, `[${ATTR_OF.X_NAME}]`));
         let accessKeys = `"` + ucUtil.distinct(Array.from(EModify.querySelectorAll(codeHT, `[${ATTR_OF.ACCESSIBLE_KEY}]`))
             .map(s => EModify.getAttribute(s, ATTR_OF.ACCESSIBLE_KEY))).join(`" | "`) + `"`;
- 
+
         let cnt: ICoupleNode = {
             htmlGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.html, { source: srcPathOf.html })),
             cssGuid: ResourceKeyBridge.extractKey(this.gen.cssBulder.build(srcPathOf.scss, { source: srcPathOf.scss })),
@@ -197,7 +198,7 @@ export class BuildDesigner {
         if (!existsSync(finfo.allPathOf[pref.srcDec].scss)) {
             writeFileSync(finfo.allPathOf[pref.srcDec].scss, this.gen.filex('ts.tpt.style')({}), 'utf8');
         }
-        console.log('sss');
+       
 
         let compileedCode = ucUtil.PHP_REMOVE(htmlcode);
         /*try {
@@ -313,11 +314,10 @@ export class BuildDesigner {
                     scope: scope,
                 });
             }
-            tpts.push({
-                name: accessKey,
-                scope: "public",
-                controls: controls
-            });
+            const tpt = new Template();
+            tpt.name = accessKey;
+            tpt.controls = controls;
+            tpts.push(tpt);
         };
 
 

@@ -28,7 +28,7 @@ export const cMap_<?=src.name?>: {
 export class <?=designer.className ?> extends <?= designer.baseClassName ?> {
      
     <?php $templates.forEach($tpt=>{ 
-    ?> public&nbsp;<?=$tpt.name?>:<?=$tpt.name?>$TemplateNode;
+    ?> public&nbsp;<?=$tpt.nameQT?>:<?=$tpt.name?>$TemplateNode;
     <?php }); ?>
    
     <?php _DESIGNER(false); ?>
@@ -58,11 +58,11 @@ function _DESIGNER(isAsync = false){
         let tpts = oot.templates;
        
         <?php $templates.forEach($tpt=>{ ?>
-        this.<?=$tpt.name ?> = new <?=$tpt.name ?>$TemplateNode(this); 
-        tpts.<?=$tpt.name ?>.accessKey = '<?=$tpt.name ?>';
-        tpts.<?=$tpt.name ?>.objectKey  = `${fargs.guid}#<?=$tpt.name ?>`;    
-        this.<?=$tpt.name ?>.extended.initializecomponent(fargs,tpts.<?=$tpt.name ?>); 
-        this.<?=$tpt.name?>.extended.takeoff();
+        this<?=$tpt.nameThis ?>  = new <?=$tpt.name ?>$TemplateNode(this); 
+        tpts<?=$tpt.nameThis ?>.accessKey = '<?=$tpt.name ?>';
+        tpts<?=$tpt.nameThis ?>.objectKey  = `${fargs.guid}#<?=$tpt.name ?>`;    
+        this<?=$tpt.nameThis ?>.extended.initializecomponent(fargs,tpts<?=$tpt.nameThis ?>); 
+        this<?=$tpt.nameThis ?>.extended.takeoff();
         <?php }); ?>
 
         
