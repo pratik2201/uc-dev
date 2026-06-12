@@ -63,7 +63,7 @@ function _DESIGNER(isAsync = false){
         args.htmlContent = ResourceManage.getContent("<?= $designer.htmlGuid ?>");
         args.cssContent = ResourceManage.getContent("<?= $designer.cssGuid ?>");
 
-        ucExt.initializecomponent(args);                
+        <?=  $await ?> ucExt.initializecomponent(args);                
         const CONTROLS = ucExt.controls; 
 
         <?php $designer.controls.forEach($rw => { 
