@@ -126,7 +126,8 @@ export class commonGeneratorX {
                 baseHtmlGuid = ResourceKeyBridge.extractKey(this.cssBulder.build(htmlPath, { source: htmlPath }));
             }
         }
-
+        let resSrcFile = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageFile);
+        const resSubDir = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageDir);
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -142,7 +143,7 @@ export class commonGeneratorX {
             mainProject: ResourceBuildEngine.MAIN_PROJECT,
             projectList: this.cssBulder.projectList,
             baseHtmlGuid,
-            baseHtmlLoadUrlOptions: JSON.stringify(proj.config.cli.baseHtmlLoadUrlOptions ?? {}, null, 4) ,
+            baseHtmlLoadUrlOptions: JSON.stringify(proj.config.cli.baseHtmlLoadUrlOptions ?? {}, null, 4),
             useElectron: proj.config.cli.useElectron,
             resources,
             ipcFileList: [],
@@ -157,8 +158,8 @@ export class commonGeneratorX {
         });
         const srcDec = x.srcDec;
         // console.log(['=>',x.cli.ResourceStorageFile]);
-        debugger;
-        let resSrcFile = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageFile);
+        //debugger;
+
         rowForRes.projectList.forEach(s => {
             const resFullpath = s.resourceRelativePath;
             s.resourceRelativePath = JSON.stringify(resFullpath);
@@ -170,10 +171,25 @@ export class commonGeneratorX {
         ensureDirectoryExistence(resSrcFile);
 
         let resContent = this.filex('ts.resources')(rowForRes);
+        //ensureDirectoryExistence(resSrcFile);
+        //console.log(resSubDir);
+
+        ensureDirectoryExistence(join(resSubDir, 'abc.txt'));
 
         //console.log(resSrcFile);
 
+        for (let i = 0; i < rowForRes.resources.length; i++) {
+            const ress = rowForRes.resources[i];
+            const ar: string[] = JSON.parse(ress.guid).split(":");
+            let fileName = ar[0] + "_" + ar[2] + ".res";
+            const fpath = join(resSubDir, fileName);
+            const resContent = JSON.parse(ress.content);
+            //console.log(fpath);             
+            writeFileSync(fpath, resContent, 'utf-8');
+
+        }
         writeFileSync(resSrcFile, resContent, 'utf-8');
+
         if (!proj.config.cli.useTypeScript) {
             let resSrcTypeFile = ucUtil.changeExtension(resSrcFile, '.js', '.d.ts');
             let resContentTypes = this.filex('t.resources')(rowForRes);

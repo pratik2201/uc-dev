@@ -71,7 +71,7 @@ function _DESIGNER(isAsync = false){
                 accessName:"<?=$rw.name?>" , 
                 targetElement : CONTROLS<?=$rw.nameThis?> as any
             });
-        this<?=$rw.nameThis ?>.ucExtends.show({decision : 'replace'});
+        <?=  $await ?> this<?=$rw.nameThis ?>.ucExtends.show({decision : 'replace'});
         <?php   break;  
             }
         });

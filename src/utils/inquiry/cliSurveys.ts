@@ -24,7 +24,9 @@ export class cliSurveys {
     cli.removeMenu = true;
     cli.baseCssPath = 'styles.scss';
     cli.baseHtmlPath = 'index.html';
-    cli.ResourceStorageFile = `Resources${cli.codeFileExt}`;
+    cli.ResourceStorageFile = cli.designerDir + `/Resources${cli.codeFileExt}`;
+    cli.ResourceStorageDir = cli.designerDir;
+
     cli.filesToMove = '.jpg,.png,.html,.scss,.ico,.svg';
     cli.ignoreInBuild = `node_modules;.git;.vscode;${cli.outDir}`;
   }
@@ -74,6 +76,9 @@ export class cliSurveys {
 
     cli.ResourceStorageFile = await ask(`ResourceFile Path (in ${cli.srcDir} directory): `,
       cli.ResourceStorageFile ?? correctpath(join(cli.designerDir, `Resources${cli.codeFileExt}`))
+    );
+    cli.ResourceStorageDir = await ask(`Resource Dir Path (in ${cli.srcDir} directory): `,
+      cli.ResourceStorageDir ?? correctpath(cli.designerDir)
     );
     if (cli.useTypeScript) {
       cli.filesToMove = await ask(`RUNTIME EXTRA FILES (SPECIFY EXTENSIONS)
