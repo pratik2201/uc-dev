@@ -126,8 +126,12 @@ export class commonGeneratorX {
                 baseHtmlGuid = ResourceKeyBridge.extractKey(this.cssBulder.build(htmlPath, { source: htmlPath }));
             }
         }
+
+
         let resSrcFile = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageFile);
-        const resSubDir = resolve(proj.projectPath, x.srcDec.dirPath, x.cli.ResourceStorageDir);
+
+
+
         const resources = Array.from(this.cssBulder.resources.values());
         resources.forEach(s => {
             s.content = JSON.stringify(s.content);
@@ -151,6 +155,11 @@ export class commonGeneratorX {
             importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? '../core-main.js' : 'uc-runtime/core-main.js',
             declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? 'uc-runtime/src/core-main' : 'uc-runtime/core-main'
         };
+        // this.cssBulder.projectList.forEach(prj => {
+        // console.log(prj.project.);
+            
+        // });
+        
         const ipclist = BuildingProcess.resourceCopy.sourceFileList.filter(s => s.endsWith('.ipc.ts'));
         const resPath = normalize(dirname(join(proj.projectPath, x.srcDec.dirPath, proj.config.cli.ResourceStorageFile)));
         ipclist.forEach(ipcFilePath => {
@@ -173,6 +182,7 @@ export class commonGeneratorX {
         let resContent = this.filex('ts.resources')(rowForRes);
         //ensureDirectoryExistence(resSrcFile);
         //console.log(resSubDir);
+        const resSubDir = resolve(proj.projectPath, x.cli.ResourceStorageDir);
 
         ensureDirectoryExistence(join(resSubDir, 'abc.txt'));
 

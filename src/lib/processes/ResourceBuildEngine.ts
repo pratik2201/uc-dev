@@ -1,6 +1,6 @@
- 
+
 import { encryptResource, ImportMapResolver } from "ap-shared-core/core-main.js";
-import { BuildTimeGuidMeta,type GuidSequenceType,  correctpath, ProjectRowBase, UserUCConfig } from "ap-shared-core/core-common.js";
+import { BuildTimeGuidMeta, type GuidSequenceType, correctpath, ProjectRowBase, UserUCConfig } from "ap-shared-core/core-common.js";
 
 import { ucUtil } from "ap-shared-core/core.js";
 import { existsSync, readFileSync } from "fs";
@@ -79,7 +79,16 @@ class GuidResolver {
   }
 }
 
+// export function getPackageFile(
+//   packageName: string,
+//   filePath: string
+// ): string {
+//   const packageRoot = dirname(
+//     require.resolve(`${packageName}/package.json`)
+//   );
 
+//   return join(packageRoot, filePath);
+// }
 /* ------------------ engine ------------------ */
 
 export class ResourceBuildEngine {
@@ -122,21 +131,23 @@ export class ResourceBuildEngine {
     importMapGuid: undefined as string,
     mainHtmlGuid: undefined as string,
     encryptResource: false,
+    ResourceStorageDir: undefined as string,
   }
   registerProject = (s: ProjectRowBase) => {
     // let stylePath = join(s.projectPath, s.config.projectBaseCsdsPath);
     // let resourcePath = join(s.projectPath, s.config.projectBadseCssPath);
-    
+
 
     //const pref = s.config.preference;
-     //console.log(s.config.cli.ResourceStorageFile);
-   
     //console.log(s.config.cli.ResourceStorageFile);
-    
+
+    //console.log(s.config.cli.ResourceStorageFile);
+
     const resRelFilePath = correctpath(ucUtil.changeExtension(
       normalize(join(s.projectName, s.config.cli.ResourceStorageFile ?? '')), '.ts', '.js')
     );
-    
+
+
     this.projectList.push({
       project: s,
       projectGuid: s.config.guid,
@@ -146,6 +157,7 @@ export class ResourceBuildEngine {
     //console.log(resFilePath);
 
   }
+
   isVirtualResource(key: string): boolean {
     // no file extension + not an absolute/relative path
     return (
@@ -180,7 +192,7 @@ export class ResourceBuildEngine {
         if (res.name == undefined || res.name == '') {
           //   //console.log(['here',blueprint.name,JSON.stringify(blueprint.name)]);          
           res.name = blueprint.name ? JSON.stringify(this.guidResolver.projectName + ':' + blueprint.name) : undefined;
-        
+
         }
       }
 

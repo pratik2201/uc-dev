@@ -75,6 +75,7 @@ function registerMain() {
         content: safeStringify(chandler.importmap),
         encrypt: cfg.encryptResource,
     }));
+    mp.ResourceStorageDir = JSON.stringify(cfg.cli.ResourceStorageDir);
     mp.ProjectCSS = JSON.stringify(ResourceKeyBridge.extractKey(_cssbuilder.build(stylePath, {})));
 
     if (cfg.cli.baseHtmlPath != undefined && cfg.cli.baseHtmlPath.length > 0) {

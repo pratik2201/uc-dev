@@ -37,48 +37,43 @@ const Resources:UserResource[] = [
         if(res.isGlobalCss === true){ ?> isGlobalCss : true, <?php } 
         if(res.name && res.name!=''){ ?> name : <?= res.name ?>, <?php } 
         
-        ?>  project: "<?= res.project ?>",  source: <?= res.source ?>,   type: "<?= res.type ?>",  encrypt:<?= res.encrypt ?>   }, <?php } ?>
+        ?>  project: "<?= res.project ?>",  source: <?= res.source ?>,   type: "<?= res.type ?>",  encrypt:<?= res.encrypt ?>,   content: <?= res.content ?>  }, <?php } ?>
 ];
 ResourceStorage.bulkRegister(Resources);
 
-export async function loadAssembly(prePath: string = "") {
+ResourceStorage.RuntimeProps['importmap'] = ResourceStorage.RuntimeProps['importmap'] ?? ResourceStorage.getContent("<?= mainProject.importMapGuid ?>");
+<?php  if(mainProject.mainHtmlGuid!=undefined){ ?>
+ResourceStorage.RuntimeProps['htmlcontent'] = ResourceStorage.RuntimeProps['htmlcontent'] ?? ResourceStorage.getContent("<?= mainProject.mainHtmlGuid ?>");
+<?php  } ?>
 
-    AssemblyManager.Register(UpdateResourcePath({
-         name: <?= mainProject.name ?>,
-         ProjectGUID: "<?= mainProject.ProjectGUID ?>",
-         ProjectCSS: <?= mainProject.ProjectCSS ?>,
-         ProjectUcConfig: <?= mainProject.ProjectUcConfig ?>,
-         ResourceStorageDir: <?= mainProject.ResourceStorageDir ?>,
-    }, prePath));
-
-    ResourceStorage.RuntimeProps['importmap'] = ResourceStorage.RuntimeProps['importmap'] ?? ResourceStorage.getContent("<?= mainProject.importMapGuid ?>");
-    <?php  if(mainProject.mainHtmlGuid!=undefined){ ?>
-    ResourceStorage.RuntimeProps['htmlcontent'] = ResourceStorage.RuntimeProps['htmlcontent'] ?? ResourceStorage.getContent("<?= mainProject.mainHtmlGuid ?>");
-    <?php  } ?>
-
-    <?php 
-    for (const res of projectList) {
-        if (res.importResource == true) { ?>
-    (await import(<?= res.resourceRelativePath ?>)).loadAssembly('node_modules/<?= res.project.projectName ?>');<?php    
-        }    
-    } ?>
+<?php 
+for (const res of projectList) {
+    if (res.importResource == true) { ?>
+await import(<?= res.resourceRelativePath ?>);<?php    
+    }    
+} ?>
 
 
-    <?php 
-    for (const res of ipcFileList) {
-    ?>
-    try { (await import("<?= res ?>")).default(); } catch(ex){ console.log(ex); } <?php           
-    } ?>
-    <?php if(useElectron){ ?>
-    await IpcMainHelper.init();
-    <?php } ?>
-}
+<?php 
+for (const res of ipcFileList) {
+?>
+try { (await import("<?= res ?>")).default(); } catch(ex){ console.log(ex); } <?php           
+} ?>
+
+AssemblyManager.Register(UpdateResourcePath({
+     name: <?= mainProject.name ?>,
+     ProjectGUID: "<?= mainProject.ProjectGUID ?>",
+     ProjectCSS: <?= mainProject.ProjectCSS ?>,
+     ProjectUcConfig: <?= mainProject.ProjectUcConfig ?>,
+     ResourceStorageDir: <?= mainProject.ResourceStorageDir ?>,
+}));
+
 // console.log(fs.readFileSync(path.resolve('node_modules',<?= mainProject.name ?>, 'package.json'), 'binary'));
 
-<?php if(useElectron){ ?> 
+<?php if(useElectron){ ?>
+await IpcMainHelper.init();
     <?php if(baseHtmlGuid){ ?>
 export async function loadContent(win: Electron.BrowserWindow) {
-    await loadAssembly("");
     IpcMainHelper.loadContent(ResourceStorage.getContent("<?= baseHtmlGuid ?>"), win,   <?= baseHtmlLoadUrlOptions ?>);
 }       
     <?php } ?>
