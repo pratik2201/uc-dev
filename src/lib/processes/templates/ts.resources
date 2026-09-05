@@ -41,7 +41,7 @@ const Resources:UserResource[] = [
 ];
 ResourceStorage.bulkRegister(Resources);
 
-export async function loadAssembly(prePath: string = "") {
+export async function loadForNodeOnly(prePathForSubProjects: string = "") {
 
     AssemblyManager.Register(UpdateResourcePath({
          name: <?= mainProject.name ?>,
@@ -49,7 +49,7 @@ export async function loadAssembly(prePath: string = "") {
          ProjectCSS: <?= mainProject.ProjectCSS ?>,
          ProjectUcConfig: <?= mainProject.ProjectUcConfig ?>,
          ResourceStorageDir: <?= mainProject.ResourceStorageDir ?>,
-    }, prePath));
+    }, prePathForSubProjects));
 
     ResourceStorage.RuntimeProps['importmap'] = ResourceStorage.RuntimeProps['importmap'] ?? ResourceStorage.getContent("<?= mainProject.importMapGuid ?>");
     <?php  if(mainProject.mainHtmlGuid!=undefined){ ?>
@@ -59,7 +59,7 @@ export async function loadAssembly(prePath: string = "") {
     <?php 
     for (const res of projectList) {
         if (res.importResource == true) { ?>
-    (await import(<?= res.resourceRelativePath ?>)).loadAssembly('node_modules/<?= res.project.projectName ?>');<?php    
+    (await import(<?= res.resourceRelativePath ?>)).loadForNodeOnly('node_modules/<?= res.project.projectName ?>');<?php    
         }    
     } ?>
 
@@ -77,8 +77,8 @@ export async function loadAssembly(prePath: string = "") {
 
 <?php if(useElectron){ ?> 
     <?php if(baseHtmlGuid){ ?>
-export async function loadContent(win: Electron.BrowserWindow) {
-    await loadAssembly("");
+export async function loadForElectron(win: Electron.BrowserWindow) {
+    await loadForNodeOnly("");
     IpcMainHelper.loadContent(ResourceStorage.getContent("<?= baseHtmlGuid ?>"), win,   <?= baseHtmlLoadUrlOptions ?>);
 }       
     <?php } ?>
