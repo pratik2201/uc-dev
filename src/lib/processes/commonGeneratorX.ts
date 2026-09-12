@@ -153,13 +153,11 @@ export class commonGeneratorX {
             ipcFileList: [],
             PACKAGE_LIST: chandler.PACKAGE_LIST,
             importPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? '../core-main.js' : 'uc-runtime/core-main.js',
-            declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? 'uc-runtime/src/core-main' : 'uc-runtime/core-main'
+            declareClassPath: BuildingProcess.configHandler.MAIN_CONFIG.projectName == 'uc-runtime' ? 'uc-runtime/core-main.js' : 'uc-runtime/core-main.js'
         };
         // this.cssBulder.projectList.forEach(prj => {
         // console.log(prj.project.);
-            
-        // });
-        
+        // }); 
         const ipclist = BuildingProcess.resourceCopy.sourceFileList.filter(s => s.endsWith('.ipc.ts'));
         const resPath = normalize(dirname(join(proj.projectPath, x.srcDec.dirPath, proj.config.cli.ResourceStorageFile)));
         ipclist.forEach(ipcFilePath => {

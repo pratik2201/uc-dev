@@ -2,9 +2,7 @@
 import { UserResource, ResourceStorage,UpdateResourcePath, Assembly, AssemblyManager,IpcMainHelper } from "<?= importPath ?>";
 <?php }else{ ?>
 import { UserResource, ResourceStorage,UpdateResourcePath, Assembly, AssemblyManager } from "<?= importPath ?>";
-<?php } ?>
-import fs from "fs";
-import path from "path";
+<?php } ?> 
 
 declare module "<?= declareClassPath ?>" {
    export interface ResourceNamedRegistry{
