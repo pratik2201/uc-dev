@@ -351,7 +351,7 @@ export class ResourceBuildEngine {
     let type: BuildResourceType = "raw";
     let content = "";
 
-    if (["png", "jpg", "jpeg", "gif", "webp", "svg", "ico"].includes(ext)) {
+    if (["png", "jpg", "jpeg", "gif", "webp", /*"svg",*/ "ico"].includes(ext)) {
       type = "image";
       content = `data:image/${ext};base64,${ucUtil.bufferToString(buf, "base64")}`;
     } else {
